@@ -1,11 +1,11 @@
 [project]
 name = "datawalk-hub"
-version = "0.1.0a1"
+version = "0.1.0a2"
 description = "DataWalk Hub: share walkable 3D reports. Self-hosted: SSO, permissions, versions, comments, audit log, live follow."
 license = "MIT"
 requires-python = ">=3.11"
 dependencies = [
-    "datawalk==0.1.0a1",  # exact: "datawalk" on PyPI is another project
+    "datawalk==0.1.0a2",  # exact: "datawalk" on PyPI is another project
     "fastapi>=0.115",
     "uvicorn[standard]>=0.30",
     "jinja2>=3.1",

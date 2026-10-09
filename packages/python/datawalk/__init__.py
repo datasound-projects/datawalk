@@ -8,4 +8,4 @@ from .reports.report import MergeConflict, Report
 from .serialization.archive import ArchiveError
 
 __all__ = ["THEMES", "ArchiveError", "MergeConflict", "Report"]
-__version__ = "0.1.0a1"
+__version__ = "0.1.0a2"

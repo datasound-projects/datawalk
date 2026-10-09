@@ -6,7 +6,7 @@ As a command (works everywhere, also where the system Python refuses `pip instal
 example Python from Homebrew on macOS):
 
 ```bash
-uv tool install "datawalk[all] @ https://github.com/datasound-projects/datawalk/releases/download/v0.1.0a1/datawalk-0.1.0a1-py3-none-any.whl"
+uv tool install "datawalk[all] @ https://github.com/datasound-projects/datawalk/releases/download/v0.1.0a2/datawalk-0.1.0a2-py3-none-any.whl"
 datawalk demo                        # check: a demo report opens in the browser
 ```
 
@@ -15,7 +15,7 @@ install it in a virtual environment:
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
-pip install "datawalk[all] @ https://github.com/datasound-projects/datawalk/releases/download/v0.1.0a1/datawalk-0.1.0a1-py3-none-any.whl"
+pip install "datawalk[all] @ https://github.com/datasound-projects/datawalk/releases/download/v0.1.0a2/datawalk-0.1.0a2-py3-none-any.whl"
 ```
 
 On Windows, activate with `.venv\Scripts\activate` instead.

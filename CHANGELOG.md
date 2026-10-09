@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.0a2 (2026-10-09): installs that work everywhere
+
+- Windows: text files are UTF-8 everywhere (a web-folder export with a title such as
+  "AI → Water" failed), and the command line works on any console code page.
+- Install as a command with `uv tool install` or `pipx install`; Python from Homebrew and
+  Linux distributions refuses a plain `pip install` (PEP 668).
+- Messages about a missing extra show a command that works for your installation, always
+  with the GitHub release ("datawalk" on PyPI is another project).
+- Tested on Linux, macOS, and Windows; the public release is installed with uv, pipx, and
+  pip each week.
+
 ## 0.1.0a1 (2026-10-09): first public alpha
 
 - Turn Jupyter notebooks, Python charts (Matplotlib, Seaborn, Plotly, Altair, Bokeh), pandas

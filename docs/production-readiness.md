@@ -1,6 +1,6 @@
 # Production readiness
 
-Status on 2026-10-09, version 0.1.0a1. This page lists each readiness criterion, the
+Status on 2026-10-09, version 0.1.0a2. This page lists each readiness criterion, the
 evidence for it, and the limitations that remain. It does not claim more than the tests show.
 
 ## Verdict
@@ -146,9 +146,11 @@ at rest (AES-256-GCM) and keeps an audit log.
 
 - **PyPI name.** `datawalk` on PyPI is another project. Until a name is chosen, install from
   a wheel or a source checkout.
-- **Released on GitHub, not on PyPI.** Version 0.1.0a1 is a GitHub release with checksums
-  and a signed build provenance. CI runs every check on each change (Linux, Python 3.11 and
-  3.13, Chrome, Firefox, WebKit) and builds the hub's Docker image.
+- **Released on GitHub, not on PyPI.** Version 0.1.0a2 is a GitHub release with checksums
+  and a signed build provenance. CI runs every check on each change (Python 3.11 and 3.13;
+  Linux, macOS, and Windows; Chrome, Firefox, WebKit), installs each change as users do on
+  the three systems, and builds the hub's Docker image. Each Monday and after each release,
+  the public release is installed with uv, pipx, and pip on the three systems.
 - **Browsers without WebGL** (for example headless Firefox on Linux) show the page view; the
   3D rooms need WebGL.
 - **One hub process.** Live follow and the SAML replay cache are in the memory of one

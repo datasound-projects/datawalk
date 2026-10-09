@@ -1,6 +1,6 @@
 [project]
 name = "datawalk"
-version = "0.1.0a1"
+version = "0.1.0a2"
 description = "Walk through your data. Share it. Explore your insights. Turn plots, notebooks, dashboards, and presentations into immersive, walkable 3D worlds."
 readme = "README.md"
 license = "MIT"
