@@ -28,9 +28,17 @@
 
 ## Install
 
-You need Python 3.11 or later.
+You need Python 3.11 or later. Install DataWalk as a command (works on macOS, Windows, and Linux):
 
 ```bash
+uv tool install "datawalk[all] @ https://github.com/datasound-projects/datawalk/releases/download/v0.1.0a1/datawalk-0.1.0a1-py3-none-any.whl"
+```
+
+No `uv`? Use `pipx install` with the same text in quotes. To use DataWalk from your own Python
+code or notebooks, install it in a virtual environment:
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
 pip install "datawalk[all] @ https://github.com/datasound-projects/datawalk/releases/download/v0.1.0a1/datawalk-0.1.0a1-py3-none-any.whl"
 ```
 

@@ -2,18 +2,25 @@
 
 DataWalk needs Python 3.11 or later. Viewers of an exported report need only a browser.
 
+As a command (works everywhere, also where the system Python refuses `pip install`, for
+example Python from Homebrew on macOS):
+
 ```bash
-pip install "datawalk[all] @ <release wheel URL>"   # every feature (see the note below)
-datawalk demo                                        # check: a demo report opens in the browser
+uv tool install "datawalk[all] @ https://github.com/datasound-projects/datawalk/releases/download/v0.1.0a1/datawalk-0.1.0a1-py3-none-any.whl"
+datawalk demo                        # check: a demo report opens in the browser
+```
+
+`pipx install` takes the same text. To use DataWalk in your own Python code or notebooks,
+install it in a virtual environment:
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install "datawalk[all] @ https://github.com/datasound-projects/datawalk/releases/download/v0.1.0a1/datawalk-0.1.0a1-py3-none-any.whl"
 ```
 
 > **Note:** The name `datawalk` on PyPI belongs to another project. Install DataWalk from its
 > [GitHub release](https://github.com/datasound-projects/datawalk/releases), never with a plain
-> `pip install datawalk`:
->
-> ```bash
-> pip install "datawalk[all] @ https://github.com/datasound-projects/datawalk/releases/download/v0.1.0a1/datawalk-0.1.0a1-py3-none-any.whl"
-> ```
+> `pip install datawalk`.
 
 ## Extras
 
