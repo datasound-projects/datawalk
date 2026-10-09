@@ -1,6 +1,6 @@
 # Production readiness
 
-Status on 2026-10-09, version 0.1.0.dev0. This page lists each readiness criterion, the
+Status on 2026-10-09, version 0.1.0a1. This page lists each readiness criterion, the
 evidence for it, and the limitations that remain. It does not claim more than the tests show.
 
 ## Verdict

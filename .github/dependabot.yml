@@ -1,0 +1,15 @@
+# Weekly dependency updates, grouped so that one pull request covers the minor updates.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+    groups: { actions: { patterns: ["*"] } }
+  - package-ecosystem: npm
+    directory: /apps/web
+    schedule: { interval: weekly }
+    groups: { minor-and-patch: { update-types: [minor, patch] } }
+  - package-ecosystem: uv
+    directory: /
+    schedule: { interval: weekly }
+    groups: { minor-and-patch: { update-types: [minor, patch] } }

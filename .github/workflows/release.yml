@@ -1,0 +1,78 @@
+name: Release
+
+# Push a tag such as v0.1.0a1 (the version in pyproject.toml) to publish a release.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write # create the release
+  id-token: write # sign the build provenance
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - uses: astral-sh/setup-uv@v6
+
+      - name: The tag matches the package version
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml | head -1)
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "The tag $GITHUB_REF_NAME does not match the version $version in pyproject.toml"; exit 1
+          fi
+
+      - name: Build the viewer
+        working-directory: apps/web
+        run: npm ci && npm run build
+
+      - name: Build the packages
+        run: uv build --all-packages --out-dir dist
+
+      - name: Install the wheel in a clean environment and export a report
+        run: |
+          uv venv /tmp/clean -p 3.12
+          VIRTUAL_ENV=/tmp/clean uv pip install "$(ls dist/datawalk-*-py3-none-any.whl)[charts]"
+          unzip -l dist/datawalk-*-py3-none-any.whl | grep -q 'datawalk/server/viewer/viewer.js'
+          /tmp/clean/bin/datawalk --version
+          /tmp/clean/bin/python -c "import datawalk as dw, plotly.express as px; r = dw.Report('Smoke'); r.add(px.line(x=[1, 2], y=[3, 4]), key='a', room='Main'); r.save('/tmp/smoke.dwk')"
+          /tmp/clean/bin/datawalk export /tmp/smoke.dwk --yes
+          test -s /tmp/smoke.html
+
+      - name: Checksums
+        run: cd dist && sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
+
+      - name: Build provenance (who built these files, from which commit)
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: "dist/*.whl, dist/*.tar.gz"
+
+      - name: Publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          url="https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME"
+          awk '/^## /{n++} n==1' CHANGELOG.md > notes.md
+          cat >> notes.md <<EOF
+
+          ## Install
+
+          \`\`\`bash
+          pip install "datawalk[all] @ $url/datawalk-$version-py3-none-any.whl"
+          datawalk demo
+          \`\`\`
+
+          Verify a download: \`sha256sum -c SHA256SUMS.txt\`, or \`gh attestation verify <file> --repo $GITHUB_REPOSITORY\`.
+          EOF
+          pre=""
+          if echo "$version" | grep -Eq '(a|b|rc|dev)[0-9]+$'; then pre="--prerelease"; fi
+          gh release create "$GITHUB_REF_NAME" dist/* --title "DataWalk $version" --notes-file notes.md --verify-tag $pre

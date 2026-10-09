@@ -1,10 +1,25 @@
 [project]
 name = "datawalk"
-version = "0.1.0.dev0"
+version = "0.1.0a1"
 description = "Walk through your data. Share it. Explore your insights. Turn plots, notebooks, dashboards, and presentations into immersive, walkable 3D worlds."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
+authors = [{ name = "DataWalk contributors" }]
+keywords = ["data visualization", "3d", "jupyter", "notebook", "plotly", "matplotlib", "presentation", "report"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Developers",
+    "Framework :: Jupyter",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Office/Business",
+]
 dependencies = [
     "pydantic>=2.7",
     "fastapi>=0.115",
@@ -27,6 +42,12 @@ all = [  # every optional feature
 
 [project.scripts]
 datawalk = "datawalk.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/datasound-projects/datawalk"
+Documentation = "https://github.com/datasound-projects/datawalk/tree/main/docs"
+Issues = "https://github.com/datasound-projects/datawalk/issues"
+Changelog = "https://github.com/datasound-projects/datawalk/blob/main/CHANGELOG.md"
 
 [dependency-groups]
 dev = [
@@ -74,6 +95,7 @@ select = ["E", "F", "I", "B", "UP"]
 [tool.ruff.lint.per-file-ignores]
 "examples/notebook/make_notebook.py" = ["E501"]  # notebook cell sources as strings
 "packages/hub/**" = ["E501"]  # SQL statements read best on one line
+"examples/thematic_sectors/*.ipynb" = ["E501"]  # facts and sources as text
 
 [tool.ruff.lint.isort]
 known-first-party = ["datawalk"]

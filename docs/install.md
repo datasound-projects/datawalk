@@ -3,16 +3,16 @@
 DataWalk needs Python 3.11 or later. Viewers of an exported report need only a browser.
 
 ```bash
-pip install "datawalk[all]"         # every feature
-datawalk demo                       # check: a demo report opens in the browser
+pip install "datawalk[all] @ <release wheel URL>"   # every feature (see the note below)
+datawalk demo                                        # check: a demo report opens in the browser
 ```
 
-> **Note:** The name `datawalk` on PyPI belongs to another project at this time. Until
-> DataWalk is published under its own name, install the wheel from a release, or build it
-> from a source checkout:
+> **Note:** The name `datawalk` on PyPI belongs to another project. Install DataWalk from its
+> [GitHub release](https://github.com/datasound-projects/datawalk/releases), never with a plain
+> `pip install datawalk`:
 >
 > ```bash
-> pip install "datawalk-0.1.0.dev0-py3-none-any.whl[all]"
+> pip install "datawalk[all] @ https://github.com/datasound-projects/datawalk/releases/download/v0.1.0a1/datawalk-0.1.0a1-py3-none-any.whl"
 > ```
 
 ## Extras

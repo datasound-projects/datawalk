@@ -1,0 +1,24 @@
+name: Bug report
+description: Something does not work as described.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations: { required: true }
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The command or code, and the file type (notebook, PDF, ...). Do not attach confidential data.
+    validations: { required: true }
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Output of `datawalk doctor`
+      render: text
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and operating system

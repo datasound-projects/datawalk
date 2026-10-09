@@ -2,6 +2,7 @@ import { expect, test } from './fixtures'
 import { aimAt, startIn, state } from './helpers'
 
 test('stakeholder walkthrough: enter, walk, inspect, map, navigate rooms', async ({ page }) => {
+  test.slow(!!process.env.CI, 'the longest test, and CI renders WebGL in software') // 3x the time
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Financial Market Research' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Edit report' })).toHaveCount(0) // no token: read-only

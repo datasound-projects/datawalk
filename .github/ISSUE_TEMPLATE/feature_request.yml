@@ -1,0 +1,14 @@
+name: Feature request
+description: An idea that makes DataWalk more useful.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What do you want to do?
+      description: The task and who it is for (analyst, stakeholder, presenter, ...).
+    validations: { required: true }
+  - type: textarea
+    id: idea
+    attributes:
+      label: How could DataWalk help?
