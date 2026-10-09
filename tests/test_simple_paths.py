@@ -37,6 +37,7 @@ def test_report_export_picks_the_format_from_the_path(tmp_path, capsys):
         r.export(tmp_path / "r.docx", yes=True)
 
 
+@built
 def test_export_without_confirmation_outside_a_terminal(tmp_path, monkeypatch):
     monkeypatch.setattr("sys.stdin.isatty", lambda: False)
     with pytest.raises(ex.ExportError, match="confirm it"):

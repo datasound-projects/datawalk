@@ -361,14 +361,11 @@
   "red_brick",
   "rough_concrete",
   "marble_01",
-  "plastered_wall_03",
   "terrazzo_tiles",
   "rubber_tiles",
   "hessian_230",
   "poly_wool_herringbone",
   "rough_linen",
-  "oak_veneer_01",
-  "metal_plate_02",
   "painted_concrete_02"
  ],
  "hdris": [
@@ -728,14 +725,6 @@
    "source": "https://polyhaven.com/a/marble_01",
    "license": "CC0-1.0"
   },
-  "plastered_wall_03": {
-   "name": "Plastered Wall 03",
-   "authors": [
-    "Rob Tuytel"
-   ],
-   "source": "https://polyhaven.com/a/plastered_wall_03",
-   "license": "CC0-1.0"
-  },
   "terrazzo_tiles": {
    "name": "Terrazzo Tiles",
    "authors": [
@@ -777,22 +766,6 @@
     "Rico Cilliers"
    ],
    "source": "https://polyhaven.com/a/rough_linen",
-   "license": "CC0-1.0"
-  },
-  "oak_veneer_01": {
-   "name": "Oak Veneer 01",
-   "authors": [
-    "Jenelle van Heerden"
-   ],
-   "source": "https://polyhaven.com/a/oak_veneer_01",
-   "license": "CC0-1.0"
-  },
-  "metal_plate_02": {
-   "name": "Metal Plate 02",
-   "authors": [
-    "Rob Tuytel"
-   ],
-   "source": "https://polyhaven.com/a/metal_plate_02",
    "license": "CC0-1.0"
   },
   "lebombo": {

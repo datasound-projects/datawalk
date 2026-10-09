@@ -22,10 +22,14 @@ import { ThemedRoom } from './ThemedRoom'
 /** One WebGL canvas per quality level; room content remounts (and disposes) per room. */
 export function RoomScene({ report, room }: { report: Report; room: Room }) {
   const quality = useViewer((s) => s.quality)
+  // The inspector and the editor cover the whole screen: draw no frames behind them (on weak
+  // or software GPUs, a frame can take longer than the interface may wait).
+  const covered = useViewer((s) => s.overlay === 'inspector' || s.overlay === 'editor')
   const q = QUALITY[quality]
   return (
     <Canvas
       key={quality}
+      frameloop={covered ? 'never' : 'always'}
       shadows={q.shadows ? 'percentage' : false}
       dpr={q.dpr}
       camera={{ fov: 70, near: 0.05, far: 150 }}

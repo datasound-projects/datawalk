@@ -13,9 +13,13 @@ const server = (port: number, report = '') => ({
 // Local runs use the installed Chrome; CI installs Playwright's Chromium.
 const chrome = process.env.CI ? {} : { channel: 'chrome' }
 
+// CI runners have no GPU: WebGL renders in software, at a few frames per second.
+const slow = !!process.env.CI
+
 export default defineConfig({
   testDir: 'e2e',
-  timeout: 120_000,
+  timeout: slow ? 300_000 : 120_000,
+  expect: { timeout: slow ? 20_000 : 5_000 },
   workers: 1, // headless WebGL is software-rendered; parallel runs starve each other
   use: {
     viewport: { width: 1280, height: 800 },

@@ -194,7 +194,8 @@ def test_permissions_groups_and_links(hub):
     public = parse_qs(urlparse(res.headers["location"]).query)["token"][0]
     row = hub.store.one("SELECT expires_at FROM links WHERE public = 1")
     assert row["expires_at"] < time.time() + 7.1 * 86400  # capped by the admin setting
-    assert anon.get(f"/l/{public}").status_code == 200
+    opened = anon.get(f"/l/{public}", follow_redirects=False)  # no sign-in needed
+    assert opened.status_code == 303 and opened.headers["location"] == f"/r/{rid}/"
     assert anon.get(f"/r/{rid}/api/report").status_code == 200
     with hub.store.tx() as db:
         db.execute("UPDATE links SET expires_at = ?", (time.time() - 1,))

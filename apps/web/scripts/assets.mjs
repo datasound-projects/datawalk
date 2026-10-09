@@ -116,7 +116,11 @@ async function buildMaterial(id, opts) {
     const { url } = src[res].jpg
     const { buf, record } = await cached(url, `${id}/${name}.jpg`)
     downloads.push(record)
-    const img = name === 'normal' ? await sharp(buf).resize(NORMAL_SIZE, NORMAL_SIZE).png().toBuffer() : buf
+    // GPU block formats (BC/S3TC on Windows and Linux, ETC, ASTC) need sizes in multiples of 4,
+    // and some Poly Haven maps are 1024 x 1018: every map becomes a square power of two.
+    const { width = 1024 } = await sharp(buf).metadata()
+    const side = name === 'normal' ? NORMAL_SIZE : 2 ** Math.round(Math.log2(width))
+    const img = await sharp(buf).resize(side, side).png().toBuffer()
     const ktx = await encodeToKTX2(new Uint8Array(img), enc)
     outputs.push(await output(path.join(LIB, 'materials', id, `${name}.ktx2`), Buffer.from(ktx)))
   }

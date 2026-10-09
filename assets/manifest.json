@@ -2221,51 +2221,6 @@
    ],
    "optimization": "1k textures: KTX2 (ETC1S color and AO/roughness/metal, UASTC+RDO normal at 512 px)"
   },
-  "plastered_wall_03": {
-   "type": "materials",
-   "name": "Plastered Wall 03",
-   "authors": [
-    "Rob Tuytel"
-   ],
-   "source": "https://polyhaven.com/a/plastered_wall_03",
-   "license": "CC0-1.0",
-   "attribution": "Not required (CC0). Credited as a courtesy: Poly Haven (polyhaven.com).",
-   "downloads": [
-    {
-     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/plastered_wall_03/plastered_wall_03_diff_1k.jpg",
-     "sha256": "3d60687bae1d9cd2c14a46c4b2673e0fe753cf4b5eb82c22cc399271e16d8d5b",
-     "bytes": 555233
-    },
-    {
-     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/plastered_wall_03/plastered_wall_03_nor_gl_1k.jpg",
-     "sha256": "c913b9c5f04e499b11f5f5a0214c0a388038f850ccf1084ca84087e1c59dd304",
-     "bytes": 530434
-    },
-    {
-     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/plastered_wall_03/plastered_wall_03_arm_1k.jpg",
-     "sha256": "ab7cb38d62472e5fb23ec086873352c45bbca64c800b2e6d9b1efdb42c9ceb1a",
-     "bytes": 283693
-    }
-   ],
-   "outputs": [
-    {
-     "path": "library/materials/plastered_wall_03/color.ktx2",
-     "sha256": "98a9b00be0b5e4b2c34aa1b3303981e7075fac098109b38ac89e7c1f08ae15ff",
-     "bytes": 202608
-    },
-    {
-     "path": "library/materials/plastered_wall_03/normal.ktx2",
-     "sha256": "2c07f0220220dbc9718ba6e1eedeb12b5c7d6993edbc0bdadfb432489bbb8d80",
-     "bytes": 94055
-    },
-    {
-     "path": "library/materials/plastered_wall_03/arm.ktx2",
-     "sha256": "4b53cb95795253eaf60caf06791ca4a2095612b0a931a99f972ed9f39ef96530",
-     "bytes": 89116
-    }
-   ],
-   "optimization": "1k textures: KTX2 (ETC1S color and AO/roughness/metal, UASTC+RDO normal at 512 px)"
-  },
   "terrazzo_tiles": {
    "type": "materials",
    "name": "Terrazzo Tiles",
@@ -2386,8 +2341,8 @@
    "outputs": [
     {
      "path": "library/materials/hessian_230/color.ktx2",
-     "sha256": "298f2166a0e0ba2ad79a74b3e448173eb6e3ea1211758944223afa4f0d6182f0",
-     "bytes": 245481
+     "sha256": "ce51a325b9db3d8ebd30010f9e30667c807147d1c2136362e61571fd5aabc52c",
+     "bytes": 244275
     },
     {
      "path": "library/materials/hessian_230/normal.ktx2",
@@ -2396,8 +2351,8 @@
     },
     {
      "path": "library/materials/hessian_230/arm.ktx2",
-     "sha256": "28422f68acc4c15e5588182dfbe38b0696c92d5abedc207e29e171ef2e839c0b",
-     "bytes": 264341
+     "sha256": "03542f9966116e90f666d3e5f1ccb143a0ffddb96d4ef7428c9d0676729ec01d",
+     "bytes": 262645
     }
    ],
    "optimization": "1k textures: KTX2 (ETC1S color and AO/roughness/metal, UASTC+RDO normal at 512 px)"
@@ -2432,8 +2387,8 @@
    "outputs": [
     {
      "path": "library/materials/poly_wool_herringbone/color.ktx2",
-     "sha256": "e28aefb3d884df2f55b27a606ec646eafae807f32985e77f39efb1c588d5bb4e",
-     "bytes": 235537
+     "sha256": "e73efc3b074f0325ae188ee602daa57f9dec5b6e0195187634f811785dc175a0",
+     "bytes": 231396
     },
     {
      "path": "library/materials/poly_wool_herringbone/normal.ktx2",
@@ -2442,8 +2397,8 @@
     },
     {
      "path": "library/materials/poly_wool_herringbone/arm.ktx2",
-     "sha256": "487167ba739cd2fde4618bb463523ff10120085d89c167075b2fe173adb5a007",
-     "bytes": 254688
+     "sha256": "a589dba762509726027afd9acfe5096022586631a5d4b8b990d3f115cd1f68fe",
+     "bytes": 248861
     }
    ],
    "optimization": "1k textures: KTX2 (ETC1S color and AO/roughness/metal, UASTC+RDO normal at 512 px)"
@@ -2478,8 +2433,8 @@
    "outputs": [
     {
      "path": "library/materials/rough_linen/color.ktx2",
-     "sha256": "e9368d4c84e09821d59cec5d7a333784f27525fef1669a2cd1df1282f15d384c",
-     "bytes": 199355
+     "sha256": "abe0c6d060b455f88acf4061224835fbb38142a7bc075e10b7c67e69f4d701f2",
+     "bytes": 200152
     },
     {
      "path": "library/materials/rough_linen/normal.ktx2",
@@ -2488,98 +2443,8 @@
     },
     {
      "path": "library/materials/rough_linen/arm.ktx2",
-     "sha256": "0f567759f43fa8745f8f53e9a3d654d2530cb87b5b23709d17ca35d12e2a15cc",
-     "bytes": 227953
-    }
-   ],
-   "optimization": "1k textures: KTX2 (ETC1S color and AO/roughness/metal, UASTC+RDO normal at 512 px)"
-  },
-  "oak_veneer_01": {
-   "type": "materials",
-   "name": "Oak Veneer 01",
-   "authors": [
-    "Jenelle van Heerden"
-   ],
-   "source": "https://polyhaven.com/a/oak_veneer_01",
-   "license": "CC0-1.0",
-   "attribution": "Not required (CC0). Credited as a courtesy: Poly Haven (polyhaven.com).",
-   "downloads": [
-    {
-     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/oak_veneer_01/oak_veneer_01_diff_1k.jpg",
-     "sha256": "c14681f72f59f17bff568cae7a837641443b607b899f0c279cd64a5638f877a7",
-     "bytes": 641756
-    },
-    {
-     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/oak_veneer_01/oak_veneer_01_nor_gl_1k.jpg",
-     "sha256": "1297acf7b4476d5ccd83cc8b27be96aa6110f7a9c3a40be0bd767bf81b17db01",
-     "bytes": 484844
-    },
-    {
-     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/oak_veneer_01/oak_veneer_01_arm_1k.jpg",
-     "sha256": "8bf4f36a9ba1d5377a2fa5273a2a0763775afe511b50293d71b159d15576cf1e",
-     "bytes": 982665
-    }
-   ],
-   "outputs": [
-    {
-     "path": "library/materials/oak_veneer_01/color.ktx2",
-     "sha256": "04707782f9d7400d6f897cfaffa0fa864010ba7a83a65dccdece0a9421896962",
-     "bytes": 211083
-    },
-    {
-     "path": "library/materials/oak_veneer_01/normal.ktx2",
-     "sha256": "10deb5a4e31ec4bcdc28841fa8b20c32dbf198ea355d046be01664b847e6751c",
-     "bytes": 81409
-    },
-    {
-     "path": "library/materials/oak_veneer_01/arm.ktx2",
-     "sha256": "4e5729a4c2f07956321e37c2497f20172064bbd373d50c4f743f789554df46ae",
-     "bytes": 214222
-    }
-   ],
-   "optimization": "1k textures: KTX2 (ETC1S color and AO/roughness/metal, UASTC+RDO normal at 512 px)"
-  },
-  "metal_plate_02": {
-   "type": "materials",
-   "name": "Metal Plate 02",
-   "authors": [
-    "Rob Tuytel"
-   ],
-   "source": "https://polyhaven.com/a/metal_plate_02",
-   "license": "CC0-1.0",
-   "attribution": "Not required (CC0). Credited as a courtesy: Poly Haven (polyhaven.com).",
-   "downloads": [
-    {
-     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/metal_plate_02/metal_plate_02_diff_1k.jpg",
-     "sha256": "6e80877d0e9d5973d96298c6091df7ace906b0a6760afc4f3592e4855f3f1d4c",
-     "bytes": 625917
-    },
-    {
-     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/metal_plate_02/metal_plate_02_nor_gl_1k.jpg",
-     "sha256": "58736fbb8aa4fc6690cf8152b174db65caf22a766375b625fb0087e1bc955bc7",
-     "bytes": 183264
-    },
-    {
-     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/metal_plate_02/metal_plate_02_arm_1k.jpg",
-     "sha256": "e099a8385d53f4a515b7e0ce94f85d88657fcac49c23979474f5394b22dd550b",
-     "bytes": 1075839
-    }
-   ],
-   "outputs": [
-    {
-     "path": "library/materials/metal_plate_02/color.ktx2",
-     "sha256": "835aa0d73633ac085c04ea04ba264fbdc8c6df0093fcc991516a0bf72981781f",
-     "bytes": 215628
-    },
-    {
-     "path": "library/materials/metal_plate_02/normal.ktx2",
-     "sha256": "af28cb69bd98ce2ae749ef13a199861788c225e5f20c7597751103ecf7de22dd",
-     "bytes": 135969
-    },
-    {
-     "path": "library/materials/metal_plate_02/arm.ktx2",
-     "sha256": "5df82ec4fe04fafc7dbc14f0674912582a2f596690feb13fa4a024cfad89ba17",
-     "bytes": 264898
+     "sha256": "fe527d597a4ac5517117f1f1c5cc088dfe507d0f582c8c01255acf89dd7600a1",
+     "bytes": 227065
     }
    ],
    "optimization": "1k textures: KTX2 (ETC1S color and AO/roughness/metal, UASTC+RDO normal at 512 px)"
@@ -2995,6 +2860,6 @@
    "optimization": "view: tonemapped JPG resized to 4096 px"
   }
  },
- "generated": "2026-10-08T20:13:51.649Z",
- "totalBytes": 40085765
+ "generated": "2026-10-09T12:36:26.882Z",
+ "totalBytes": 38563816
 }

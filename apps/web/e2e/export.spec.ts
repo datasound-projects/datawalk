@@ -53,9 +53,9 @@ async function walkThrough(page: Page) {
 test('single HTML file opens offline without any request', async ({ page }) => {
   test.setTimeout(240_000)
   const file = pathToFileURL(path.join(out, 'report.html')).href
-  const { requests, errors } = watch(page, (u) => u === file || u.startsWith('data:') || u.startsWith('blob:'))
+  const { requests, errors } = watch(page, (u) => u.startsWith(file) || u.startsWith('data:') || u.startsWith('blob:'))
   await page.route(/^https?:/, (r) => r.abort())
-  await page.goto(file)
+  await page.goto(`${file}?view=3d`) // 3D also on a software GPU (CI)
   await walkThrough(page)
   const csv = await page.getByRole('link', { name: 'Daily market data' }).getAttribute('href')
   expect(csv).toMatch(/^data:text\/csv;base64,/)
@@ -66,9 +66,9 @@ test('single HTML file opens offline without any request', async ({ page }) => {
 test('lite single file (no chart libraries) opens offline and draws the room', async ({ page }) => {
   test.setTimeout(180_000)
   const file = pathToFileURL(path.join(out, 'lite.html')).href
-  const { requests, errors } = watch(page, (u) => u === file || u.startsWith('data:') || u.startsWith('blob:'))
+  const { requests, errors } = watch(page, (u) => u.startsWith(file) || u.startsWith('data:') || u.startsWith('blob:'))
   await page.route(/^https?:/, (r) => r.abort())
-  await page.goto(file)
+  await page.goto(`${file}?view=3d`) // 3D also on a software GPU (CI)
   await page.getByRole('button', { name: 'Enter room' }).click()
   await expect
     .poll(() => page.evaluate(() => (window as unknown as Win).datawalkRenderer?.info().render.calls ?? 0), { timeout: 90_000 })
@@ -96,7 +96,7 @@ test('static site loads only its own files', async ({ page }) => {
       await r.fulfill({ status: 404 })
     }
   })
-  await page.goto(host)
+  await page.goto(`${host}?view=3d`)
   await walkThrough(page)
   expect(requests).toEqual([])
   expect(errors).toEqual([])

@@ -42,14 +42,15 @@ export async function aimAt(page: Page, key: string) {
       const w = window as unknown as { datawalkPose: { z: number }; datawalkLayout: () => { depth: number } }
       return w.datawalkPose.z + w.datawalkLayout().depth / 2
     })
-  await expect.poll(async () => (await hold(page, 'w', 250), north()), { timeout: 60_000 }).toBeLessThan(5)
+  // Hold the keys long enough for a few frames, also at the low frame rate of a software GPU.
+  await expect.poll(async () => (await hold(page, 'w', 600), north()), { timeout: 180_000 }).toBeLessThan(5)
   await expect
     .poll(
       async () => {
-        await hold(page, 'a', 250)
+        await hold(page, 'a', 300)
         return (await state(page)).focused
       },
-      { timeout: 60_000 }, // themed rooms grow around windows: the chart can be several meters away
+      { timeout: 180_000 }, // themed rooms grow around windows: the chart can be several meters away
     )
     .toBe(key)
 }

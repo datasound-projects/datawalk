@@ -9,7 +9,7 @@ attribution. We credit the authors as a courtesy.
 and the URL, SHA-256, and size of every downloaded file. `npm run assets` in `apps/web`
 downloads and converts the assets again from `assets/sources.json`, and checks every hash.
 
-Assets in this version: 64, 38.2 MiB after conversion (KTX2 textures, Meshopt geometry).
+Assets in this version: 61, 36.8 MiB after conversion (KTX2 textures, Meshopt geometry).
 
 | Type | Asset | Authors | License |
 |---|---|---|---|
@@ -35,11 +35,8 @@ Assets in this version: 64, 38.2 MiB after conversion (KTX2 textures, Meshopt ge
 | Material | [Hessian 230](https://polyhaven.com/a/hessian_230) | colormass, Rico Cilliers | CC0-1.0 |
 | Material | [Laminate Floor 02](https://polyhaven.com/a/laminate_floor_02) | Dario Barresi, Charlotte Baglioni | CC0-1.0 |
 | Material | [Marble 01](https://polyhaven.com/a/marble_01) | Rob Tuytel | CC0-1.0 |
-| Material | [Metal Plate 02](https://polyhaven.com/a/metal_plate_02) | Rob Tuytel | CC0-1.0 |
-| Material | [Oak Veneer 01](https://polyhaven.com/a/oak_veneer_01) | Jenelle van Heerden | CC0-1.0 |
 | Material | [Painted Concrete 02](https://polyhaven.com/a/painted_concrete_02) | Rob Tuytel | CC0-1.0 |
 | Material | [Plank Flooring 02](https://polyhaven.com/a/plank_flooring_02) | Dario Barresi, Dimitrios Savva | CC0-1.0 |
-| Material | [Plastered Wall 03](https://polyhaven.com/a/plastered_wall_03) | Rob Tuytel | CC0-1.0 |
 | Material | [Plastered Wall 04](https://polyhaven.com/a/plastered_wall_04) | Rob Tuytel | CC0-1.0 |
 | Material | [Poly Wool Herringbone](https://polyhaven.com/a/poly_wool_herringbone) | colormass, Rico Cilliers | CC0-1.0 |
 | Material | [Red Brick](https://polyhaven.com/a/red_brick) | Rob Tuytel | CC0-1.0 |
