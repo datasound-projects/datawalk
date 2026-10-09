@@ -108,19 +108,21 @@ def kpis_from_table(
 
 def _read_run_dir(run: Path) -> tuple[str, dict[str, list[tuple[int, float]]], dict[str, str]]:
     """An MLflow file-store run directory: mlruns/<experiment>/<run>/."""
-    meta = (run / "meta.yaml").read_text() if (run / "meta.yaml").exists() else ""
+    meta = (run / "meta.yaml").read_text(encoding="utf-8") if (run / "meta.yaml").exists() else ""
     name = re.search(r"^run_name:\s*(.+)$", meta, re.M)
     metrics: dict[str, list[tuple[int, float]]] = {}
     for f in sorted((run / "metrics").rglob("*")) if (run / "metrics").exists() else []:
         if f.is_file():
-            rows = [line.split() for line in f.read_text().splitlines() if line.strip()]
+            rows = [
+                line.split() for line in f.read_text(encoding="utf-8").splitlines() if line.strip()
+            ]
             metrics[str(f.relative_to(run / "metrics"))] = [
                 (int(r[2]) if len(r) > 2 else i, float(r[1])) for i, r in enumerate(rows)
             ]
     params = {}
     for f in sorted((run / "params").rglob("*")) if (run / "params").exists() else []:
         if f.is_file():
-            params[str(f.relative_to(run / "params"))] = f.read_text().strip()
+            params[str(f.relative_to(run / "params"))] = f.read_text(encoding="utf-8").strip()
     return (name.group(1).strip() if name else run.name), metrics, params
 
 
@@ -197,11 +199,13 @@ def add_pdf(
     update: bool = False, dpi: int = 150,
 ) -> list:  # fmt: skip
     """PDF pages as static charts (for example Power BI or Tableau PDF exports). Needs
-    pypdfium2: pip install 'datawalk[pdf-import]'."""
+    pypdfium2: the `pdf-import` extra."""
     try:
         import pypdfium2 as pdfium
     except ImportError as e:
-        raise ImportError("PDF pages need pypdfium2: pip install 'datawalk[pdf-import]'") from e
+        from ..hints import install
+
+        raise ImportError(f"PDF pages need pypdfium2: {install('datawalk[pdf-import]')}") from e
     import io
 
     path = Path(path)

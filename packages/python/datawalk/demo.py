@@ -4,7 +4,7 @@ synthetic data. All data is randomly generated: no result describes a real marke
     datawalk demo                      # build it, save datawalk-demo.dwk, and open the editor
     from datawalk.demo import build    # the same report in Python
 
-Needs the plotting libraries: pip install "datawalk[all]".
+Needs the plotting libraries: the `charts` extra (docs/install.md).
 """
 
 import matplotlib.pyplot as plt

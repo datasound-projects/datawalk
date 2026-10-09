@@ -66,13 +66,24 @@ jobs:
 
           ## Install
 
+          Python 3.11 or later. As a command (macOS, Windows, Linux):
+
           \`\`\`bash
-          pip install "datawalk[all] @ $url/datawalk-$version-py3-none-any.whl"
+          uv tool install "datawalk[all] @ $url/datawalk-$version-py3-none-any.whl"
           datawalk demo
           \`\`\`
+
+          \`pipx install\` takes the same text. For your own Python code or notebooks, use
+          \`pip install\` with the same text in a virtual environment. Details:
+          [docs/install.md](https://github.com/$GITHUB_REPOSITORY/blob/$GITHUB_REF_NAME/docs/install.md).
 
           Verify a download: \`sha256sum -c SHA256SUMS.txt\`, or \`gh attestation verify <file> --repo $GITHUB_REPOSITORY\`.
           EOF
           pre=""
           if echo "$version" | grep -Eq '(a|b|rc|dev)[0-9]+$'; then pre="--prerelease"; fi
           gh release create "$GITHUB_REF_NAME" dist/* --title "DataWalk $version" --notes-file notes.md --verify-tag $pre
+
+  # The published release, installed as the README says, on Linux, macOS, and Windows.
+  installs:
+    needs: release
+    uses: ./.github/workflows/install.yml

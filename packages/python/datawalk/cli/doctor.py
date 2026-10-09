@@ -10,6 +10,8 @@ import shutil
 import sys
 from pathlib import Path
 
+from ..hints import install
+
 OK, INFO, FAIL = "ok", "--", "!!"
 
 # Same rules as the viewer (apps/web/src/app/quality.ts): the renderer string decides.
@@ -42,7 +44,7 @@ def _browser_and_gpu() -> list[tuple[str, str, str]]:
             (
                 INFO,
                 "Browser and GPU",
-                "not checked: pip install 'datawalk[pdf]' (Playwright). "
+                f"not checked: needs Playwright: {install('datawalk[pdf]')}. "
                 "The viewer lobby shows the GPU tier.",
             )
         ]
@@ -122,13 +124,13 @@ def checks() -> list[tuple[str, str, str]]:
         ("playwright", "PDF, PPTX images, GLB, USDZ, video", "datawalk[pdf]"),
         ("pypdfium2", "PDF pages as charts", "datawalk[pdf-import]"),
     ]
-    for module, what, install in extras:
+    for module, what, requirement in extras:
         found = _has(module)
         rows.append(
             (
                 OK if found else INFO,
                 what,
-                "installed" if found else f'optional: pip install "{install}"',
+                "installed" if found else f"optional: {install(requirement)}",
             )
         )
     ff = shutil.which("ffmpeg")

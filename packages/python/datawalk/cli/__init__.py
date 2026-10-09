@@ -23,6 +23,10 @@ def schema() -> dict:
 def main(argv: list[str] | None = None) -> None:
     from .. import __version__
 
+    # A Windows console or a redirected output can use a code page without "→" or "·".
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(errors="replace")
     parser = argparse.ArgumentParser(
         prog="datawalk",
         description="DataWalk: walk through your data. Share it. Explore your insights.",
@@ -140,7 +144,7 @@ def list_adapters(args: argparse.Namespace) -> int:
 
 
 def write_schema(args: argparse.Namespace) -> int:
-    args.out.write_text(json.dumps(schema(), indent=2) + "\n")
+    args.out.write_text(json.dumps(schema(), indent=2) + "\n", encoding="utf-8")
     return 0
 
 
@@ -150,8 +154,10 @@ def demo(args: argparse.Namespace) -> int:
     try:
         from ..demo import build
     except ImportError as e:
+        from ..hints import install
+
         raise ImportError(
-            f'The demo needs the plotting libraries ({e.name}): pip install "datawalk[all]"'
+            f"The demo needs the plotting libraries ({e.name}): {install('datawalk[charts]')}"
         ) from None
     print("Building the demo report (synthetic data)...", flush=True)
     report = build()

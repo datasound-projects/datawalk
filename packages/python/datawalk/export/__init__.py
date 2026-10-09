@@ -177,8 +177,8 @@ def theme_assets(themes: set[str]) -> dict[str, Path]:
     for f in (STATIC / "vendor" / "basis").glob("*"):
         files[f"vendor/basis/{f.name}"] = f
     for tid in sorted(themes):
-        theme = json.loads((STATIC / "themes" / tid / "theme.json").read_text())
-        room = json.loads((STATIC / "themes" / tid / "room.json").read_text())
+        theme = json.loads((STATIC / "themes" / tid / "theme.json").read_text(encoding="utf-8"))
+        room = json.loads((STATIC / "themes" / tid / "room.json").read_text(encoding="utf-8"))
         for name in ("theme.json", "room.json"):
             files[f"themes/{tid}/{name}"] = STATIC / "themes" / tid / name
         light = theme["lighting"]
@@ -320,7 +320,7 @@ def _viewer_files(bundle: Bundle) -> tuple[str, str]:
     css = VIEWER / "viewer.css"
     if not js.exists():
         raise ExportError("The viewer-only build is missing: run `npm run build` in apps/web.")
-    return js.read_text(), css.read_text() if css.exists() else ""
+    return js.read_text(encoding="utf-8"), css.read_text(encoding="utf-8") if css.exists() else ""
 
 
 def _page(head: str, body: str, root: str = "") -> str:
@@ -345,7 +345,10 @@ def write_site(bundle: Bundle, out: Path) -> Path:
     out = Path(out)
     if out.exists() and any(out.iterdir()):
         index = out / "index.html"
-        if not (index.exists() and 'name="datawalk-data"' in index.read_text(errors="replace")):
+        if not (
+            index.exists()
+            and 'name="datawalk-data"' in index.read_text(encoding="utf-8", errors="replace")
+        ):
             raise ExportError(f"{out} is not empty, and it is not an earlier DataWalk export")
         shutil.rmtree(out)  # an earlier export of a report: replace it
     js, css = _viewer_files(bundle)
@@ -353,10 +356,10 @@ def write_site(bundle: Bundle, out: Path) -> Path:
     (data / "payloads").mkdir(parents=True)
     (data / "previews").mkdir()
     (data / "datasets").mkdir()
-    (data / "report.json").write_text(json.dumps(bundle.data["report"]))
-    (data / "export.json").write_text(json.dumps(bundle.data["export"]))
+    (data / "report.json").write_text(json.dumps(bundle.data["report"]), encoding="utf-8")
+    (data / "export.json").write_text(json.dumps(bundle.data["export"]), encoding="utf-8")
     for vid, p in bundle.data["payloads"].items():
-        (data / "payloads" / f"{vid}.json").write_text(json.dumps(p))
+        (data / "payloads" / f"{vid}.json").write_text(json.dumps(p), encoding="utf-8")
     for vid, png in bundle.data["previews"].items():
         (data / "previews" / f"{vid}.png").write_bytes(png)
     for did, csv in bundle.data["datasets"].items():
@@ -368,8 +371,8 @@ def write_site(bundle: Bundle, out: Path) -> Path:
         dest = out / rel
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(src, dest)
-    (out / "viewer.js").write_text(js)
-    (out / "viewer.css").write_text(css)
+    (out / "viewer.js").write_text(js, encoding="utf-8")
+    (out / "viewer.css").write_text(css, encoding="utf-8")
     title = _title(bundle.data["report"])
     head = (
         f"<title>{_escape(title)}</title>\n"
@@ -378,7 +381,8 @@ def write_site(bundle: Bundle, out: Path) -> Path:
         '<link rel="stylesheet" href="viewer.css" />\n'
     )
     (out / "index.html").write_text(
-        _page(head, '<script type="module" src="viewer.js"></script>\n', SITE_FALLBACK)
+        _page(head, '<script type="module" src="viewer.js"></script>\n', SITE_FALLBACK),
+        encoding="utf-8",
     )
     return out
 
@@ -434,7 +438,9 @@ def render_html(bundle: Bundle) -> str:
     }
     # Scripts (BokehJS) run as inline scripts with CSP hashes; other assets become data URLs.
     scripts = [
-        src.read_text() for rel, src in bundle.assets.items() if rel.startswith("vendor/bokeh/")
+        src.read_text(encoding="utf-8")
+        for rel, src in bundle.assets.items()
+        if rel.startswith("vendor/bokeh/")
     ]
     scripts = [s.replace("</script", "<\\/script") for s in scripts]
     assets = {
@@ -486,7 +492,9 @@ def headless_page(html: Path, query: str = "", what: str = "This export", **cont
     try:
         from playwright.sync_api import Error, sync_playwright
     except ImportError as e:
-        raise ExportError(f"{what} needs Playwright: pip install 'datawalk[pdf]'") from e
+        from ..hints import install
+
+        raise ExportError(f"{what} needs Playwright: {install('datawalk[pdf]')}") from e
     with sync_playwright() as p:
         browser = None
         for channel in ("chrome", "msedge", None):

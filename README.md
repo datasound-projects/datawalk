@@ -42,6 +42,8 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install "datawalk[all] @ https://github.com/datasound-projects/datawalk/releases/download/v0.1.0a1/datawalk-0.1.0a1-py3-none-any.whl"
 ```
 
+On Windows, activate with `.venv\Scripts\activate` instead.
+
 Check it with a ready-made demo:
 
 ```bash

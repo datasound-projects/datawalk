@@ -139,15 +139,17 @@ def plan_export(
         raise ExportError(f"{template}: no such PowerPoint template")
     from importlib.util import find_spec
 
+    from ..hints import install
+
     browser = {"pdf", "pptx", "glb", "usdz", "video"} & {fmt for fmt, _ in outputs}
     if browser and find_spec("playwright") is None:
         extra = "pptx" if browser == {"pptx"} else "pdf"
         raise ExportError(
             f"{', '.join(sorted(f.upper() for f in browser))} export needs Playwright: "
-            f'pip install "datawalk[{extra}]"'
+            + install(f"datawalk[{extra}]")
         )
     if any(fmt == "pptx" for fmt, _ in outputs) and find_spec("pptx") is None:
-        raise ExportError('PowerPoint export needs python-pptx: pip install "datawalk[pptx]"')
+        raise ExportError(f"PowerPoint export needs python-pptx: {install('datawalk[pptx]')}")
     notes = []
     options = replace(options, preview_only=resolve_preview_only(report, options.preview_only))
     rule = policy(report.classification)

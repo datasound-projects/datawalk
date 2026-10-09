@@ -18,6 +18,11 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install "datawalk[all] @ https://github.com/datasound-projects/datawalk/releases/download/v0.1.0a1/datawalk-0.1.0a1-py3-none-any.whl"
 ```
 
+On Windows, activate with `.venv\Scripts\activate` instead.
+
+To add an extra later, install again with the extras that you want. `datawalk doctor` shows the
+command for your installation.
+
 > **Note:** The name `datawalk` on PyPI belongs to another project. Install DataWalk from its
 > [GitHub release](https://github.com/datasound-projects/datawalk/releases), never with a plain
 > `pip install datawalk`.

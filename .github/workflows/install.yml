@@ -1,0 +1,85 @@
+name: Install
+
+# Install DataWalk as users do, on Linux, macOS, and Windows, then turn a notebook into a
+# report, export it, and start the demo. CI calls it with the wheel of each commit (uv only);
+# on its own it installs the public release from the README with uv, pipx, and pip.
+on:
+  workflow_call:
+    inputs:
+      wheel-artifact:
+        type: string
+  schedule:
+    - cron: "0 6 * * 1" # Mondays: new releases of dependencies can break an install
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        how: ${{ fromJSON(inputs.wheel-artifact && '["uv"]' || '["uv", "pipx", "venv"]') }}
+    name: ${{ matrix.how }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v6
+        if: matrix.how == 'uv'
+      - uses: actions/download-artifact@v4
+        if: inputs.wheel-artifact
+        with:
+          name: ${{ inputs.wheel-artifact }}
+          path: dist
+
+      - name: What to install
+        run: |
+          if [ -d dist ]; then
+            wheel=$(python -c "import glob, pathlib; print(pathlib.Path(glob.glob('dist/datawalk-*.whl')[0]).resolve().as_uri())")
+          else
+            wheel=$(grep -o 'https://github.com/[^"]*\.whl' README.md | head -1)
+          fi
+          echo "SPEC=datawalk[all] @ $wheel" >> "$GITHUB_ENV"
+          echo "datawalk[all] @ $wheel"
+
+      - name: Install (${{ matrix.how }})
+        run: |
+          case "${{ matrix.how }}" in
+            uv)
+              uv tool install "$SPEC"
+              uv tool dir --bin >> "$GITHUB_PATH" ;;
+            pipx)
+              pipx install --python "$(python -c 'import sys; print(sys.executable)')" "$SPEC"
+              pipx environment --value PIPX_BIN_DIR >> "$GITHUB_PATH" ;;
+            venv)
+              python -m venv .venv
+              source .venv/bin/activate 2>/dev/null || source .venv/Scripts/activate
+              pip install "$SPEC"
+              python -c "import sysconfig; print(sysconfig.get_path('scripts'))" >> "$GITHUB_PATH" ;;
+          esac
+
+      - name: Use it
+        run: |
+          datawalk --version
+          datawalk doctor | tee doctor.txt || true
+          grep -qE "problem|Everything" doctor.txt
+          datawalk import examples/thematic_sectors/thematic_sectors.ipynb -o sectors.dwk
+          datawalk export sectors.dwk --html sectors.html --site sectors-site --yes
+          grep -q 'name="datawalk-data"' sectors.html
+          grep -q 'name="datawalk-data"' sectors-site/index.html
+
+      - name: The demo starts
+        run: |
+          datawalk demo --no-browser --port 8765 &
+          for i in $(seq 1 90); do curl -fs http://127.0.0.1:8765/ >/dev/null && break; sleep 2; done
+          curl -fs http://127.0.0.1:8765/ | grep -qi "<!doctype html>"
+          kill $! || true

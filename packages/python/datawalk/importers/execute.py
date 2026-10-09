@@ -10,7 +10,9 @@ def main() -> None:
         import nbformat
         from nbclient import NotebookClient
     except ImportError:
-        sys.exit("Notebook execution needs nbclient: pip install 'datawalk[notebook]'")
+        from datawalk.hints import install
+
+        sys.exit(f"Notebook execution needs nbclient: {install('datawalk[notebook]')}")
     src, out, timeout = sys.argv[1], sys.argv[2], int(sys.argv[3])
     nb = nbformat.read(src, as_version=4)
     NotebookClient(

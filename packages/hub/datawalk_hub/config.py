@@ -79,7 +79,7 @@ class Config:
             SamlConfig(
                 _env("SAML_IDP_ENTITY_ID"),
                 _env("SAML_IDP_SSO_URL"),
-                Path(_env("SAML_IDP_CERT_FILE")).read_text(),
+                Path(_env("SAML_IDP_CERT_FILE")).read_text(encoding="utf-8"),
                 _env("SAML_SP_ENTITY_ID", base + "/saml/metadata"),
                 _env("SAML_NAME", "SAML sign-on"),
             )

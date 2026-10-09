@@ -65,7 +65,14 @@ def execute(path: Path, timeout: int) -> Path:
     out = Path(tempfile.mkdtemp()) / path.name
     cmd = [sys.executable, "-m", "datawalk.importers.execute", str(path), str(out), str(timeout)]
     try:
-        subprocess.run(cmd, check=True, timeout=timeout + 60, capture_output=True, text=True)
+        subprocess.run(
+            cmd,
+            check=True,
+            timeout=timeout + 60,
+            capture_output=True,
+            encoding="utf-8",
+            errors="replace",
+        )
     except subprocess.TimeoutExpired:
         raise NotebookError(f"Execution took longer than {timeout} s and was stopped.") from None
     except subprocess.CalledProcessError as e:

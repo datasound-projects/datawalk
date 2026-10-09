@@ -1,6 +1,6 @@
 """PowerPoint export: one slide per tour stop. Titles, findings, KPI values, tables, and text
 are native PowerPoint text (selectable); charts are the images that the walls show; speaker
-notes come from the tour. Needs python-pptx: pip install 'datawalk[pptx]'."""
+notes come from the tour. Needs python-pptx: the `pptx` extra."""
 
 from __future__ import annotations
 
@@ -402,7 +402,9 @@ def write_pptx(
     try:
         import pptx  # noqa: F401
     except ImportError as e:
-        raise ImportError("PPTX export needs python-pptx: pip install 'datawalk[pptx]'") from e
+        from ..hints import install
+
+        raise ImportError(f"PPTX export needs python-pptx: {install('datawalk[pptx]')}") from e
     deck = _Deck(report, template, images, levels or {}, watermark)
     deck.title_slide()
     for stop, room, target in report.tour_stops():

@@ -70,7 +70,7 @@ def labels() -> dict[str, dict]:
     if not path:
         return BUILT_IN
     try:
-        doc = json.loads(Path(path).read_text())
+        doc = json.loads(Path(path).read_text(encoding="utf-8"))
     except (OSError, ValueError) as e:
         raise PolicyError(f"DATAWALK_POLICY file {path}: {e}") from None
     if not isinstance(doc, dict) or not isinstance(doc.get("labels"), dict):

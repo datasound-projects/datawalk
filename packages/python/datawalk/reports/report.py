@@ -514,7 +514,7 @@ class Report(ReportModel):
         base = Path(".")
         if not isinstance(brand, dict):
             base = Path(brand).parent
-            brand = json.loads(Path(brand).read_text())
+            brand = json.loads(Path(brand).read_text(encoding="utf-8"))
         spec = dict(brand)
         logo = spec.pop("logo", None)
         self._brand_logo = to_png((base / logo).read_bytes()) if logo else None

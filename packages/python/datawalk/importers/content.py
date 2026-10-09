@@ -121,7 +121,9 @@ def to_png(data: bytes) -> bytes:
     try:
         from PIL import Image
     except ImportError as e:
-        raise ImportError("JPEG images need Pillow: pip install pillow") from e
+        from ..hints import install
+
+        raise ImportError(f"JPEG images need Pillow: {install('pillow')}") from e
     out = io.BytesIO()
     with Image.open(io.BytesIO(data)) as img:
         img.save(out, format="PNG")

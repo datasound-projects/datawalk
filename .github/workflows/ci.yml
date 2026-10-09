@@ -12,18 +12,23 @@ concurrency:
 
 jobs:
   python:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.11", "3.13"]
+        include:
+          - { os: ubuntu-latest, python: "3.11" }
+          - { os: ubuntu-latest, python: "3.13" }
+          - { os: macos-latest, python: "3.13" }
+          - { os: windows-latest, python: "3.13" }
+    name: python (${{ matrix.python }}, ${{ matrix.os }})
     steps:
       - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v6
       - run: uv sync -p ${{ matrix.python }} --all-packages --all-extras
-      - run: uv run ruff check .
-      - run: uv run ruff format --check .
+      - run: uv run ruff check . && uv run ruff format --check .
+        if: runner.os == 'Linux'
       - run: uv run pytest
 
   web:
@@ -120,6 +125,18 @@ jobs:
           /tmp/clean/bin/datawalk adapters
           /tmp/clean/bin/python -c "import datawalk as dw, plotly.express as px; r = dw.Report('Smoke'); r.add(px.line(x=[1, 2], y=[3, 4]), key='a', room='Main'); r.save('/tmp/smoke.dwk')"
           /tmp/clean/bin/datawalk export /tmp/smoke.dwk --html /tmp/smoke.html --yes
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheel
+          path: dist/datawalk-*.whl
+          retention-days: 7
+
+  # The wheel of this commit, installed as users do, on Linux, macOS, and Windows.
+  install:
+    needs: package
+    uses: ./.github/workflows/install.yml
+    with:
+      wheel-artifact: wheel
 
   hub-image:
     runs-on: ubuntu-latest

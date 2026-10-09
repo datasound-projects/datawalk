@@ -13,8 +13,10 @@ def bokeh_js(version: str) -> dict[str, Path]:
     try:
         import bokeh
     except ImportError:
+        from .hints import install
+
         raise LookupError(
-            f"Bokeh charts need bokeh=={version}: pip install bokeh=={version}"
+            f"Bokeh charts need bokeh=={version}: {install(f'bokeh=={version}')}"
         ) from None
     if bokeh.__version__ != version:
         raise LookupError(

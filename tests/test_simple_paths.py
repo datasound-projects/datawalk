@@ -247,3 +247,19 @@ def test_a_used_port_is_a_clear_error():
         s.listen()
         with pytest.raises(OSError, match="is in use"):
             serve(dw.Report("r"), port=s.getsockname()[1], open_browser=False, block=False)
+
+
+def test_install_hints_never_point_to_the_other_datawalk_on_pypi(tmp_path, monkeypatch):
+    from datawalk.hints import install
+
+    wheel = f"releases/download/v{dw.__version__}/datawalk-{dw.__version__}-py3-none-any.whl"
+    assert install("datawalk[pdf]").startswith('pip install "datawalk[pdf] @ https://github.com/')
+    assert wheel in install("datawalk[pdf]") and install("pillow") == 'pip install "pillow"'
+    monkeypatch.setattr("sys.prefix", str(tmp_path))
+    (tmp_path / "uv-receipt.toml").touch()  # a uv tool install
+    assert install("datawalk[pdf]").startswith('uv tool install "datawalk[all] @ https://')
+    assert install("bokeh==3.6.0").endswith(' --with "bokeh==3.6.0"')
+    (tmp_path / "uv-receipt.toml").unlink()
+    (tmp_path / "pipx_metadata.json").touch()  # a pipx install
+    assert install("datawalk[pptx]").startswith('pipx install --force "datawalk[all] @ https://')
+    assert install("pillow") == 'pipx inject datawalk "pillow"'
