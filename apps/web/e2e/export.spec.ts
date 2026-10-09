@@ -55,7 +55,7 @@ async function walkThrough(page: Page) {
   expect(viz.find((v) => v.key === 'returns_dist')?.source.has_payload).toBe(false)
   await page.evaluate((id) => (window as unknown as Win).datawalk.getState().inspect(id), viz.find((v) => v.key === 'price')!.id)
   await expect(page.locator('.inspector .js-plotly-plot')).toBeVisible({ timeout: 30_000 })
-  await expect(page.getByRole('link', { name: 'Daily market data' })).toHaveAttribute('download', 'market_daily.csv')
+  await expect(page.locator('.inspector').getByRole('link', { name: 'Daily market data' })).toHaveAttribute('download', 'market_daily.csv')
 }
 
 test('single HTML file opens offline without any request', async ({ page }) => {
@@ -65,7 +65,7 @@ test('single HTML file opens offline without any request', async ({ page }) => {
   await page.route(/^https?:/, (r) => r.abort())
   await page.goto(`${file}?view=3d`) // 3D also on a software GPU (CI)
   await walkThrough(page)
-  const csv = await page.getByRole('link', { name: 'Daily market data' }).getAttribute('href')
+  const csv = await page.locator('.inspector').getByRole('link', { name: 'Daily market data' }).getAttribute('href')
   expect(csv).toMatch(/^data:text\/csv;base64,/)
   expect(requests).toEqual([])
   expect(errors).toEqual([])
