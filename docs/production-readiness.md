@@ -10,7 +10,7 @@ evidence for it, and the limitations that remain. It does not claim more than th
 | Client demonstrations and sales presentations (`datawalk demo`, own reports, exports) | Yes |
 | Pilots and internal use: analysts on their machines, exports to stakeholders | Yes |
 | A self-hosted hub for one team (one hub process, HTTPS reverse proxy) | Yes, after the deployment checks below |
-| `pip install datawalk` from PyPI | **No.** The name `datawalk` on PyPI belongs to another project. The owner must choose a distribution name (see "Open decisions") |
+| `pip install datawalk` from PyPI | **No.** The name `datawalk` on PyPI belongs to another project. Install from the [GitHub release](https://github.com/datasound-projects/datawalk/releases); for PyPI, the owner must choose a distribution name (see "Open decisions") |
 
 ## Criteria and evidence
 
@@ -146,8 +146,11 @@ at rest (AES-256-GCM) and keeps an audit log.
 
 - **PyPI name.** `datawalk` on PyPI is another project. Until a name is chosen, install from
   a wheel or a source checkout.
-- **No published release yet.** The CI workflow exists but was not run on a hosting service
-  in this review. The hub's Docker image was not built here (no Docker daemon).
+- **Released on GitHub, not on PyPI.** Version 0.1.0a1 is a GitHub release with checksums
+  and a signed build provenance. CI runs every check on each change (Linux, Python 3.11 and
+  3.13, Chrome, Firefox, WebKit) and builds the hub's Docker image.
+- **Browsers without WebGL** (for example headless Firefox on Linux) show the page view; the
+  3D rooms need WebGL.
 - **One hub process.** Live follow and the SAML replay cache are in the memory of one
   process, and the database is SQLite. Do not run several hub workers.
 - **Hub pull.** Editors who pull a report get the complete archive, whatever its
@@ -178,7 +181,7 @@ at rest (AES-256-GCM) and keeps an audit log.
 
 1. The distribution name on PyPI (free on 2026-10-09: `datawalk-3d`, `datawalk3d`,
    `datawalk-viz`, `datawalk-reports`). The import name `datawalk` can stay.
-2. When to tag and publish the first release ([release-checklist.md](release-checklist.md)).
+2. The next release: push a version tag ([release-checklist.md](release-checklist.md)).
 
 ## How to verify
 
