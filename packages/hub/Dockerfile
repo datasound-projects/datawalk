@@ -9,6 +9,7 @@ WORKDIR /src/apps/web
 COPY apps/web/package.json apps/web/package-lock.json ./
 RUN npm ci
 COPY assets /src/assets
+COPY packages/schema/generated /src/packages/schema/generated
 COPY apps/web ./
 RUN npm run build
 

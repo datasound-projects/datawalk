@@ -7,7 +7,7 @@ the report, and optionally another one for a room, in Python or in the editor (*
 tab, with a preview).
 
 ```python
-report = dw.Report("Quarterly Review", theme="dark_gallery")   # or theme="Dark Gallery"
+report = dw.Report("Quarterly Review", theme="dark_gallery")  # or theme="Dark Gallery"
 ```
 
 | Theme id | Name | Character |

@@ -5,10 +5,17 @@ on:
     branches: [main]
   pull_request:
 
+# A new push replaces the run of the previous one.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   python:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
+      fail-fast: false
       matrix:
         python: ["3.11", "3.13"]
     steps:
@@ -21,6 +28,53 @@ jobs:
 
   web:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm test
+
+  # The browser tests, in parallel. GitHub's runners have no GPU: WebGL renders in software,
+  # so the 3D tests are slow, and one job per group keeps the total time short.
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: tour and themes
+            browser: chromium
+            args: --project=viewer e2e/tour.spec.ts e2e/themes.spec.ts
+          - name: walking and flat view
+            browser: chromium
+            args: --project=viewer e2e/walkthrough.spec.ts e2e/doors.spec.ts e2e/flat.spec.ts e2e/fidelity.spec.ts
+          - name: editor
+            browser: chromium
+            args: --project=editor
+          - name: notebook, sources, hub
+            browser: chromium
+            args: --project=notebook --project=sources --project=hub
+          - name: exports (Chromium)
+            browser: chromium
+            args: --project=export
+          - name: exports (Firefox)
+            browser: firefox
+            args: --project=export-firefox
+          - name: exports (WebKit)
+            browser: webkit
+            args: --project=export-webkit
+    name: e2e (${{ matrix.name }})
     defaults:
       run:
         working-directory: apps/web
@@ -33,31 +87,43 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - uses: astral-sh/setup-uv@v6
       - run: npm ci
-      - run: npm run lint
       - run: npm run build
-      - run: npm test
       - run: uv sync --all-packages --all-extras
-      - run: npx playwright install --with-deps chromium firefox webkit
-      - run: npm run test:e2e
-      # Tests that need the web build and a browser: PDF, PPTX, world files, the CI recipe.
-      - run: uv run playwright install chromium
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - run: npx playwright test ${{ matrix.args }} --reporter=list
+
+  # Tests that need the web build and a browser (PDF, PPTX, world files, the CI recipe), and
+  # the wheel, which must contain the viewer and work without Node.js.
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - uses: astral-sh/setup-uv@v6
+      - run: npm ci && npm run build
+        working-directory: apps/web
+      - run: uv sync --all-packages --all-extras
+      - run: uv run playwright install --with-deps chromium
       - run: uv run pytest tests/test_export.py tests/test_pptx_world.py tests/test_ci_recipe.py
-        working-directory: .
-      # The wheel must contain the viewer and must work without Node.js.
       - name: Build and smoke-test the wheel
-        working-directory: .
         run: |
           uv build
           uv venv /tmp/clean -p 3.11
-          VIRTUAL_ENV=/tmp/clean uv pip install "$(ls dist/*.whl)[plotly]"
-          unzip -l dist/*.whl | grep -q 'datawalk/server/static/index.html'
-          unzip -l dist/*.whl | grep -q 'datawalk/server/viewer/viewer.js'
+          VIRTUAL_ENV=/tmp/clean uv pip install "$(ls dist/datawalk-*.whl)[plotly]"
+          unzip -l dist/datawalk-*.whl | grep -q 'datawalk/server/static/index.html'
+          unzip -l dist/datawalk-*.whl | grep -q 'datawalk/server/viewer/viewer.js'
           /tmp/clean/bin/datawalk adapters
-          /tmp/clean/bin/python -c "import datawalk as vz, plotly.express as px; r = vz.Report('Smoke'); r.add(px.line(x=[1, 2], y=[3, 4]), key='a', room='Main'); r.save('/tmp/smoke.dwk')"
+          /tmp/clean/bin/python -c "import datawalk as dw, plotly.express as px; r = dw.Report('Smoke'); r.add(px.line(x=[1, 2], y=[3, 4]), key='a', room='Main'); r.save('/tmp/smoke.dwk')"
           /tmp/clean/bin/datawalk export /tmp/smoke.dwk --html /tmp/smoke.html --yes
 
   hub-image:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
       - name: Build the hub image
