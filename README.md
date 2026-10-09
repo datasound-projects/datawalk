@@ -15,8 +15,9 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/demo.gif" alt="A walk through a DataWalk report: AI, Water, and Robotics rooms" width="820">
-  <br><sub>The demo report below: walk with the keyboard and mouse, look closer at a chart, go through a door to the next topic.</sub>
+  <img src="docs/images/demo.avif" alt="A walk through a DataWalk report: AI, Water, and Robotics rooms" width="820">
+  <br><sub>The demo report below: walk with the keyboard and mouse, look closer at a chart, go through a door to the next topic.
+  <a href="https://github.com/datasound-projects/datawalk/releases/download/v0.1.0a2/datawalk-demo-4k.mp4">Watch it in 4K</a>.</sub>
 </p>
 
 ## Why DataWalk
