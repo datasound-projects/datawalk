@@ -1,0 +1,89 @@
+{
+  "height": 6.0,
+  "minSize": [
+    14,
+    10
+  ],
+  "skylight": {
+    "size": [
+      0.6,
+      0.5
+    ],
+    "frame": "#cfc8bd",
+    "mullions": 6
+  },
+  "pilasters": {
+    "spacing": 4.5,
+    "width": 0.6,
+    "depth": 0.25,
+    "color": "#e2d6c3"
+  },
+  "benches": {
+    "color": "#3b3027",
+    "seat": "#7a5a3a"
+  },
+  "furniture": [
+    {
+      "model": "marble_bust_01",
+      "anchor": {
+        "corner": "nw",
+        "inset": 0.45
+      },
+      "rotation": 135,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": {
+        "size": [
+          0.5,
+          1.1,
+          0.5
+        ],
+        "color": "#efe8dc"
+      },
+      "collide": true
+    },
+    {
+      "model": "horse_statue_01",
+      "anchor": {
+        "corner": "ne",
+        "inset": 0.45
+      },
+      "rotation": 225,
+      "scale": 3.5,
+      "elevation": 0,
+      "plinth": {
+        "size": [
+          0.55,
+          1.0,
+          0.55
+        ],
+        "color": "#efe8dc"
+      },
+      "collide": true
+    },
+    {
+      "model": "potted_plant_02",
+      "anchor": {
+        "corner": "sw",
+        "inset": 0.15
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "potted_plant_02",
+      "anchor": {
+        "corner": "se",
+        "inset": 0.15
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ t('account.title') }}</h1>
+{% if cfg.oidc or cfg.saml %}
+<section>
+  <h2>{{ t('account.sso') }}</h2>
+  {% if user.sso_subject %}<p>{{ t('account.sso_connected') }}</p>
+  {% else %}<p class="muted">{{ t('account.sso_help') }}</p>
+  <p class="row">{% if cfg.oidc %}<a class="button" href="/sso/oidc?link=1&next=/account">{{ t('account.sso_connect', name=cfg.oidc.name) }}</a>{% endif %}
+  {% if cfg.saml %}<a class="button" href="/saml/login?link=1&next=/account">{{ t('account.sso_connect', name=cfg.saml.name) }}</a>{% endif %}</p>{% endif %}
+</section>
+{% endif %}
+<section>
+  <h2>{{ t('account.tokens') }}</h2>
+  {% if new_token %}<p role="status">{{ t('account.new_token') }} <span class="token">{{ new_token }}</span></p>
+  <p>{{ t('account.publish') }} <code>DATAWALK_HUB_TOKEN=&lt;token&gt; datawalk publish report.dwk --hub {{ cfg.base_url }}</code></p>{% endif %}
+  <table>{% for tok in tokens %}<tr><td>{{ tok.name }}</td><td class="muted">{{ t('account.created', date=tok.created_at|int|datetime) }}</td><td class="muted">{% if tok.last_used %}{{ t('account.used', date=tok.last_used|int|datetime) }}{% else %}{{ t('account.not_used') }}{% endif %}</td></tr>{% endfor %}</table>
+  <form method="post" action="/account/tokens" class="row"><label>{{ t('common.name') }} <input name="name" value="publish" /></label><button class="primary">{{ t('account.create_token') }}</button></form>
+</section>
+{% endblock %}

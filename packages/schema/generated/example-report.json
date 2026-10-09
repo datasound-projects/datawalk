@@ -1,0 +1,409 @@
+{
+  "report": {
+    "schema_version": "0.3.0",
+    "id": "00000000000000000000000000000001",
+    "name": "Example",
+    "description": "Contract fixture",
+    "author": "Analytics team",
+    "date": "2026-10-01",
+    "data_cutoff": "2026-09-30",
+    "classification": "Confidential",
+    "theme": "dark_gallery",
+    "revision": 2,
+    "visualizations": [
+      {
+        "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "key": "price",
+        "source": {
+          "library": "matplotlib",
+          "chart_type": "line",
+          "mode": "structured",
+          "title": "Price",
+          "axes": [
+            {
+              "title": "Price",
+              "x": {
+                "label": "date",
+                "scale": "linear"
+              },
+              "y": {
+                "label": "USD",
+                "scale": "log"
+              },
+              "z": {
+                "label": "depth",
+                "scale": "linear"
+              },
+              "legend": [
+                "close"
+              ]
+            }
+          ],
+          "aspect": 1.5,
+          "default_name": "Price",
+          "limitations": [
+            "Bars are image-only"
+          ],
+          "has_preview": true,
+          "has_payload": true,
+          "provenance": {
+            "kind": "notebook",
+            "path": "analysis.ipynb",
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "cell_id": "abc",
+            "output_index": 0,
+            "execution_count": 3,
+            "code": "plot()"
+          }
+        },
+        "overrides": {
+          "name": "Bitcoin Price",
+          "description": "Daily",
+          "explanation": {
+            "what_it_shows": "a",
+            "inputs": "b",
+            "units": "USD",
+            "data_source": "synthetic",
+            "findings": [
+              "Up"
+            ],
+            "interpretation": "c",
+            "methodology": "d",
+            "assumptions": "e",
+            "limitations": "f",
+            "author": "g"
+          },
+          "edited": [
+            "name",
+            "explanation.findings"
+          ]
+        },
+        "status": "removed"
+      },
+      {
+        "id": "cccccccccccccccccccccccccccccccc",
+        "key": "acc",
+        "source": {
+          "library": "matplotlib",
+          "chart_type": "line",
+          "mode": "structured",
+          "title": "Price",
+          "axes": [
+            {
+              "title": "Price",
+              "x": {
+                "label": "date",
+                "scale": "linear"
+              },
+              "y": {
+                "label": "USD",
+                "scale": "log"
+              },
+              "z": {
+                "label": "depth",
+                "scale": "linear"
+              },
+              "legend": [
+                "close"
+              ]
+            }
+          ],
+          "aspect": 1.5,
+          "default_name": "Price",
+          "limitations": [
+            "Bars are image-only"
+          ],
+          "has_preview": true,
+          "has_payload": true,
+          "provenance": {
+            "kind": "notebook",
+            "path": "analysis.ipynb",
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "cell_id": "abc",
+            "output_index": 0,
+            "execution_count": 3,
+            "code": "plot()"
+          }
+        },
+        "overrides": {
+          "name": null,
+          "description": "",
+          "explanation": {
+            "what_it_shows": "",
+            "inputs": "",
+            "units": "",
+            "data_source": "",
+            "findings": [],
+            "interpretation": "",
+            "methodology": "",
+            "assumptions": "",
+            "limitations": "",
+            "author": ""
+          },
+          "edited": []
+        },
+        "status": "active"
+      }
+    ],
+    "dashboards": [
+      {
+        "id": "dddddddddddddddddddddddddddddddd",
+        "key": "Overview",
+        "name": "Overview",
+        "description": "Two",
+        "items": [
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "cccccccccccccccccccccccccccccccc"
+        ]
+      }
+    ],
+    "rooms": [
+      {
+        "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "key": "Market",
+        "name": "Market",
+        "description": "Overview",
+        "theme": "executive_office",
+        "items": [
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "dddddddddddddddddddddddddddddddd"
+        ],
+        "placements": {
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": {
+            "wall": "east",
+            "u": 0.25,
+            "v": 0.5,
+            "width": 2.0,
+            "locked": true
+          }
+        }
+      }
+    ],
+    "links": [
+      {
+        "id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "key": "Market",
+        "name": "Market",
+        "items": [
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "cccccccccccccccccccccccccccccccc"
+        ],
+        "on": "x"
+      }
+    ],
+    "datasets": [
+      {
+        "id": "ffffffffffffffffffffffffffffffff",
+        "key": "prices",
+        "name": "Prices",
+        "description": "Daily close",
+        "columns": [
+          "date",
+          "close"
+        ],
+        "rows": 2,
+        "visualizations": [
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ]
+      }
+    ],
+    "tour": [
+      {
+        "id": "99999999999999999999999999999999",
+        "ref": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "notes": "Start here.",
+        "duration": 8.5
+      },
+      {
+        "id": "88888888888888888888888888888888",
+        "ref": "dddddddddddddddddddddddddddddddd",
+        "notes": "",
+        "duration": null
+      }
+    ],
+    "brand": {
+      "name": "Contoso",
+      "frame": "#112233",
+      "plaque": "#ffffff",
+      "plaque_text": "#111111",
+      "accent": "#0055aa",
+      "has_logo": false
+    },
+    "edited": [
+      "tour"
+    ]
+  },
+  "payloads": [
+    {
+      "kind": "series",
+      "series": [
+        {
+          "axes": 0,
+          "name": "close",
+          "kind": "line",
+          "x": [
+            "2024-01-01",
+            2.5
+          ],
+          "y": [
+            1.0,
+            null
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "plotly",
+      "figure": {
+        "data": [
+          {
+            "type": "scatter",
+            "y": [
+              1,
+              2
+            ]
+          }
+        ],
+        "layout": {}
+      }
+    },
+    {
+      "kind": "kpi",
+      "value": 0.873,
+      "display": "87.3%",
+      "unit": "",
+      "delta": 0.012,
+      "delta_display": "+1.2%",
+      "higher_is_better": true
+    },
+    {
+      "kind": "table",
+      "columns": [
+        "id",
+        "x",
+        "ok"
+      ],
+      "rows": [
+        [
+          "p",
+          1.5,
+          true
+        ],
+        [
+          "q",
+          null,
+          false
+        ]
+      ],
+      "total_rows": 2
+    },
+    {
+      "kind": "text",
+      "markdown": "**Up** 3 %",
+      "links": [
+        "price"
+      ]
+    },
+    {
+      "kind": "vegalite",
+      "spec": {
+        "mark": "bar",
+        "data": {
+          "values": [
+            {
+              "a": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "kind": "svg",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"2\" height=\"1\"/>"
+    },
+    {
+      "kind": "bokeh",
+      "item": {
+        "root_id": "p1",
+        "doc": {}
+      },
+      "version": "3.10.0"
+    }
+  ],
+  "decode": [
+    {
+      "encoded": {
+        "dtype": "f8",
+        "bdata": "AAAAAAAA+D8AAAAAAAACwFnz+MIfbqUBNVgAZi3rUX4="
+      },
+      "values": [
+        1.5,
+        -2.25,
+        1e-300,
+        3e+300
+      ],
+      "shape": [
+        4
+      ]
+    },
+    {
+      "encoded": {
+        "dtype": "i4",
+        "bdata": "AQAAAP7///8DAAAA"
+      },
+      "values": [
+        1,
+        -2,
+        3
+      ],
+      "shape": [
+        3
+      ]
+    },
+    {
+      "encoded": {
+        "dtype": "u1",
+        "bdata": "Bwg="
+      },
+      "values": [
+        7,
+        8
+      ],
+      "shape": [
+        2
+      ]
+    },
+    {
+      "encoded": {
+        "dtype": "f4",
+        "bdata": "AAAAPwAAgD4="
+      },
+      "values": [
+        0.5,
+        0.25
+      ],
+      "shape": [
+        2
+      ]
+    },
+    {
+      "encoded": {
+        "dtype": "i2",
+        "bdata": "AAABAAIAAwAEAAUA",
+        "shape": "2, 3"
+      },
+      "values": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "shape": [
+        2,
+        3
+      ]
+    }
+  ]
+}

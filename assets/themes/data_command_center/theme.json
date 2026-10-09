@@ -1,0 +1,80 @@
+{
+  "id": "data_command_center",
+  "name": "Data Command Center",
+  "description": "A dark control room with LED display walls, control desks and blue accent light.",
+  "lighting": {
+    "environment": "studio_small_03",
+    "environmentIntensity": 0.3,
+    "exposure": 1.1,
+    "view": null,
+    "viewIntensity": 1.0,
+    "sun": null,
+    "ambient": {
+      "sky": "#9fb4ff",
+      "ground": "#1b2230",
+      "intensity": 0.18
+    },
+    "fixtures": "downlights",
+    "fixtureColor": "#dfe9ff",
+    "fixtureIntensity": 3,
+    "accent": {
+      "color": "#2f7bff",
+      "intensity": 3
+    },
+    "viewRotation": 0,
+    "ceilingBounce": 0.0
+  },
+  "surfaces": {
+    "floor": {
+      "material": "rubber_tiles",
+      "color": "#2e333b",
+      "tile": 1.5,
+      "roughness": 2.5,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "walls": {
+      "material": "hessian_230",
+      "color": "#1d2430",
+      "tile": 2.0,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "ceiling": {
+      "material": null,
+      "color": "#0e1116",
+      "tile": 2.0,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "wainscot": null,
+    "trim": "#10141b",
+    "rug": null
+  },
+  "display": {
+    "style": "led",
+    "frame": "#15181d",
+    "plaque": {
+      "background": "#0f141c",
+      "text": "#d6e4ff"
+    },
+    "spotlight": false,
+    "glow": "#2f7bff"
+  },
+  "door": {
+    "color": "#1a1f27",
+    "frame": "#10141b"
+  },
+  "preview": {
+    "from": [
+      0.6,
+      0.85
+    ],
+    "to": [
+      0.35,
+      0.1
+    ]
+  }
+}

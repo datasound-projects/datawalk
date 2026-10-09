@@ -1,0 +1,924 @@
+{
+ "models": {
+  "sofa_02": {
+   "min": [
+    -0.903,
+    0,
+    -0.478
+   ],
+   "max": [
+    0.904,
+    0.71,
+    0.34
+   ]
+  },
+  "sofa_03": {
+   "min": [
+    -1.366,
+    0.001,
+    -0.464
+   ],
+   "max": [
+    1.366,
+    1.119,
+    0.461
+   ]
+  },
+  "Sofa_01": {
+   "min": [
+    -0.778,
+    -0.001,
+    -0.361
+   ],
+   "max": [
+    0.793,
+    0.796,
+    0.297
+   ]
+  },
+  "ArmChair_01": {
+   "min": [
+    -0.424,
+    0,
+    -0.417
+   ],
+   "max": [
+    0.424,
+    1.065,
+    0.348
+   ]
+  },
+  "modern_arm_chair_01": {
+   "min": [
+    -0.407,
+    0,
+    -0.575
+   ],
+   "max": [
+    0.414,
+    1.023,
+    0.411
+   ]
+  },
+  "mid_century_lounge_chair": {
+   "min": [
+    -0.504,
+    0,
+    -0.661
+   ],
+   "max": [
+    0.504,
+    1.169,
+    0.529
+   ]
+  },
+  "GreenChair_01": {
+   "min": [
+    -0.337,
+    -0.001,
+    -0.378
+   ],
+   "max": [
+    0.336,
+    1.058,
+    0.286
+   ]
+  },
+  "modern_coffee_table_01": {
+   "min": [
+    -0.3,
+    0,
+    -0.601
+   ],
+   "max": [
+    0.3,
+    0.39,
+    0.601
+   ]
+  },
+  "side_table_01": {
+   "min": [
+    -0.275,
+    -0.002,
+    -0.225
+   ],
+   "max": [
+    0.275,
+    0.548,
+    0.225
+   ]
+  },
+  "side_table_tall_01": {
+   "min": [
+    -0.192,
+    0,
+    -0.192
+   ],
+   "max": [
+    0.192,
+    0.761,
+    0.192
+   ]
+  },
+  "industrial_coffee_table": {
+   "min": [
+    -0.386,
+    0,
+    -0.379
+   ],
+   "max": [
+    0.393,
+    0.638,
+    0.379
+   ]
+  },
+  "WoodenTable_01": {
+   "min": [
+    -0.9,
+    0,
+    -0.329
+   ],
+   "max": [
+    0.9,
+    0.549,
+    0.329
+   ]
+  },
+  "metal_office_desk": {
+   "min": [
+    -1,
+    0,
+    -0.469
+   ],
+   "max": [
+    1,
+    0.787,
+    0.478
+   ]
+  },
+  "desk_lamp_arm_01": {
+   "min": [
+    -0.118,
+    -0.088,
+    -0.297
+   ],
+   "max": [
+    0.083,
+    0.805,
+    0.317
+   ]
+  },
+  "classic_laptop": {
+   "min": [
+    -0.326,
+    -0.001,
+    -0.242
+   ],
+   "max": [
+    0.326,
+    0.542,
+    0.244
+   ]
+  },
+  "wooden_bookshelf_worn": {
+   "min": [
+    -0.687,
+    0,
+    -0.291
+   ],
+   "max": [
+    0.687,
+    2.063,
+    0.291
+   ]
+  },
+  "steel_frame_shelves_01": {
+   "min": [
+    -5.486,
+    -0.011,
+    -2.51
+   ],
+   "max": [
+    5.487,
+    21.394,
+    2.51
+   ]
+  },
+  "modern_ceiling_lamp_01": {
+   "min": [
+    -0.216,
+    0.221,
+    -0.214
+   ],
+   "max": [
+    0.216,
+    1.173,
+    0.217
+   ]
+  },
+  "hanging_industrial_lamp": {
+   "min": [
+    -0.275,
+    -1.34,
+    -0.275
+   ],
+   "max": [
+    0.275,
+    0.015,
+    0.275
+   ]
+  },
+  "metal_stool_01": {
+   "min": [
+    -0.176,
+    0,
+    -0.177
+   ],
+   "max": [
+    0.176,
+    0.883,
+    0.177
+   ]
+  },
+  "metal_stool_02": {
+   "min": [
+    -0.224,
+    0,
+    -0.235
+   ],
+   "max": [
+    0.224,
+    0.458,
+    0.238
+   ]
+  },
+  "potted_plant_02": {
+   "min": [
+    -0.396,
+    0,
+    -0.42
+   ],
+   "max": [
+    0.304,
+    0.841,
+    0.237
+   ]
+  },
+  "potted_plant_04": {
+   "min": [
+    -0.084,
+    0,
+    -0.084
+   ],
+   "max": [
+    0.084,
+    0.268,
+    0.101
+   ]
+  },
+  "ceramic_vase_01": {
+   "min": [
+    -0.102,
+    0.001,
+    -0.102
+   ],
+   "max": [
+    0.102,
+    0.401,
+    0.102
+   ]
+  },
+  "ceramic_vase_02": {
+   "min": [
+    -0.109,
+    0.001,
+    -0.109
+   ],
+   "max": [
+    0.109,
+    0.31,
+    0.109
+   ]
+  },
+  "marble_bust_01": {
+   "min": [
+    -0.123,
+    0,
+    -0.145
+   ],
+   "max": [
+    0.149,
+    0.515,
+    0.155
+   ]
+  },
+  "horse_statue_01": {
+   "min": [
+    -0.085,
+    0,
+    -0.054
+   ],
+   "max": [
+    0.078,
+    0.22,
+    0.054
+   ]
+  },
+  "bronze_whale_statue": {
+   "min": [
+    -0.508,
+    0,
+    -0.816
+   ],
+   "max": [
+    0.424,
+    1.073,
+    0.549
+   ]
+  },
+  "concrete_cat_statue": {
+   "min": [
+    -0.078,
+    0,
+    -0.15
+   ],
+   "max": [
+    0.075,
+    0.283,
+    0.1
+   ]
+  }
+ },
+ "materials": [
+  "herringbone_parquet",
+  "dark_wood",
+  "plastered_wall_04",
+  "plank_flooring_02",
+  "white_stucco",
+  "laminate_floor_02",
+  "dark_wooden_planks",
+  "concrete_floor_worn_001",
+  "red_brick",
+  "rough_concrete",
+  "marble_01",
+  "plastered_wall_03",
+  "terrazzo_tiles",
+  "rubber_tiles",
+  "hessian_230",
+  "poly_wool_herringbone",
+  "rough_linen",
+  "oak_veneer_01",
+  "metal_plate_02",
+  "painted_concrete_02"
+ ],
+ "hdris": [
+  "hotel_room",
+  "lebombo",
+  "photo_studio_loft_hall",
+  "studio_small_03",
+  "artist_workshop",
+  "photo_studio_london_hall",
+  "leadenhall_market",
+  "studio_small_09",
+  "belfast_sunset_puresky"
+ ],
+ "views": [
+  "belfast_sunset_puresky",
+  "kloofendal_overcast_puresky",
+  "urban_street_01",
+  "kloofendal_48d_partly_cloudy_puresky",
+  "sunset_jhbcentral",
+  "modern_evening_street",
+  "kloppenheim_06_puresky"
+ ],
+ "credits": {
+  "sofa_02": {
+   "name": "Sofa 02",
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "source": "https://polyhaven.com/a/sofa_02",
+   "license": "CC0-1.0"
+  },
+  "herringbone_parquet": {
+   "name": "Herringbone Parquet",
+   "authors": [
+    "Jenelle van Heerden",
+    "Sergej Majboroda"
+   ],
+   "source": "https://polyhaven.com/a/herringbone_parquet",
+   "license": "CC0-1.0"
+  },
+  "hotel_room": {
+   "name": "Hotel Room",
+   "authors": [
+    "Greg Zaal"
+   ],
+   "source": "https://polyhaven.com/a/hotel_room",
+   "license": "CC0-1.0"
+  },
+  "sofa_03": {
+   "name": "Sofa 03",
+   "authors": [
+    "Fran Calvente"
+   ],
+   "source": "https://polyhaven.com/a/sofa_03",
+   "license": "CC0-1.0"
+  },
+  "Sofa_01": {
+   "name": "Sofa 01",
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "source": "https://polyhaven.com/a/Sofa_01",
+   "license": "CC0-1.0"
+  },
+  "ArmChair_01": {
+   "name": "Arm Chair 01",
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "source": "https://polyhaven.com/a/ArmChair_01",
+   "license": "CC0-1.0"
+  },
+  "modern_arm_chair_01": {
+   "name": "Modern Arm Chair 01",
+   "authors": [
+    "Vibrant Nordic"
+   ],
+   "source": "https://polyhaven.com/a/modern_arm_chair_01",
+   "license": "CC0-1.0"
+  },
+  "mid_century_lounge_chair": {
+   "name": "Mid Century Lounge Chair",
+   "authors": [
+    "Kuutti Siitonen"
+   ],
+   "source": "https://polyhaven.com/a/mid_century_lounge_chair",
+   "license": "CC0-1.0"
+  },
+  "GreenChair_01": {
+   "name": "Green Chair 01",
+   "authors": [
+    "Kirill Sannikov"
+   ],
+   "source": "https://polyhaven.com/a/GreenChair_01",
+   "license": "CC0-1.0"
+  },
+  "modern_coffee_table_01": {
+   "name": "Modern Coffee Table 01",
+   "authors": [
+    "Amin"
+   ],
+   "source": "https://polyhaven.com/a/modern_coffee_table_01",
+   "license": "CC0-1.0"
+  },
+  "side_table_01": {
+   "name": "Side Table 01",
+   "authors": [
+    "James Ray Cock"
+   ],
+   "source": "https://polyhaven.com/a/side_table_01",
+   "license": "CC0-1.0"
+  },
+  "side_table_tall_01": {
+   "name": "Side Table Tall 01",
+   "authors": [
+    "James Ray Cock"
+   ],
+   "source": "https://polyhaven.com/a/side_table_tall_01",
+   "license": "CC0-1.0"
+  },
+  "industrial_coffee_table": {
+   "name": "Industrial Coffee Table",
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "source": "https://polyhaven.com/a/industrial_coffee_table",
+   "license": "CC0-1.0"
+  },
+  "WoodenTable_01": {
+   "name": "Wooden Table 01",
+   "authors": [
+    "Ethan Place"
+   ],
+   "source": "https://polyhaven.com/a/WoodenTable_01",
+   "license": "CC0-1.0"
+  },
+  "metal_office_desk": {
+   "name": "Metal Office Desk",
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "source": "https://polyhaven.com/a/metal_office_desk",
+   "license": "CC0-1.0"
+  },
+  "desk_lamp_arm_01": {
+   "name": "Desk Lamp Arm 01",
+   "authors": [
+    "Yann Kervran",
+    "Kuutti Siitonen"
+   ],
+   "source": "https://polyhaven.com/a/desk_lamp_arm_01",
+   "license": "CC0-1.0"
+  },
+  "classic_laptop": {
+   "name": "Classic Laptop",
+   "authors": [
+    "Arrangemonk"
+   ],
+   "source": "https://polyhaven.com/a/classic_laptop",
+   "license": "CC0-1.0"
+  },
+  "wooden_bookshelf_worn": {
+   "name": "Wooden Bookshelf Worn",
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "source": "https://polyhaven.com/a/wooden_bookshelf_worn",
+   "license": "CC0-1.0"
+  },
+  "steel_frame_shelves_01": {
+   "name": "Steel Frame Shelves 01",
+   "authors": [
+    "James Ray Cock"
+   ],
+   "source": "https://polyhaven.com/a/steel_frame_shelves_01",
+   "license": "CC0-1.0"
+  },
+  "modern_ceiling_lamp_01": {
+   "name": "Modern Ceiling Lamp 01",
+   "authors": [
+    "James Ray Cock"
+   ],
+   "source": "https://polyhaven.com/a/modern_ceiling_lamp_01",
+   "license": "CC0-1.0"
+  },
+  "hanging_industrial_lamp": {
+   "name": "Hanging Industrial Lamp",
+   "authors": [
+    "Kuutti Siitonen"
+   ],
+   "source": "https://polyhaven.com/a/hanging_industrial_lamp",
+   "license": "CC0-1.0"
+  },
+  "metal_stool_01": {
+   "name": "Metal Stool 01",
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "source": "https://polyhaven.com/a/metal_stool_01",
+   "license": "CC0-1.0"
+  },
+  "metal_stool_02": {
+   "name": "Metal Stool 02",
+   "authors": [
+    "Ulan Cabanilla"
+   ],
+   "source": "https://polyhaven.com/a/metal_stool_02",
+   "license": "CC0-1.0"
+  },
+  "potted_plant_02": {
+   "name": "Potted Plant 02",
+   "authors": [
+    "Rico Cilliers"
+   ],
+   "source": "https://polyhaven.com/a/potted_plant_02",
+   "license": "CC0-1.0"
+  },
+  "potted_plant_04": {
+   "name": "Potted Plant 04",
+   "authors": [
+    "James Ray Cock"
+   ],
+   "source": "https://polyhaven.com/a/potted_plant_04",
+   "license": "CC0-1.0"
+  },
+  "ceramic_vase_01": {
+   "name": "Ceramic Vase 01",
+   "authors": [
+    "James Ray Cock"
+   ],
+   "source": "https://polyhaven.com/a/ceramic_vase_01",
+   "license": "CC0-1.0"
+  },
+  "ceramic_vase_02": {
+   "name": "Ceramic Vase 02",
+   "authors": [
+    "James Ray Cock"
+   ],
+   "source": "https://polyhaven.com/a/ceramic_vase_02",
+   "license": "CC0-1.0"
+  },
+  "marble_bust_01": {
+   "name": "Marble Bust 01",
+   "authors": [
+    "Rico Cilliers"
+   ],
+   "source": "https://polyhaven.com/a/marble_bust_01",
+   "license": "CC0-1.0"
+  },
+  "horse_statue_01": {
+   "name": "Horse Statue 01",
+   "authors": [
+    "Rico Cilliers"
+   ],
+   "source": "https://polyhaven.com/a/horse_statue_01",
+   "license": "CC0-1.0"
+  },
+  "bronze_whale_statue": {
+   "name": "Bronze Whale Statue",
+   "authors": [
+    "Tina"
+   ],
+   "source": "https://polyhaven.com/a/bronze_whale_statue",
+   "license": "CC0-1.0"
+  },
+  "concrete_cat_statue": {
+   "name": "Concrete Cat Statue",
+   "authors": [
+    "Rico Cilliers",
+    "Riley Queen"
+   ],
+   "source": "https://polyhaven.com/a/concrete_cat_statue",
+   "license": "CC0-1.0"
+  },
+  "dark_wood": {
+   "name": "Dark Wood",
+   "authors": [
+    "Dario Barresi",
+    "Dimitrios Savva",
+    "Rico Cilliers"
+   ],
+   "source": "https://polyhaven.com/a/dark_wood",
+   "license": "CC0-1.0"
+  },
+  "plastered_wall_04": {
+   "name": "Plastered Wall 04",
+   "authors": [
+    "Rob Tuytel"
+   ],
+   "source": "https://polyhaven.com/a/plastered_wall_04",
+   "license": "CC0-1.0"
+  },
+  "plank_flooring_02": {
+   "name": "Plank Flooring 02",
+   "authors": [
+    "Dario Barresi",
+    "Dimitrios Savva"
+   ],
+   "source": "https://polyhaven.com/a/plank_flooring_02",
+   "license": "CC0-1.0"
+  },
+  "white_stucco": {
+   "name": "White Stucco",
+   "authors": [
+    "Amal Kumar"
+   ],
+   "source": "https://polyhaven.com/a/white_stucco",
+   "license": "CC0-1.0"
+  },
+  "laminate_floor_02": {
+   "name": "Laminate Floor 02",
+   "authors": [
+    "Dario Barresi",
+    "Charlotte Baglioni"
+   ],
+   "source": "https://polyhaven.com/a/laminate_floor_02",
+   "license": "CC0-1.0"
+  },
+  "dark_wooden_planks": {
+   "name": "Dark Wooden Planks",
+   "authors": [
+    "Amal Kumar"
+   ],
+   "source": "https://polyhaven.com/a/dark_wooden_planks",
+   "license": "CC0-1.0"
+  },
+  "concrete_floor_worn_001": {
+   "name": "Concrete Floor Worn 001",
+   "authors": [
+    "Dimitrios Savva",
+    "Rico Cilliers"
+   ],
+   "source": "https://polyhaven.com/a/concrete_floor_worn_001",
+   "license": "CC0-1.0"
+  },
+  "red_brick": {
+   "name": "Red Brick",
+   "authors": [
+    "Rob Tuytel"
+   ],
+   "source": "https://polyhaven.com/a/red_brick",
+   "license": "CC0-1.0"
+  },
+  "rough_concrete": {
+   "name": "Rough Concrete",
+   "authors": [
+    "Dimitrios Savva"
+   ],
+   "source": "https://polyhaven.com/a/rough_concrete",
+   "license": "CC0-1.0"
+  },
+  "marble_01": {
+   "name": "Marble 01",
+   "authors": [
+    "Rob Tuytel"
+   ],
+   "source": "https://polyhaven.com/a/marble_01",
+   "license": "CC0-1.0"
+  },
+  "plastered_wall_03": {
+   "name": "Plastered Wall 03",
+   "authors": [
+    "Rob Tuytel"
+   ],
+   "source": "https://polyhaven.com/a/plastered_wall_03",
+   "license": "CC0-1.0"
+  },
+  "terrazzo_tiles": {
+   "name": "Terrazzo Tiles",
+   "authors": [
+    "Amal Kumar"
+   ],
+   "source": "https://polyhaven.com/a/terrazzo_tiles",
+   "license": "CC0-1.0"
+  },
+  "rubber_tiles": {
+   "name": "Rubber Tiles",
+   "authors": [
+    "Amal Kumar"
+   ],
+   "source": "https://polyhaven.com/a/rubber_tiles",
+   "license": "CC0-1.0"
+  },
+  "hessian_230": {
+   "name": "Hessian 230",
+   "authors": [
+    "colormass",
+    "Rico Cilliers"
+   ],
+   "source": "https://polyhaven.com/a/hessian_230",
+   "license": "CC0-1.0"
+  },
+  "poly_wool_herringbone": {
+   "name": "Poly Wool Herringbone",
+   "authors": [
+    "colormass",
+    "Rico Cilliers"
+   ],
+   "source": "https://polyhaven.com/a/poly_wool_herringbone",
+   "license": "CC0-1.0"
+  },
+  "rough_linen": {
+   "name": "Rough Linen",
+   "authors": [
+    "colormass",
+    "Rico Cilliers"
+   ],
+   "source": "https://polyhaven.com/a/rough_linen",
+   "license": "CC0-1.0"
+  },
+  "oak_veneer_01": {
+   "name": "Oak Veneer 01",
+   "authors": [
+    "Jenelle van Heerden"
+   ],
+   "source": "https://polyhaven.com/a/oak_veneer_01",
+   "license": "CC0-1.0"
+  },
+  "metal_plate_02": {
+   "name": "Metal Plate 02",
+   "authors": [
+    "Rob Tuytel"
+   ],
+   "source": "https://polyhaven.com/a/metal_plate_02",
+   "license": "CC0-1.0"
+  },
+  "lebombo": {
+   "name": "Lebombo",
+   "authors": [
+    "Greg Zaal"
+   ],
+   "source": "https://polyhaven.com/a/lebombo",
+   "license": "CC0-1.0"
+  },
+  "photo_studio_loft_hall": {
+   "name": "Photo Studio Loft Hall",
+   "authors": [
+    "Sergej Majboroda"
+   ],
+   "source": "https://polyhaven.com/a/photo_studio_loft_hall",
+   "license": "CC0-1.0"
+  },
+  "studio_small_03": {
+   "name": "Studio Small 03",
+   "authors": [
+    "Greg Zaal"
+   ],
+   "source": "https://polyhaven.com/a/studio_small_03",
+   "license": "CC0-1.0"
+  },
+  "artist_workshop": {
+   "name": "Artist Workshop",
+   "authors": [
+    "Oliksiy Yakovlyev"
+   ],
+   "source": "https://polyhaven.com/a/artist_workshop",
+   "license": "CC0-1.0"
+  },
+  "photo_studio_london_hall": {
+   "name": "Photo Studio London Hall",
+   "authors": [
+    "Sergej Majboroda"
+   ],
+   "source": "https://polyhaven.com/a/photo_studio_london_hall",
+   "license": "CC0-1.0"
+  },
+  "leadenhall_market": {
+   "name": "Leadenhall Market",
+   "authors": [
+    "Andreas Mischok"
+   ],
+   "source": "https://polyhaven.com/a/leadenhall_market",
+   "license": "CC0-1.0"
+  },
+  "studio_small_09": {
+   "name": "Studio Small 09",
+   "authors": [
+    "Sergej Majboroda"
+   ],
+   "source": "https://polyhaven.com/a/studio_small_09",
+   "license": "CC0-1.0"
+  },
+  "belfast_sunset_puresky": {
+   "name": "Belfast Sunset (Pure Sky)",
+   "authors": [
+    "Greg Zaal",
+    "Dimitrios Savva",
+    "Jarod Guest"
+   ],
+   "source": "https://polyhaven.com/a/belfast_sunset_puresky",
+   "license": "CC0-1.0"
+  },
+  "kloofendal_overcast_puresky": {
+   "name": "Kloofendal Overcast (Pure Sky)",
+   "authors": [
+    "Greg Zaal"
+   ],
+   "source": "https://polyhaven.com/a/kloofendal_overcast_puresky",
+   "license": "CC0-1.0"
+  },
+  "urban_street_01": {
+   "name": "Urban Street 01",
+   "authors": [
+    "Andreas Mischok"
+   ],
+   "source": "https://polyhaven.com/a/urban_street_01",
+   "license": "CC0-1.0"
+  },
+  "kloofendal_48d_partly_cloudy_puresky": {
+   "name": "Kloofendal 48d Partly Cloudy (Pure Sky)",
+   "authors": [
+    "Greg Zaal",
+    "Jarod Guest"
+   ],
+   "source": "https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky",
+   "license": "CC0-1.0"
+  },
+  "painted_concrete_02": {
+   "name": "Painted Concrete 02",
+   "authors": [
+    "Rob Tuytel"
+   ],
+   "source": "https://polyhaven.com/a/painted_concrete_02",
+   "license": "CC0-1.0"
+  },
+  "sunset_jhbcentral": {
+   "name": "Joburg Central Sunset",
+   "authors": [
+    "Greg Zaal",
+    "Dimitrios Savva"
+   ],
+   "source": "https://polyhaven.com/a/sunset_jhbcentral",
+   "license": "CC0-1.0"
+  },
+  "modern_evening_street": {
+   "name": "Modern Evening Street",
+   "authors": [
+    "Grzegorz Wronkowski"
+   ],
+   "source": "https://polyhaven.com/a/modern_evening_street",
+   "license": "CC0-1.0"
+  },
+  "kloppenheim_06_puresky": {
+   "name": "Kloppenheim 06 (Pure Sky)",
+   "authors": [
+    "Greg Zaal",
+    "Jarod Guest"
+   ],
+   "source": "https://polyhaven.com/a/kloppenheim_06_puresky",
+   "license": "CC0-1.0"
+  }
+ }
+}

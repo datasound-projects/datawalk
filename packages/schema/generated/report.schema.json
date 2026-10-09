@@ -1,0 +1,1252 @@
+{
+  "schema_version": "0.3.0",
+  "report": {
+    "$defs": {
+      "AxesInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "x": {
+            "$ref": "#/$defs/Axis"
+          },
+          "y": {
+            "$ref": "#/$defs/Axis"
+          },
+          "z": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Axis"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "legend": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Legend",
+            "type": "array"
+          }
+        },
+        "title": "AxesInfo",
+        "type": "object"
+      },
+      "Axis": {
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "default": "",
+            "title": "Label",
+            "type": "string"
+          },
+          "scale": {
+            "default": "linear",
+            "title": "Scale",
+            "type": "string"
+          }
+        },
+        "title": "Axis",
+        "type": "object"
+      },
+      "Brand": {
+        "additionalProperties": false,
+        "description": "A customer's brand for customer-facing reports: logo, display frame and plaque colors.",
+        "properties": {
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "frame": {
+            "anyOf": [
+              {
+                "pattern": "^#[0-9a-fA-F]{6}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Frame"
+          },
+          "plaque": {
+            "anyOf": [
+              {
+                "pattern": "^#[0-9a-fA-F]{6}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Plaque"
+          },
+          "plaque_text": {
+            "anyOf": [
+              {
+                "pattern": "^#[0-9a-fA-F]{6}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Plaque Text"
+          },
+          "accent": {
+            "anyOf": [
+              {
+                "pattern": "^#[0-9a-fA-F]{6}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Accent"
+          },
+          "has_logo": {
+            "default": false,
+            "title": "Has Logo",
+            "type": "boolean"
+          }
+        },
+        "title": "Brand",
+        "type": "object"
+      },
+      "Dashboard": {
+        "additionalProperties": false,
+        "description": "Several visualizations shown together on one display.",
+        "properties": {
+          "id": {
+            "pattern": "^[0-9a-f]{32}$",
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Key"
+          },
+          "name": {
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "items": {
+            "default": [],
+            "items": {
+              "pattern": "^[0-9a-f]{32}$",
+              "type": "string"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "Dashboard",
+        "type": "object"
+      },
+      "Dataset": {
+        "additionalProperties": false,
+        "description": "A table that the analyst attached for download. Exports include it only on request.",
+        "properties": {
+          "id": {
+            "pattern": "^[0-9a-f]{32}$",
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "columns": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Columns",
+            "type": "array"
+          },
+          "rows": {
+            "minimum": 0,
+            "title": "Rows",
+            "type": "integer"
+          },
+          "visualizations": {
+            "default": [],
+            "items": {
+              "pattern": "^[0-9a-f]{32}$",
+              "type": "string"
+            },
+            "title": "Visualizations",
+            "type": "array"
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "rows"
+        ],
+        "title": "Dataset",
+        "type": "object"
+      },
+      "Explanation": {
+        "additionalProperties": false,
+        "properties": {
+          "what_it_shows": {
+            "default": "",
+            "title": "What It Shows",
+            "type": "string"
+          },
+          "inputs": {
+            "default": "",
+            "title": "Inputs",
+            "type": "string"
+          },
+          "units": {
+            "default": "",
+            "title": "Units",
+            "type": "string"
+          },
+          "data_source": {
+            "default": "",
+            "title": "Data Source",
+            "type": "string"
+          },
+          "findings": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "interpretation": {
+            "default": "",
+            "title": "Interpretation",
+            "type": "string"
+          },
+          "methodology": {
+            "default": "",
+            "title": "Methodology",
+            "type": "string"
+          },
+          "assumptions": {
+            "default": "",
+            "title": "Assumptions",
+            "type": "string"
+          },
+          "limitations": {
+            "default": "",
+            "title": "Limitations",
+            "type": "string"
+          },
+          "author": {
+            "default": "",
+            "title": "Author",
+            "type": "string"
+          }
+        },
+        "title": "Explanation",
+        "type": "object"
+      },
+      "Link": {
+        "additionalProperties": false,
+        "description": "Visualizations that share x values (dates or ids), declared by the analyst.\nSelecting or zooming an x range in one of them applies it to the others.",
+        "properties": {
+          "id": {
+            "pattern": "^[0-9a-f]{32}$",
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Key"
+          },
+          "name": {
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "pattern": "^[0-9a-f]{32}$",
+              "type": "string"
+            },
+            "minItems": 2,
+            "title": "Items",
+            "type": "array"
+          },
+          "on": {
+            "const": "x",
+            "default": "x",
+            "title": "On",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "items"
+        ],
+        "title": "Link",
+        "type": "object"
+      },
+      "Overrides": {
+        "additionalProperties": false,
+        "description": "Data that the user owns. A source refresh never changes it.",
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Name"
+          },
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "explanation": {
+            "$ref": "#/$defs/Explanation"
+          },
+          "edited": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Edited",
+            "type": "array"
+          }
+        },
+        "title": "Overrides",
+        "type": "object"
+      },
+      "Placement": {
+        "additionalProperties": false,
+        "description": "A manual position in normalized coordinates, so it survives room resizing and\ntheme changes. On a wall: u along the wall (left to right as seen from inside), v up.\nOn the floor (3D exhibits): u from west to east, v from north to south.",
+        "properties": {
+          "wall": {
+            "enum": [
+              "north",
+              "east",
+              "south",
+              "west",
+              "floor"
+            ],
+            "title": "Wall",
+            "type": "string"
+          },
+          "u": {
+            "maximum": 1,
+            "minimum": 0,
+            "title": "U",
+            "type": "number"
+          },
+          "v": {
+            "maximum": 1,
+            "minimum": 0,
+            "title": "V",
+            "type": "number"
+          },
+          "width": {
+            "exclusiveMinimum": 0,
+            "maximum": 20,
+            "title": "Width",
+            "type": "number"
+          },
+          "locked": {
+            "default": false,
+            "title": "Locked",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "wall",
+          "u",
+          "v",
+          "width"
+        ],
+        "title": "Placement",
+        "type": "object"
+      },
+      "Provenance": {
+        "additionalProperties": false,
+        "description": "Where an imported visualization comes from (notebooks, files, MLflow runs).",
+        "properties": {
+          "kind": {
+            "enum": [
+              "notebook",
+              "file",
+              "mlflow"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "sha256": {
+            "default": "",
+            "title": "Sha256",
+            "type": "string"
+          },
+          "cell_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cell Id"
+          },
+          "output_index": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Output Index"
+          },
+          "execution_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Execution Count"
+          },
+          "code": {
+            "default": "",
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "path"
+        ],
+        "title": "Provenance",
+        "type": "object"
+      },
+      "Room": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "pattern": "^[0-9a-f]{32}$",
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Key"
+          },
+          "name": {
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "theme": {
+            "anyOf": [
+              {
+                "enum": [
+                  "executive_office",
+                  "home_office",
+                  "light_gallery",
+                  "dark_gallery",
+                  "industrial_loft",
+                  "minimalist_studio",
+                  "museum_atrium",
+                  "futuristic_lab",
+                  "metaverse_pavilion",
+                  "data_command_center"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Theme"
+          },
+          "items": {
+            "default": [],
+            "items": {
+              "pattern": "^[0-9a-f]{32}$",
+              "type": "string"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "placements": {
+            "default": {},
+            "patternProperties": {
+              "^[0-9a-f]{32}$": {
+                "$ref": "#/$defs/Placement"
+              }
+            },
+            "title": "Placements",
+            "type": "object"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "Room",
+        "type": "object"
+      },
+      "Source": {
+        "additionalProperties": false,
+        "description": "Data that the adapter extracts. A source refresh replaces all of it.",
+        "properties": {
+          "library": {
+            "title": "Library",
+            "type": "string"
+          },
+          "chart_type": {
+            "title": "Chart Type",
+            "type": "string"
+          },
+          "mode": {
+            "default": "static",
+            "enum": [
+              "interactive",
+              "structured",
+              "static"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Title"
+          },
+          "axes": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/AxesInfo"
+            },
+            "title": "Axes",
+            "type": "array"
+          },
+          "aspect": {
+            "exclusiveMinimum": 0,
+            "title": "Aspect",
+            "type": "number"
+          },
+          "default_name": {
+            "default": "",
+            "title": "Default Name",
+            "type": "string"
+          },
+          "limitations": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "has_preview": {
+            "default": false,
+            "title": "Has Preview",
+            "type": "boolean"
+          },
+          "has_payload": {
+            "default": false,
+            "title": "Has Payload",
+            "type": "boolean"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "library",
+          "chart_type",
+          "aspect"
+        ],
+        "title": "Source",
+        "type": "object"
+      },
+      "TourStop": {
+        "additionalProperties": false,
+        "description": "One stop of the guided tour: a visualization, dashboard, 3D exhibit, or room.",
+        "properties": {
+          "id": {
+            "pattern": "^[0-9a-f]{32}$",
+            "title": "Id",
+            "type": "string"
+          },
+          "ref": {
+            "pattern": "^[0-9a-f]{32}$",
+            "title": "Ref",
+            "type": "string"
+          },
+          "notes": {
+            "default": "",
+            "title": "Notes",
+            "type": "string"
+          },
+          "duration": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "maximum": 3600,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Duration"
+          }
+        },
+        "required": [
+          "ref"
+        ],
+        "title": "TourStop",
+        "type": "object"
+      },
+      "Visualization": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "pattern": "^[0-9a-f]{32}$",
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/$defs/Source"
+          },
+          "overrides": {
+            "$ref": "#/$defs/Overrides"
+          },
+          "status": {
+            "default": "active",
+            "enum": [
+              "active",
+              "removed"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "source"
+        ],
+        "title": "Visualization",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "schema_version": {
+        "default": "0.3.0",
+        "title": "Schema Version",
+        "type": "string"
+      },
+      "id": {
+        "pattern": "^[0-9a-f]{32}$",
+        "title": "Id",
+        "type": "string"
+      },
+      "name": {
+        "minLength": 1,
+        "title": "Name",
+        "type": "string"
+      },
+      "description": {
+        "default": "",
+        "title": "Description",
+        "type": "string"
+      },
+      "author": {
+        "default": "",
+        "title": "Author",
+        "type": "string"
+      },
+      "date": {
+        "default": "",
+        "title": "Date",
+        "type": "string"
+      },
+      "data_cutoff": {
+        "default": "",
+        "title": "Data Cutoff",
+        "type": "string"
+      },
+      "classification": {
+        "default": "",
+        "maxLength": 60,
+        "title": "Classification",
+        "type": "string"
+      },
+      "theme": {
+        "default": "executive_office",
+        "enum": [
+          "executive_office",
+          "home_office",
+          "light_gallery",
+          "dark_gallery",
+          "industrial_loft",
+          "minimalist_studio",
+          "museum_atrium",
+          "futuristic_lab",
+          "metaverse_pavilion",
+          "data_command_center"
+        ],
+        "title": "Theme",
+        "type": "string"
+      },
+      "revision": {
+        "default": 0,
+        "title": "Revision",
+        "type": "integer"
+      },
+      "visualizations": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/Visualization"
+        },
+        "title": "Visualizations",
+        "type": "array"
+      },
+      "dashboards": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/Dashboard"
+        },
+        "title": "Dashboards",
+        "type": "array"
+      },
+      "rooms": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/Room"
+        },
+        "title": "Rooms",
+        "type": "array"
+      },
+      "links": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/Link"
+        },
+        "title": "Links",
+        "type": "array"
+      },
+      "datasets": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/Dataset"
+        },
+        "title": "Datasets",
+        "type": "array"
+      },
+      "tour": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/TourStop"
+        },
+        "title": "Tour",
+        "type": "array"
+      },
+      "brand": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Brand"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null
+      },
+      "edited": {
+        "default": [],
+        "items": {
+          "type": "string"
+        },
+        "title": "Edited",
+        "type": "array"
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "title": "ReportModel",
+    "type": "object"
+  },
+  "payload": {
+    "$defs": {
+      "BokehPayload": {
+        "additionalProperties": false,
+        "description": "A Bokeh json_item. The viewer renders it with BokehJS of the same version, taken from\nthe bokeh package on the machine that serves or exports the report. JavaScript callbacks\nare removed (see `bokeh_without_code`).",
+        "properties": {
+          "kind": {
+            "const": "bokeh",
+            "default": "bokeh",
+            "title": "Kind",
+            "type": "string"
+          },
+          "item": {
+            "additionalProperties": true,
+            "title": "Item",
+            "type": "object"
+          },
+          "version": {
+            "pattern": "^\\d+\\.\\d+\\.\\d+$",
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "item",
+          "version"
+        ],
+        "title": "BokehPayload",
+        "type": "object"
+      },
+      "KpiPayload": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "kpi",
+            "default": "kpi",
+            "title": "Kind",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "display": {
+            "title": "Display",
+            "type": "string"
+          },
+          "unit": {
+            "default": "",
+            "title": "Unit",
+            "type": "string"
+          },
+          "delta": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Delta"
+          },
+          "delta_display": {
+            "default": "",
+            "title": "Delta Display",
+            "type": "string"
+          },
+          "higher_is_better": {
+            "default": true,
+            "title": "Higher Is Better",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "value",
+          "display"
+        ],
+        "title": "KpiPayload",
+        "type": "object"
+      },
+      "PlotlyPayload": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "plotly",
+            "default": "plotly",
+            "title": "Kind",
+            "type": "string"
+          },
+          "figure": {
+            "additionalProperties": true,
+            "title": "Figure",
+            "type": "object"
+          }
+        },
+        "required": [
+          "figure"
+        ],
+        "title": "PlotlyPayload",
+        "type": "object"
+      },
+      "Series": {
+        "additionalProperties": false,
+        "properties": {
+          "axes": {
+            "minimum": 0,
+            "title": "Axes",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "line",
+              "scatter"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "x": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "X",
+            "type": "array"
+          },
+          "y": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Y",
+            "type": "array"
+          }
+        },
+        "required": [
+          "axes",
+          "name",
+          "kind",
+          "x",
+          "y"
+        ],
+        "title": "Series",
+        "type": "object"
+      },
+      "SeriesPayload": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "series",
+            "default": "series",
+            "title": "Kind",
+            "type": "string"
+          },
+          "series": {
+            "items": {
+              "$ref": "#/$defs/Series"
+            },
+            "title": "Series",
+            "type": "array"
+          }
+        },
+        "required": [
+          "series"
+        ],
+        "title": "SeriesPayload",
+        "type": "object"
+      },
+      "SvgPayload": {
+        "additionalProperties": false,
+        "description": "A sanitized SVG image: no scripts, event handlers, or external references.",
+        "properties": {
+          "kind": {
+            "const": "svg",
+            "default": "svg",
+            "title": "Kind",
+            "type": "string"
+          },
+          "svg": {
+            "maxLength": 20000000,
+            "title": "Svg",
+            "type": "string"
+          }
+        },
+        "required": [
+          "svg"
+        ],
+        "title": "SvgPayload",
+        "type": "object"
+      },
+      "TablePayload": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "table",
+            "default": "table",
+            "title": "Kind",
+            "type": "string"
+          },
+          "columns": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Columns",
+            "type": "array"
+          },
+          "rows": {
+            "items": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "total_rows": {
+            "minimum": 0,
+            "title": "Total Rows",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "columns",
+          "rows",
+          "total_rows"
+        ],
+        "title": "TablePayload",
+        "type": "object"
+      },
+      "TextPayload": {
+        "additionalProperties": false,
+        "description": "Markdown text for a wall panel. Rendered without HTML: raw HTML shows as text.",
+        "properties": {
+          "kind": {
+            "const": "text",
+            "default": "text",
+            "title": "Kind",
+            "type": "string"
+          },
+          "markdown": {
+            "maxLength": 20000,
+            "title": "Markdown",
+            "type": "string"
+          },
+          "links": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Links",
+            "type": "array"
+          }
+        },
+        "required": [
+          "markdown"
+        ],
+        "title": "TextPayload",
+        "type": "object"
+      },
+      "VegaLitePayload": {
+        "additionalProperties": false,
+        "description": "A Vega-Lite specification (Altair, notebooks). Rendered with vega-embed.",
+        "properties": {
+          "kind": {
+            "const": "vegalite",
+            "default": "vegalite",
+            "title": "Kind",
+            "type": "string"
+          },
+          "spec": {
+            "additionalProperties": true,
+            "title": "Spec",
+            "type": "object"
+          }
+        },
+        "required": [
+          "spec"
+        ],
+        "title": "VegaLitePayload",
+        "type": "object"
+      }
+    },
+    "discriminator": {
+      "mapping": {
+        "bokeh": "#/$defs/BokehPayload",
+        "kpi": "#/$defs/KpiPayload",
+        "plotly": "#/$defs/PlotlyPayload",
+        "series": "#/$defs/SeriesPayload",
+        "svg": "#/$defs/SvgPayload",
+        "table": "#/$defs/TablePayload",
+        "text": "#/$defs/TextPayload",
+        "vegalite": "#/$defs/VegaLitePayload"
+      },
+      "propertyName": "kind"
+    },
+    "oneOf": [
+      {
+        "$ref": "#/$defs/SeriesPayload"
+      },
+      {
+        "$ref": "#/$defs/PlotlyPayload"
+      },
+      {
+        "$ref": "#/$defs/KpiPayload"
+      },
+      {
+        "$ref": "#/$defs/TablePayload"
+      },
+      {
+        "$ref": "#/$defs/TextPayload"
+      },
+      {
+        "$ref": "#/$defs/VegaLitePayload"
+      },
+      {
+        "$ref": "#/$defs/SvgPayload"
+      },
+      {
+        "$ref": "#/$defs/BokehPayload"
+      }
+    ]
+  }
+}

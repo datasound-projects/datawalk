@@ -1,0 +1,57 @@
+{
+  "height": 3.4,
+  "minSize": [
+    12,
+    9
+  ],
+  "furniture": [
+    {
+      "model": "metal_office_desk",
+      "anchor": {
+        "x": 0.32,
+        "z": 0.27
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "modern_arm_chair_01",
+      "anchor": {
+        "x": 0.32,
+        "z": 0.38
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "metal_office_desk",
+      "anchor": {
+        "x": 0.68,
+        "z": 0.27
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "modern_arm_chair_01",
+      "anchor": {
+        "x": 0.68,
+        "z": 0.38
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    }
+  ]
+}

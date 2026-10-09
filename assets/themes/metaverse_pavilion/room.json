@@ -1,0 +1,77 @@
+{
+  "height": 3.6,
+  "minSize": [
+    12,
+    10
+  ],
+  "windows": [
+    {
+      "wall": "north",
+      "from": 0.03,
+      "to": 0.97,
+      "sill": 0.0,
+      "head": 3.45,
+      "mullions": 6,
+      "frame": "#f2f2f2",
+      "displayable": true
+    },
+    {
+      "wall": "east",
+      "from": 0.03,
+      "to": 0.97,
+      "sill": 0.0,
+      "head": 3.45,
+      "mullions": 6,
+      "frame": "#f2f2f2",
+      "displayable": true
+    },
+    {
+      "wall": "west",
+      "from": 0.03,
+      "to": 0.97,
+      "sill": 0.0,
+      "head": 3.45,
+      "mullions": 6,
+      "frame": "#f2f2f2",
+      "displayable": true
+    }
+  ],
+  "furniture": [
+    {
+      "model": "potted_plant_02",
+      "anchor": {
+        "corner": "nw",
+        "inset": 0.15
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "potted_plant_02",
+      "anchor": {
+        "corner": "ne",
+        "inset": 0.15
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "mid_century_lounge_chair",
+      "anchor": {
+        "corner": "sw",
+        "inset": 0.6
+      },
+      "rotation": 45,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    }
+  ]
+}

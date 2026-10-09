@@ -1,0 +1,88 @@
+{
+  "id": "metaverse_pavilion",
+  "name": "Metaverse Pavilion",
+  "description": "An open glass pavilion at sunset, with floating display panels.",
+  "lighting": {
+    "environment": "belfast_sunset_puresky",
+    "environmentIntensity": 0.9,
+    "exposure": 1.0,
+    "view": "belfast_sunset_puresky",
+    "viewIntensity": 1.0,
+    "sun": {
+      "direction": [
+        0.95,
+        0.18,
+        0.31
+      ],
+      "color": "#ffcf9a",
+      "intensity": 2.4
+    },
+    "ambient": {
+      "sky": "#ffe3c4",
+      "ground": "#cdbfc0",
+      "intensity": 0.4
+    },
+    "fixtures": "none",
+    "fixtureColor": "#ffffff",
+    "fixtureIntensity": 0,
+    "accent": {
+      "color": "#c9a0ff",
+      "intensity": 1.6
+    },
+    "viewRotation": 0,
+    "ceilingBounce": 0.2
+  },
+  "surfaces": {
+    "floor": {
+      "material": "terrazzo_tiles",
+      "color": "#f0ece6",
+      "tile": 2.0,
+      "roughness": 0.7,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "walls": {
+      "material": null,
+      "color": "#f2f2f2",
+      "tile": 2.0,
+      "roughness": 0.6,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "ceiling": {
+      "material": null,
+      "color": "#ffffff",
+      "tile": 2.0,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "wainscot": null,
+    "trim": "#f2f2f2",
+    "rug": null
+  },
+  "display": {
+    "style": "floating",
+    "frame": "#ffffff",
+    "plaque": {
+      "background": "#ffffff",
+      "text": "#333333"
+    },
+    "spotlight": false,
+    "glow": "#c9a0ff"
+  },
+  "door": {
+    "color": "#f6f6f6",
+    "frame": "#e6e6e6"
+  },
+  "preview": {
+    "from": [
+      0.25,
+      0.7
+    ],
+    "to": [
+      0.95,
+      0.35
+    ]
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "id": "minimalist_studio",
+  "name": "Minimalist Studio",
+  "description": "Plain white surfaces, polished concrete and one large window. No distractions.",
+  "lighting": {
+    "environment": "photo_studio_london_hall",
+    "environmentIntensity": 1.0,
+    "exposure": 1.0,
+    "view": "kloppenheim_06_puresky",
+    "viewIntensity": 1.0,
+    "sun": {
+      "direction": [
+        1,
+        0.18,
+        0.05
+      ],
+      "color": "#ffe9cc",
+      "intensity": 1.8
+    },
+    "ambient": {
+      "sky": "#ffffff",
+      "ground": "#d8d6d2",
+      "intensity": 0.45
+    },
+    "fixtures": "downlights",
+    "fixtureColor": "#fffaf2",
+    "fixtureIntensity": 3,
+    "accent": null,
+    "viewRotation": 0,
+    "ceilingBounce": 0.15
+  },
+  "surfaces": {
+    "floor": {
+      "material": "painted_concrete_02",
+      "color": "#ffffff",
+      "tile": 3.0,
+      "roughness": 0.9,
+      "metalness": 0,
+      "normalScale": 0.6
+    },
+    "walls": {
+      "material": "white_stucco",
+      "color": "#fbfaf8",
+      "tile": 2.5,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 0.4
+    },
+    "ceiling": {
+      "material": null,
+      "color": "#ffffff",
+      "tile": 2.0,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "wainscot": null,
+    "trim": "#ffffff",
+    "rug": null
+  },
+  "display": {
+    "style": "frameless",
+    "frame": "#efefef",
+    "plaque": {
+      "background": "#fbfaf8",
+      "text": "#444444"
+    },
+    "spotlight": false,
+    "glow": null
+  },
+  "door": {
+    "color": "#f4f3f0",
+    "frame": "#ffffff"
+  },
+  "preview": {
+    "from": [
+      0.2,
+      0.85
+    ],
+    "to": [
+      0.85,
+      0.3
+    ]
+  }
+}

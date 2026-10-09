@@ -1,0 +1,85 @@
+{
+  "id": "industrial_loft",
+  "name": "Industrial Loft",
+  "description": "Brick walls, steel beams, worn concrete and tall factory windows.",
+  "lighting": {
+    "environment": "artist_workshop",
+    "environmentIntensity": 0.75,
+    "exposure": 1.0,
+    "view": "modern_evening_street",
+    "viewIntensity": 1.0,
+    "sun": {
+      "direction": [
+        -1,
+        0.5,
+        0.2
+      ],
+      "color": "#fff1df",
+      "intensity": 2.0
+    },
+    "ambient": {
+      "sky": "#f3ece2",
+      "ground": "#8f8478",
+      "intensity": 0.35
+    },
+    "fixtures": "pendants",
+    "fixtureColor": "#ffd9a8",
+    "fixtureIntensity": 6,
+    "accent": null,
+    "viewRotation": -108,
+    "ceilingBounce": 0.08
+  },
+  "surfaces": {
+    "floor": {
+      "material": "concrete_floor_worn_001",
+      "color": "#ffffff",
+      "tile": 3.0,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "walls": {
+      "material": "red_brick",
+      "color": "#ffffff",
+      "tile": 1.6,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "ceiling": {
+      "material": "rough_concrete",
+      "color": "#9a9a9a",
+      "tile": 3.0,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "wainscot": null,
+    "trim": "#2a2b2d",
+    "rug": null
+  },
+  "display": {
+    "style": "steel",
+    "frame": "#2a2b2d",
+    "plaque": {
+      "background": "#e9e4da",
+      "text": "#1f1f1f"
+    },
+    "spotlight": false,
+    "glow": null
+  },
+  "door": {
+    "color": "#2c2e30",
+    "frame": "#1d1f21"
+  },
+  "preview": {
+    "from": [
+      0.8,
+      0.85
+    ],
+    "to": [
+      0.15,
+      0.3
+    ]
+  }
+}

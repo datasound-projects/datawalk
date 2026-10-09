@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ t('admin.title') }}</h1>
+{% for n in cfg.notes %}<p class="warn">{{ n }}</p>{% endfor %}
+<section>
+  <h2>{{ t('admin.settings') }}</h2>
+  <form method="post" action="/admin/settings">
+    <label><input type="checkbox" name="public_links" value="1" {% if settings.public_links %}checked{% endif %} /> {{ t('admin.public_links') }}</label>
+    <label>{{ t('admin.public_link_max_days') }} <input type="number" name="public_link_max_days" min="1" max="365" value="{{ settings.public_link_max_days }}" /></label>
+    <label><input type="checkbox" name="analytics" value="1" {% if settings.analytics %}checked{% endif %} /> {{ t('admin.analytics') }}</label>
+    <label>{{ t('admin.retention_days') }} <input type="number" name="retention_days" min="0" value="{{ settings.retention_days }}" /></label>
+    <label>{{ t('admin.keep_revisions') }} <input type="number" name="keep_revisions" min="0" value="{{ settings.keep_revisions }}" /></label>
+    <label>{{ t('admin.frame_ancestors') }} <input name="frame_ancestors" value="{{ settings.frame_ancestors }}" style="width: 100%" placeholder="https://contoso.sharepoint.com https://teams.microsoft.com" /></label>
+    <button class="primary">{{ t('admin.save_settings') }}</button>
+  </form>
+</section>
+<section>
+  <h2>{{ t('admin.users') }}</h2>
+  <table>{% for u in users %}<tr><td>{{ u.email }}</td><td>{{ u.name }}</td><td>{{ t('admin.is_admin') if u.is_admin }}</td><td class="muted">{{ t('admin.sso') if u.sso }}</td></tr>{% endfor %}</table>
+  {% if cfg.local_accounts %}
+  <form method="post" action="/admin/users" class="row">
+    <label>{{ t('common.email') }} <input name="email" type="email" required /></label>
+    <label>{{ t('common.name') }} <input name="name" /></label>
+    <label>{{ t('admin.password') }} <input name="password" type="password" autocomplete="new-password" /></label>
+    <label><input type="checkbox" name="admin" value="1" /> {{ t('admin.make_admin') }}</label>
+    <button class="primary">{{ t('admin.add_user') }}</button>
+  </form>
+  {% endif %}
+</section>
+<section>
+  <h2>{{ t('admin.groups') }}</h2>
+  <table>{% for g in groups %}<tr><td>{{ g.name }}</td><td>{{ g.members|join(', ') }}</td></tr>{% endfor %}</table>
+  <form method="post" action="/admin/groups" class="row">
+    <label>{{ t('admin.group') }} <input name="group" required /></label><label>{{ t('admin.add_member') }} <input name="email" type="email" /></label>
+    <button class="primary">{{ t('common.save') }}</button>
+  </form>
+</section>
+<section>
+  <h2>{{ t('admin.audit') }}</h2>
+  <p><a href="/admin/audit.csv">{{ t('admin.audit_download') }}</a> · JSON: <code>GET /api/audit</code></p>
+</section>
+{% endblock %}

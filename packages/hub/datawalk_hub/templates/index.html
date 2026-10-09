@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ t('index.title') }}</h1>
+{% if mentions %}
+<section aria-label="{{ t('index.mentions') }}">
+  <h2>{{ t('index.mentioned') }}</h2>
+  <ul>{% for m in mentions %}<li><a href="/r/{{ m.report_id }}/#viz-{{ m.viz_key }}">{{ m.report }}: {{ m.viz_key }}</a></li>{% endfor %}</ul>
+</section>
+{% endif %}
+<section>
+  {% if reports %}
+  <table>
+    <thead><tr><th>{{ t('index.report') }}</th><th>{{ t('index.your_role') }}</th><th>{{ t('index.revision') }}</th><th></th></tr></thead>
+    <tbody>
+    {% for r in reports %}
+      <tr>
+        <td><a href="/reports/{{ r.id }}">{{ r.name }}</a> {% if r.classification %}<span class="label">{{ r.classification }}</span>{% endif %}</td>
+        <td>{{ t('role.' ~ r.role) }}</td><td>{{ r.latest }}</td>
+        <td><a href="/r/{{ r.id }}/">{{ t('index.open') }}</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">{{ t('index.empty') }} <code>datawalk publish report.dwk --hub {{ cfg.base_url }}</code> {{ t('index.empty_token') }}</p>
+  {% endif %}
+</section>
+{% endblock %}

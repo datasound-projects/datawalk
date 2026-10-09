@@ -1,0 +1,77 @@
+{
+  "id": "dark_gallery",
+  "name": "Dark Gallery",
+  "description": "Charcoal walls, dark oak and warm spotlights. High-contrast displays.",
+  "lighting": {
+    "environment": "studio_small_03",
+    "environmentIntensity": 0.22,
+    "exposure": 1.15,
+    "view": null,
+    "viewIntensity": 1.0,
+    "sun": null,
+    "ambient": {
+      "sky": "#c9cfda",
+      "ground": "#2a2522",
+      "intensity": 0.08
+    },
+    "fixtures": "tracks",
+    "fixtureColor": "#ffe3bd",
+    "fixtureIntensity": 3,
+    "accent": null,
+    "viewRotation": 0,
+    "ceilingBounce": 0.0
+  },
+  "surfaces": {
+    "floor": {
+      "material": "dark_wooden_planks",
+      "color": "#9c8a78",
+      "tile": 2.0,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "walls": {
+      "material": "plastered_wall_04",
+      "color": "#3a3b40",
+      "tile": 3.0,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 0.5
+    },
+    "ceiling": {
+      "material": null,
+      "color": "#18181a",
+      "tile": 2.0,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "wainscot": null,
+    "trim": "#222225",
+    "rug": null
+  },
+  "display": {
+    "style": "gallery_dark",
+    "frame": "#0d0d0d",
+    "plaque": {
+      "background": "#1c1c1e",
+      "text": "#e8e2d6"
+    },
+    "spotlight": true,
+    "glow": null
+  },
+  "door": {
+    "color": "#202022",
+    "frame": "#2b2b2e"
+  },
+  "preview": {
+    "from": [
+      0.7,
+      0.85
+    ],
+    "to": [
+      0.25,
+      0.2
+    ]
+  }
+}

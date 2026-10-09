@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{{ t('export.title') }} · {{ report.name }}{% endblock %}
+{% block content %}
+<h1>{{ t('export.heading') }}</h1>
+<p class="muted">{{ t('export.intro') }}</p>
+<form method="get" action="/reports/{{ report.id }}/export">
+<section>
+  <h2>{{ t('export.review') }}</h2>
+  <table>
+    <thead><tr><th>{{ t('export.chart') }}</th><th>{{ t('export.data') }}</th><th>{{ t('export.points') }}</th><th>{{ t('export.size') }}</th><th>{{ t('export.preview_column') }}</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr><td>{{ r.name }}</td><td>{{ t('export.level.' ~ r.level) }}</td>
+        <td>{{ '{:,}'.format(r.points) }}</td><td>{{ (r.bytes / 1024)|round|int }} KB</td>
+        <td>{% if r.key in has_preview %}<input type="checkbox" name="preview:{{ r.key }}" value="1" aria-label="{{ t('export.preview_only', name=r.name) }}" {% if r.key in options.preview_only %}checked{% endif %} />{% endif %}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if datasets %}<label><input type="checkbox" name="datasets" value="1" {% if options.include_datasets %}checked{% endif %} /> {{ t('export.include_datasets') }}</label>{% endif %}
+  <label>{{ t('export.watermark') }} <input name="watermark" value="{{ options.watermark }}" maxlength="200" /></label>
+  <button>{{ t('export.update') }}</button>
+  {% if total %}<p>{{ t('export.total', mb='%.1f'|format(total / 1048576)) }}{% if total > budget %} <span class="warn">{{ t('export.too_large') }}</span>{% endif %}</p>{% endif %}
+  {% for n in notes %}<p>{{ n }}</p>{% endfor %}
+  {% if error %}<p class="warn">{{ error }}</p>{% endif %}
+</section>
+</form>
+{% if not error %}
+<form method="post" action="/reports/{{ report.id }}/export">
+  {% for k in options.preview_only %}<input type="hidden" name="preview:{{ k }}" value="1" />{% endfor %}
+  <input type="hidden" name="datasets" value="{{ '1' if options.include_datasets else '' }}" />
+  <input type="hidden" name="watermark" value="{{ options.watermark }}" />
+  <label><input type="checkbox" name="confirmed" value="1" required /> {{ t('export.confirm') }}</label>
+  <button class="primary">{{ t('export.download') }}</button>
+</form>
+{% endif %}
+{% endblock %}

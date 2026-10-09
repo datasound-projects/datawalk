@@ -1,0 +1,72 @@
+{
+  "height": 3.0,
+  "minSize": [
+    10,
+    8
+  ],
+  "windows": [
+    {
+      "wall": "east",
+      "from": 0.2,
+      "to": 0.8,
+      "sill": 0.2,
+      "head": 2.7,
+      "mullions": 0,
+      "frame": "#f4f4f4",
+      "displayable": false
+    }
+  ],
+  "furniture": [
+    {
+      "model": "mid_century_lounge_chair",
+      "anchor": {
+        "wall": "east",
+        "at": 0.3,
+        "inset": 0.7
+      },
+      "rotation": 25,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "side_table_tall_01",
+      "anchor": {
+        "wall": "east",
+        "at": 0.18,
+        "inset": 0.5
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "ceramic_vase_02",
+      "anchor": {
+        "wall": "east",
+        "at": 0.18,
+        "inset": 0.58
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0.76,
+      "plinth": null,
+      "collide": false
+    },
+    {
+      "model": "potted_plant_02",
+      "anchor": {
+        "corner": "nw",
+        "inset": 0.15
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    }
+  ]
+}

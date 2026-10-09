@@ -1,0 +1,110 @@
+{
+  "models": {
+    "sofa_02": {},
+    "sofa_03": {},
+    "Sofa_01": {},
+    "ArmChair_01": {},
+    "modern_arm_chair_01": {},
+    "mid_century_lounge_chair": {},
+    "GreenChair_01": {},
+    "modern_coffee_table_01": {},
+    "side_table_01": {},
+    "side_table_tall_01": {},
+    "industrial_coffee_table": {
+      "simplify": 0.35
+    },
+    "WoodenTable_01": {},
+    "metal_office_desk": {},
+    "desk_lamp_arm_01": {
+      "simplify": 0.5
+    },
+    "classic_laptop": {},
+    "wooden_bookshelf_worn": {},
+    "steel_frame_shelves_01": {},
+    "modern_ceiling_lamp_01": {},
+    "hanging_industrial_lamp": {},
+    "metal_stool_01": {},
+    "metal_stool_02": {},
+    "potted_plant_02": {
+      "simplify": 0.35
+    },
+    "potted_plant_04": {},
+    "ceramic_vase_01": {},
+    "ceramic_vase_02": {},
+    "marble_bust_01": {
+      "simplify": 0.6
+    },
+    "horse_statue_01": {
+      "simplify": 0.6
+    },
+    "bronze_whale_statue": {},
+    "concrete_cat_statue": {}
+  },
+  "materials": {
+    "herringbone_parquet": {},
+    "dark_wood": {},
+    "plastered_wall_04": {},
+    "plank_flooring_02": {},
+    "white_stucco": {},
+    "laminate_floor_02": {},
+    "dark_wooden_planks": {},
+    "concrete_floor_worn_001": {},
+    "red_brick": {},
+    "rough_concrete": {},
+    "marble_01": {},
+    "terrazzo_tiles": {},
+    "rubber_tiles": {},
+    "hessian_230": {},
+    "poly_wool_herringbone": {},
+    "rough_linen": {},
+    "painted_concrete_02": {}
+  },
+  "hdris": {
+    "hotel_room": {
+      "lighting": true
+    },
+    "lebombo": {
+      "lighting": true
+    },
+    "photo_studio_loft_hall": {
+      "lighting": true
+    },
+    "studio_small_03": {
+      "lighting": true
+    },
+    "artist_workshop": {
+      "lighting": true
+    },
+    "photo_studio_london_hall": {
+      "lighting": true
+    },
+    "leadenhall_market": {
+      "lighting": true
+    },
+    "studio_small_09": {
+      "lighting": true
+    },
+    "belfast_sunset_puresky": {
+      "lighting": true,
+      "view": true
+    },
+    "kloofendal_overcast_puresky": {
+      "view": true
+    },
+    "urban_street_01": {
+      "view": true
+    },
+    "kloofendal_48d_partly_cloudy_puresky": {
+      "view": true
+    },
+    "sunset_jhbcentral": {
+      "view": true
+    },
+    "modern_evening_street": {
+      "view": true
+    },
+    "kloppenheim_06_puresky": {
+      "view": true
+    }
+  }
+}

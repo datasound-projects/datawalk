@@ -1,0 +1,92 @@
+{
+  "id": "home_office",
+  "name": "Home Office",
+  "description": "Warm wood floor, white walls, a desk under the window and a reading corner.",
+  "lighting": {
+    "environment": "lebombo",
+    "environmentIntensity": 0.8,
+    "exposure": 1.05,
+    "view": "urban_street_01",
+    "viewIntensity": 1.0,
+    "sun": {
+      "direction": [
+        -1,
+        0.6,
+        -0.25
+      ],
+      "color": "#ffe7c7",
+      "intensity": 2.2
+    },
+    "ambient": {
+      "sky": "#fff3e2",
+      "ground": "#c9b49a",
+      "intensity": 0.4
+    },
+    "fixtures": "pendants",
+    "fixtureColor": "#ffe9c9",
+    "fixtureIntensity": 5,
+    "accent": null,
+    "viewRotation": -108,
+    "ceilingBounce": 0.22
+  },
+  "surfaces": {
+    "floor": {
+      "material": "plank_flooring_02",
+      "color": "#ffffff",
+      "tile": 2.4,
+      "roughness": 2.0,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "walls": {
+      "material": "white_stucco",
+      "color": "#f1eadf",
+      "tile": 2.5,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 0.5
+    },
+    "ceiling": {
+      "material": null,
+      "color": "#f7f4ef",
+      "tile": 2.0,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "wainscot": null,
+    "trim": "#fbf8f2",
+    "rug": {
+      "material": "rough_linen",
+      "color": "#e6dccb",
+      "tile": 0.8,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    }
+  },
+  "display": {
+    "style": "monitor",
+    "frame": "#141414",
+    "plaque": {
+      "background": "#ffffff",
+      "text": "#333333"
+    },
+    "spotlight": false,
+    "glow": null
+  },
+  "door": {
+    "color": "#e9e2d6",
+    "frame": "#fbf8f2"
+  },
+  "preview": {
+    "from": [
+      0.8,
+      0.8
+    ],
+    "to": [
+      0.15,
+      0.35
+    ]
+  }
+}

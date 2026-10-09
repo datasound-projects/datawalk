@@ -1,0 +1,27 @@
+# .github/workflows/report.yml: rebuild and publish the report every weekday at 06:00 UTC.
+# Copy report-as-code.sh, analysis.py, and data.csv (or your own data) to the repository root.
+name: Report
+on:
+  schedule:
+    - cron: "0 6 * * 1-5"
+  workflow_dispatch:
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    env:
+      DATAWALK_HUB: https://hub.example.internal
+      DATAWALK_HUB_TOKEN: ${{ secrets.DATAWALK_HUB_TOKEN }}
+      REPORT_ID: ${{ vars.REPORT_ID }}
+      WATERMARK: Internal distribution
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv venv && uv pip install "datawalk[plotly,pdf]" pandas
+      - run: uv run playwright install --with-deps chromium # PDF export
+      - run: uv run bash report-as-code.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: report
+          path: |
+            report.html
+            report.pdf

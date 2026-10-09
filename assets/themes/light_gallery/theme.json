@@ -1,0 +1,85 @@
+{
+  "id": "light_gallery",
+  "name": "Light Gallery",
+  "description": "White walls, pale oak and soft daylight from a skylight. The charts come first.",
+  "lighting": {
+    "environment": "photo_studio_loft_hall",
+    "environmentIntensity": 0.95,
+    "exposure": 1.0,
+    "view": "kloofendal_overcast_puresky",
+    "viewIntensity": 1.0,
+    "sun": {
+      "direction": [
+        0.25,
+        1,
+        0.15
+      ],
+      "color": "#eef3ff",
+      "intensity": 1.4
+    },
+    "ambient": {
+      "sky": "#ffffff",
+      "ground": "#e3dccf",
+      "intensity": 0.45
+    },
+    "fixtures": "tracks",
+    "fixtureColor": "#fff6ea",
+    "fixtureIntensity": 4,
+    "accent": null,
+    "viewRotation": 0,
+    "ceilingBounce": 0.12
+  },
+  "surfaces": {
+    "floor": {
+      "material": "laminate_floor_02",
+      "color": "#ffffff",
+      "tile": 2.2,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "walls": {
+      "material": null,
+      "color": "#f5f4f0",
+      "tile": 2.0,
+      "roughness": 0.95,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "ceiling": {
+      "material": null,
+      "color": "#fbfbfa",
+      "tile": 2.0,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "wainscot": null,
+    "trim": "#ffffff",
+    "rug": null
+  },
+  "display": {
+    "style": "gallery",
+    "frame": "#d8c3a5",
+    "plaque": {
+      "background": "#ffffff",
+      "text": "#333333"
+    },
+    "spotlight": true,
+    "glow": null
+  },
+  "door": {
+    "color": "#f2f1ed",
+    "frame": "#ffffff"
+  },
+  "preview": {
+    "from": [
+      0.7,
+      0.85
+    ],
+    "to": [
+      0.3,
+      0.15
+    ]
+  }
+}

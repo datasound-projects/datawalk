@@ -1,0 +1,85 @@
+{
+  "id": "museum_atrium",
+  "name": "Museum Atrium",
+  "description": "A tall hall with marble, stone pilasters, sculptures and a glass roof.",
+  "lighting": {
+    "environment": "leadenhall_market",
+    "environmentIntensity": 0.85,
+    "exposure": 1.0,
+    "view": "kloofendal_48d_partly_cloudy_puresky",
+    "viewIntensity": 1.0,
+    "sun": {
+      "direction": [
+        0.3,
+        1,
+        0.2
+      ],
+      "color": "#fff6e8",
+      "intensity": 2.0
+    },
+    "ambient": {
+      "sky": "#fff8ee",
+      "ground": "#e6dccb",
+      "intensity": 0.4
+    },
+    "fixtures": "none",
+    "fixtureColor": "#fff3e0",
+    "fixtureIntensity": 0,
+    "accent": null,
+    "viewRotation": 0,
+    "ceilingBounce": 0.12
+  },
+  "surfaces": {
+    "floor": {
+      "material": "marble_01",
+      "color": "#ffffff",
+      "tile": 2.5,
+      "roughness": 0.6,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "walls": {
+      "material": "plastered_wall_04",
+      "color": "#f2e8d8",
+      "tile": 4.0,
+      "roughness": 1,
+      "metalness": 0,
+      "normalScale": 0.6
+    },
+    "ceiling": {
+      "material": null,
+      "color": "#f4efe6",
+      "tile": 2.0,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "wainscot": null,
+    "trim": "#e2d6c3",
+    "rug": null
+  },
+  "display": {
+    "style": "museum",
+    "frame": "#b08d57",
+    "plaque": {
+      "background": "#f5efe3",
+      "text": "#3a2e22"
+    },
+    "spotlight": true,
+    "glow": null
+  },
+  "door": {
+    "color": "#5a4632",
+    "frame": "#e2d6c3"
+  },
+  "preview": {
+    "from": [
+      0.65,
+      0.88
+    ],
+    "to": [
+      0.3,
+      0.1
+    ]
+  }
+}

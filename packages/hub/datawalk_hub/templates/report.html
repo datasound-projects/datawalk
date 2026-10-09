@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}{{ report.name }} · DataWalk Hub{% endblock %}
+{% block content %}
+<h1>{{ report.name }} {% if report.classification %}<span class="label">{{ report.classification }}</span>{% endif %}</h1>
+<p class="row">
+  <a href="/r/{{ report.id }}/"><button class="primary" type="button">{{ t('report.open') }}</button></a>
+  <span class="muted">{{ t('report.your_role', role=t('role.' ~ role)) }}</span>
+  {% if role in ('editor', 'owner') %}<a href="/reports/{{ report.id }}/export">{{ t('export.heading') }}</a>{% endif %}
+</p>
+<section aria-label="{{ t('report.embed') }}">
+  <h2>{{ t('report.embed') }}</h2>
+  <p class="muted">{{ t('report.embed_hint') }}</p>
+  <code>&lt;iframe src="{{ cfg.base_url }}/r/{{ report.id }}/" width="1280" height="720" allow="fullscreen"&gt;&lt;/iframe&gt;</code>
+</section>
+<section aria-label="{{ t('report.revisions') }}">
+  <h2>{{ t('report.revisions') }}</h2>
+  <table>
+    <thead><tr><th>#</th><th>{{ t('report.published') }}</th><th>{{ t('report.by') }}</th><th>{{ t('report.changes') }}</th></tr></thead>
+    <tbody>
+    {% for v in revisions %}
+      <tr>
+        <td><a href="/r/{{ report.id }}/v/{{ v.number }}/">{{ v.number }}</a></td>
+        <td>{{ v.created_at|int|datetime }}</td>
+        <td>{{ v.author }}</td>
+        <td>
+          {% set c = v.changes %}
+          {% if not (c.added or c.removed or c.updated or c.kpis) %}<span class="muted">{% if loop.last %}{{ t('report.first_revision') }}{% else %}{{ t('report.no_changes') }}{% endif %}</span>{% endif %}
+          {% if c.added %}<div>{{ t('report.added', names=c.added|map(attribute='name')|join(', ')) }}</div>{% endif %}
+          {% if c.removed %}<div>{{ t('report.removed', names=c.removed|map(attribute='name')|join(', ')) }}</div>{% endif %}
+          {% if c.updated %}<div>{{ t('report.updated', names=c.updated|map(attribute='name')|join(', ')) }}</div>{% endif %}
+          {% for k in c.kpis %}<div>{{ k.name }}: {{ k.before }} → {{ k.after }}{% if k.delta is not none %} ({{ '%+g'|format(k.delta) }}{% if k.unit %} {{ k.unit }}{% endif %}){% endif %}</div>{% endfor %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% if views %}
+<section aria-label="{{ t('report.views') }}">
+  <h2>{{ t('report.views_per_chart') }}</h2>
+  <p class="muted">{{ t('report.views_hint') }}</p>
+  <table>{% for v in views %}<tr><td>{{ v.viz_key }}</td><td>{{ v.n }}</td></tr>{% endfor %}</table>
+</section>
+{% endif %}
+{% if role == 'owner' %}
+<section aria-label="{{ t('report.sharing') }}">
+  <h2>{{ t('report.sharing') }}</h2>
+  <table>
+    {% for g in grants %}
+    <tr><td>{{ g.who }} <span class="muted">({{ t('principal.' ~ g.principal) }})</span></td><td>{{ t('role.' ~ g.role) }}</td>
+      <td><form class="inline" method="post" action="/reports/{{ report.id }}/unshare">
+        <input type="hidden" name="principal" value="{{ g.principal }}" /><input type="hidden" name="principal_id" value="{{ g.principal_id }}" />
+        <button>{{ t('report.remove') }}</button></form></td></tr>
+    {% else %}<tr><td class="muted">{{ t('report.only_you') }}</td></tr>{% endfor %}
+  </table>
+  <form method="post" action="/reports/{{ report.id }}/share" class="row">
+    <label>{{ t('report.who') }} <input name="who" required /></label>
+    <label>{{ t('report.role') }} <select name="role">{% for rl in ('viewer', 'editor', 'owner') %}<option value="{{ rl }}">{{ t('role.' ~ rl) }}</option>{% endfor %}</select></label>
+    <button class="primary">{{ t('report.share') }}</button>
+  </form>
+</section>
+<section aria-label="{{ t('report.links') }}">
+  <h2>{{ t('report.links') }}</h2>
+  {% if new_token %}<p role="status">{{ t('report.new_link') }} <span class="token">{{ cfg.base_url }}/l/{{ new_token }}</span></p>{% endif %}
+  <table>
+    {% for l in links %}
+    <tr><td>{{ l.label or t('report.link') }}</td>
+      <td>{{ t('report.public') if l.public else t('report.sign_in_required') }}</td>
+      <td>{% if l.revoked %}{{ t('report.revoked') }}{% elif l.expires_at and l.expires_at < now %}{{ t('report.expired') }}{% elif l.expires_at %}{{ t('report.expires', date=l.expires_at|int|datetime) }}{% else %}{{ t('report.no_expiry') }}{% endif %}</td>
+      <td>{% if not l.revoked %}<form class="inline" method="post" action="/reports/{{ report.id }}/links/{{ l.token_hash }}/revoke"><button>{{ t('report.revoke') }}</button></form>{% endif %}</td></tr>
+    {% endfor %}
+  </table>
+  <form method="post" action="/reports/{{ report.id }}/links" class="row">
+    <label>{{ t('report.label') }} <input name="label" /></label>
+    <label>{{ t('report.days') }} <input name="days" type="number" min="1" max="365" /></label>
+    {% if public_links %}<label><input type="checkbox" name="public" value="1" /> {{ t('report.public_option', days=max_days) }}</label>{% endif %}
+    <button class="primary">{{ t('report.create_link') }}</button>
+  </form>
+  {% if not public_links %}<p class="muted">{{ t('error.public_links_off') }}</p>{% endif %}
+</section>
+<section aria-label="{{ t('report.data') }}">
+  <h2>{{ t('report.data') }}</h2>
+  <p class="row"><a href="/reports/{{ report.id }}/audit.csv">{{ t('report.audit_download') }}</a></p>
+  <form method="post" action="/reports/{{ report.id }}/delete">
+    <button class="warn">{{ t('report.delete') }}</button>
+  </form>
+</section>
+{% endif %}
+{% endblock %}

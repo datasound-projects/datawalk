@@ -1,0 +1,59 @@
+{
+  "height": 4.2,
+  "minSize": [
+    12,
+    9
+  ],
+  "skylight": {
+    "size": [
+      0.55,
+      0.32
+    ],
+    "frame": "#e6e6e3",
+    "mullions": 4
+  },
+  "benches": {
+    "color": "#2b2b2b",
+    "seat": "#c9a77c"
+  },
+  "furniture": [
+    {
+      "model": "marble_bust_01",
+      "anchor": {
+        "corner": "nw",
+        "inset": 0.5
+      },
+      "rotation": 135,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": {
+        "size": [
+          0.45,
+          1.05,
+          0.45
+        ],
+        "color": "#f3f2ee"
+      },
+      "collide": true
+    },
+    {
+      "model": "concrete_cat_statue",
+      "anchor": {
+        "corner": "ne",
+        "inset": 0.5
+      },
+      "rotation": 225,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": {
+        "size": [
+          0.5,
+          0.75,
+          0.5
+        ],
+        "color": "#f3f2ee"
+      },
+      "collide": true
+    }
+  ]
+}

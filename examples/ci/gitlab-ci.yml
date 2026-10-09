@@ -1,0 +1,15 @@
+# .gitlab-ci.yml: run in a pipeline schedule (CI/CD > Schedules), for example every weekday.
+# Copy report-as-code.sh, analysis.py, and data.csv (or your own data) to the repository root.
+report:
+  image: mcr.microsoft.com/playwright/python:v1.55.0-noble
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"
+  variables:
+    DATAWALK_HUB: https://hub.example.internal
+    WATERMARK: Internal distribution
+    # DATAWALK_HUB_TOKEN and REPORT_ID: masked CI/CD variables
+  script:
+    - pip install "datawalk[plotly,pdf]" pandas
+    - bash report-as-code.sh
+  artifacts:
+    paths: [report.html, report.pdf]

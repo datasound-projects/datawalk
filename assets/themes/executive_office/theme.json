@@ -1,0 +1,100 @@
+{
+  "id": "executive_office",
+  "name": "Executive Office",
+  "description": "Herringbone oak, walnut paneling and a window wall over the city. For board-level reviews.",
+  "lighting": {
+    "environment": "hotel_room",
+    "environmentIntensity": 0.65,
+    "exposure": 1.0,
+    "view": "sunset_jhbcentral",
+    "viewIntensity": 1.0,
+    "sun": {
+      "direction": [
+        1,
+        0.35,
+        -0.3
+      ],
+      "color": "#ffe2bf",
+      "intensity": 2.2
+    },
+    "ambient": {
+      "sky": "#fff6ea",
+      "ground": "#b39a80",
+      "intensity": 0.35
+    },
+    "fixtures": "downlights",
+    "fixtureColor": "#fff0d8",
+    "fixtureIntensity": 7,
+    "accent": null,
+    "viewRotation": 0,
+    "ceilingBounce": 0.22
+  },
+  "surfaces": {
+    "floor": {
+      "material": "herringbone_parquet",
+      "color": "#ffffff",
+      "tile": 2.0,
+      "roughness": 3.0,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "walls": {
+      "material": "plastered_wall_04",
+      "color": "#eee7dc",
+      "tile": 3.0,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 0.6
+    },
+    "ceiling": {
+      "material": null,
+      "color": "#f6f3ee",
+      "tile": 2.0,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    },
+    "wainscot": {
+      "material": "dark_wood",
+      "color": "#ffffff",
+      "tile": 1.6,
+      "roughness": 0.8,
+      "metalness": 0.0,
+      "normalScale": 1.0,
+      "height": 0.8
+    },
+    "trim": "#f2ede4",
+    "rug": {
+      "material": "poly_wool_herringbone",
+      "color": "#d9cdbd",
+      "tile": 1.0,
+      "roughness": 1.0,
+      "metalness": 0.0,
+      "normalScale": 1.0
+    }
+  },
+  "display": {
+    "style": "premium",
+    "frame": "#3a2a1e",
+    "plaque": {
+      "background": "#f2ede4",
+      "text": "#2a2a2a"
+    },
+    "spotlight": false,
+    "glow": null
+  },
+  "door": {
+    "color": "#3b2a1f",
+    "frame": "#f2ede4"
+  },
+  "preview": {
+    "from": [
+      0.2,
+      0.85
+    ],
+    "to": [
+      0.85,
+      0.25
+    ]
+  }
+}

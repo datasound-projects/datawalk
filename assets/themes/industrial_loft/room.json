@@ -1,0 +1,93 @@
+{
+  "height": 4.0,
+  "minSize": [
+    12,
+    10
+  ],
+  "windows": [
+    {
+      "wall": "west",
+      "from": 0.1,
+      "to": 0.9,
+      "sill": 0.9,
+      "head": 3.5,
+      "mullions": 5,
+      "frame": "#1d1f21",
+      "displayable": false
+    }
+  ],
+  "beams": {
+    "spacing": 2.5,
+    "depth": 0.35,
+    "color": "#2a2b2d"
+  },
+  "furniture": [
+    {
+      "model": "Sofa_01",
+      "anchor": {
+        "wall": "west",
+        "at": 0.5,
+        "inset": 0.35
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "industrial_coffee_table",
+      "anchor": {
+        "wall": "west",
+        "at": 0.5,
+        "inset": 1.3
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "steel_frame_shelves_01",
+      "anchor": {
+        "corner": "nw",
+        "inset": 0.15
+      },
+      "rotation": 0,
+      "scale": 0.09,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "metal_stool_01",
+      "anchor": {
+        "wall": "west",
+        "at": 0.82,
+        "inset": 0.6
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "potted_plant_02",
+      "anchor": {
+        "corner": "sw",
+        "inset": 0.15
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    }
+  ],
+  "pendants": {
+    "model": "hanging_industrial_lamp",
+    "drop": 0.0
+  }
+}

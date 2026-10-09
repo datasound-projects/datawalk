@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="{{ lang }}">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{% block title %}DataWalk Hub{% endblock %}</title>
+<link rel="icon" href="data:," />
+<style>
+  :root { --bg: #f7f6f3; --panel: #fff; --text: #1d1d1f; --muted: #5f5d58; --line: #e2dfd8; --accent: #7a5410; color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header.top { display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; border-bottom: 1px solid var(--line); background: var(--panel); }
+  header.top a { color: var(--text); text-decoration: none; font-weight: 600; }
+  main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 64px; }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px 20px; margin: 0 0 16px; }
+  h1 { font-size: 1.6rem; margin: 0 0 12px; } h2 { font-size: 1.1rem; margin: 0 0 10px; }
+  a { color: var(--accent); }
+  .muted { color: var(--muted); } .warn { color: #a61b1b; }
+  table { width: 100%; border-collapse: collapse; } th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  form.inline { display: inline; }
+  input, select, button { font: inherit; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--text); }
+  button { cursor: pointer; } button.primary, a.button.primary { background: var(--accent); color: #fff; border: none; }
+  a.button { display: inline-block; font: inherit; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--text); text-decoration: none; }
+  label { display: block; margin: 6px 0; }
+  code, .token { font-family: ui-monospace, Menlo, monospace; background: #f1efe9; padding: 2px 6px; border-radius: 4px; word-break: break-all; }
+  .label { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #a61b1b; color: #fff; font-size: 0.8rem; font-weight: 600; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <a href="/">DataWalk Hub</a>
+  <div class="row">
+    {% if user %}
+    <span class="muted">{{ user.name }}</span>
+    <a href="/account">{{ t('account.title') }}</a>
+    {% if user.is_admin %}<a href="/admin">{{ t('admin.title') }}</a>{% endif %}
+    <form class="inline" method="post" action="/logout"><button>{{ t('nav.sign_out') }}</button></form>
+    {% endif %}
+    <nav class="row" aria-label="{{ t('nav.language') }}">{% for code in languages %}<a href="?{{ request.url.include_query_params(lang=code).query }}" lang="{{ code }}"{% if code == lang %} aria-current="true"{% endif %}>{{ code|upper }}</a>{% endfor %}</nav>
+  </div>
+</header>
+<main>{% block content %}{% endblock %}</main>
+</body>
+</html>

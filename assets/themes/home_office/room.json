@@ -1,0 +1,160 @@
+{
+  "height": 2.8,
+  "minSize": [
+    10,
+    8
+  ],
+  "windows": [
+    {
+      "wall": "west",
+      "from": 0.12,
+      "to": 0.4,
+      "sill": 0.9,
+      "head": 2.3,
+      "mullions": 1,
+      "frame": "#f7f5f0",
+      "displayable": false
+    },
+    {
+      "wall": "west",
+      "from": 0.6,
+      "to": 0.88,
+      "sill": 0.9,
+      "head": 2.3,
+      "mullions": 1,
+      "frame": "#f7f5f0",
+      "displayable": false
+    }
+  ],
+  "furniture": [
+    {
+      "model": "WoodenTable_01",
+      "anchor": {
+        "wall": "west",
+        "at": 0.5,
+        "inset": 0.1
+      },
+      "rotation": 0,
+      "scale": 1.35,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "classic_laptop",
+      "anchor": {
+        "wall": "west",
+        "at": 0.52,
+        "inset": 0.3
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0.74,
+      "plinth": null,
+      "collide": false
+    },
+    {
+      "model": "desk_lamp_arm_01",
+      "anchor": {
+        "wall": "west",
+        "at": 0.36,
+        "inset": 0.15
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0.74,
+      "plinth": null,
+      "collide": false
+    },
+    {
+      "model": "GreenChair_01",
+      "anchor": {
+        "wall": "west",
+        "at": 0.5,
+        "inset": 1.05
+      },
+      "rotation": 180,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "wooden_bookshelf_worn",
+      "anchor": {
+        "corner": "nw",
+        "inset": 0.15
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "mid_century_lounge_chair",
+      "anchor": {
+        "corner": "se",
+        "inset": 0.35
+      },
+      "rotation": 225,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "side_table_01",
+      "anchor": {
+        "wall": "east",
+        "at": 0.68,
+        "inset": 0.15
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "potted_plant_04",
+      "anchor": {
+        "wall": "east",
+        "at": 0.68,
+        "inset": 0.3
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0.55,
+      "plinth": null,
+      "collide": false
+    },
+    {
+      "model": "potted_plant_02",
+      "anchor": {
+        "corner": "ne",
+        "inset": 0.15
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    }
+  ],
+  "pendants": {
+    "model": "modern_ceiling_lamp_01",
+    "drop": 1.17
+  },
+  "rug": {
+    "anchor": {
+      "wall": "west",
+      "at": 0.5,
+      "inset": 0.25
+    },
+    "size": [
+      2.8,
+      2.2
+    ]
+  }
+}

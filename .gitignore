@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+.venv/
+dist/
+.pytest_cache/
+.ruff_cache/
+node_modules/
+apps/web/test-results/
+apps/web/playwright-report/
+# Built by `npm run build` in apps/web; shipped inside the wheel.
+packages/python/datawalk/server/static/
+packages/python/datawalk/server/viewer/
+*.dwk
+*.vza
+.DS_Store
+.asset-cache/
+assets/vendor/
+.serena/
+research/

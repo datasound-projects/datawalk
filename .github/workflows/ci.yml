@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync -p ${{ matrix.python }} --all-packages --all-extras
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pytest
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - uses: astral-sh/setup-uv@v6
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm test
+      - run: uv sync --all-packages --all-extras
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run test:e2e
+      # Tests that need the web build and a browser: PDF, PPTX, world files, the CI recipe.
+      - run: uv run playwright install chromium
+      - run: uv run pytest tests/test_export.py tests/test_pptx_world.py tests/test_ci_recipe.py
+        working-directory: .
+      # The wheel must contain the viewer and must work without Node.js.
+      - name: Build and smoke-test the wheel
+        working-directory: .
+        run: |
+          uv build
+          uv venv /tmp/clean -p 3.11
+          VIRTUAL_ENV=/tmp/clean uv pip install "$(ls dist/*.whl)[plotly]"
+          unzip -l dist/*.whl | grep -q 'datawalk/server/static/index.html'
+          unzip -l dist/*.whl | grep -q 'datawalk/server/viewer/viewer.js'
+          /tmp/clean/bin/datawalk adapters
+          /tmp/clean/bin/python -c "import datawalk as vz, plotly.express as px; r = vz.Report('Smoke'); r.add(px.line(x=[1, 2], y=[3, 4]), key='a', room='Main'); r.save('/tmp/smoke.dwk')"
+          /tmp/clean/bin/datawalk export /tmp/smoke.dwk --html /tmp/smoke.html --yes
+
+  hub-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build the hub image
+        run: docker build -f packages/hub/Dockerfile -t datawalk-hub .
+      - name: Start it and sign-in page answers
+        run: |
+          docker run -d --name hub -p 8800:8800 -e HUB_ENCRYPTION_KEY="$(openssl rand -base64 32)" datawalk-hub
+          for i in $(seq 1 30); do curl -fs http://127.0.0.1:8800/login && break; sleep 2; done
+          curl -fs http://127.0.0.1:8800/login | grep -q "Sign in"

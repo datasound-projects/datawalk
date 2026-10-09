@@ -1,0 +1,121 @@
+{
+  "height": 3.2,
+  "minSize": [
+    11,
+    9
+  ],
+  "windows": [
+    {
+      "wall": "east",
+      "from": 0.12,
+      "to": 0.88,
+      "sill": 0.45,
+      "head": 2.75,
+      "mullions": 3,
+      "frame": "#2b2b2b",
+      "displayable": false
+    }
+  ],
+  "furniture": [
+    {
+      "model": "sofa_03",
+      "anchor": {
+        "wall": "east",
+        "at": 0.55,
+        "inset": 0.3
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "modern_coffee_table_01",
+      "anchor": {
+        "wall": "east",
+        "at": 0.55,
+        "inset": 1.6
+      },
+      "rotation": 90,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "side_table_01",
+      "anchor": {
+        "wall": "east",
+        "at": 0.2,
+        "inset": 0.3
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "ceramic_vase_01",
+      "anchor": {
+        "wall": "east",
+        "at": 0.2,
+        "inset": 0.42
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0.55,
+      "plinth": null,
+      "collide": false
+    },
+    {
+      "model": "modern_arm_chair_01",
+      "anchor": {
+        "wall": "east",
+        "at": 0.3,
+        "inset": 1.45
+      },
+      "rotation": -60,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "potted_plant_02",
+      "anchor": {
+        "corner": "nw",
+        "inset": 0.15
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    },
+    {
+      "model": "potted_plant_02",
+      "anchor": {
+        "corner": "ne",
+        "inset": 0.15
+      },
+      "rotation": 0,
+      "scale": 1,
+      "elevation": 0,
+      "plinth": null,
+      "collide": true
+    }
+  ],
+  "rug": {
+    "anchor": {
+      "wall": "east",
+      "at": 0.55,
+      "inset": 0.9
+    },
+    "size": [
+      3.2,
+      2.2
+    ]
+  }
+}
