@@ -19,6 +19,7 @@ type Win = {
   datawalkRenderer?: { info: () => { render: { calls: number } } }
   datawalk: {
     getState: () => {
+      gpu: { webgl: boolean }
       report: { visualizations: { id: string; key: string; source: { has_payload: boolean } }[] }
       inspect: (id: string) => void
     }
@@ -35,13 +36,20 @@ function watch(page: Page, allowed: (url: string) => boolean) {
   return { requests, errors }
 }
 
-async function walkThrough(page: Page) {
-  await expect(page.getByText('Exported copy · revision')).toBeVisible({ timeout: 60_000 })
-  await expect(page.locator('.watermark').first()).toContainText('E2E copy')
+/** Enter the 3D room; a browser without WebGL (Firefox on Linux CI) shows the page view. */
+async function enterOrRead(page: Page) {
+  const webgl = await page.evaluate(() => (window as unknown as Win).datawalk.getState().gpu.webgl)
+  if (!webgl) return expect(page.locator('.flat .flat-chart').first()).toBeVisible({ timeout: 60_000 })
   await page.getByRole('button', { name: 'Enter room' }).click()
   await expect
     .poll(() => page.evaluate(() => (window as unknown as Win).datawalkRenderer?.info().render.calls ?? 0), { timeout: 90_000 })
     .toBeGreaterThan(40)
+}
+
+async function walkThrough(page: Page) {
+  await expect(page.getByText('Exported copy · revision')).toBeVisible({ timeout: 60_000 })
+  await expect(page.locator('.watermark').first()).toContainText('E2E copy')
+  await enterOrRead(page)
   // The interactive chart renders with Plotly; the reduced chart has no data.
   const viz = await page.evaluate(() => (window as unknown as Win).datawalk.getState().report.visualizations)
   expect(viz.find((v) => v.key === 'returns_dist')?.source.has_payload).toBe(false)
@@ -69,10 +77,8 @@ test('lite single file (no chart libraries) opens offline and draws the room', a
   const { requests, errors } = watch(page, (u) => u.startsWith(file) || u.startsWith('data:') || u.startsWith('blob:'))
   await page.route(/^https?:/, (r) => r.abort())
   await page.goto(`${file}?view=3d`) // 3D also on a software GPU (CI)
-  await page.getByRole('button', { name: 'Enter room' }).click()
-  await expect
-    .poll(() => page.evaluate(() => (window as unknown as Win).datawalkRenderer?.info().render.calls ?? 0), { timeout: 90_000 })
-    .toBeGreaterThan(40)
+  await page.waitForFunction(() => !!(window as unknown as Win).datawalk?.getState().report, null, { timeout: 60_000 })
+  await enterOrRead(page)
   const html = readFileSync(path.join(out, 'lite.html'), 'utf8')
   expect(html.length).toBeLessThan(15 * 2 ** 20)
   expect(requests).toEqual([])

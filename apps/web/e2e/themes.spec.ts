@@ -6,9 +6,23 @@ type Memory = { geometries: number; textures: number }
 type Info = { render: { calls: number }; memory: Memory }
 type Win = {
   datawalkRenderer: { info: () => Info }
-  datawalk: { getState: () => { report: { rooms: { id: string }[] }; enterRoom: (r: string) => void } }
+  datawalk: { getState: () => { report: { rooms: { id: string }[] }; roomLoading: boolean; enterRoom: (r: string) => void } }
 }
 const info = (page: Page) => page.evaluate(() => (window as unknown as Win).datawalkRenderer.info())
+
+/** GPU memory once the room is drawn: loaded, and the counts no longer change (slow on CI). */
+async function settled(page: Page): Promise<Memory> {
+  await page.waitForFunction(() => !(window as unknown as Win).datawalk.getState().roomLoading, null, { timeout: 60_000 })
+  let last = ''
+  for (let i = 0; i < 30; i++) {
+    await page.waitForTimeout(1500)
+    const { geometries, textures } = (await info(page)).memory
+    const now = `${geometries}/${textures}`
+    if (now === last) return { geometries, textures }
+    last = now
+  }
+  throw new Error(`GPU memory did not settle: ${last}`)
+}
 
 test('every theme loads and renders without errors', async ({ page }) => {
   test.setTimeout(600_000)
@@ -35,8 +49,7 @@ test('repeated room changes do not leak GPU memory', async ({ page }) => {
     laps.push([])
     for (const id of rooms) {
       await page.evaluate((r) => (window as unknown as Win).datawalk.getState().enterRoom(r), id)
-      await page.waitForTimeout(5000)
-      laps[lap].push({ ...(await info(page)).memory })
+      laps[lap].push(await settled(page))
     }
   }
   // Lap 1 fills the caches. A leak grows from lap to lap: compare the warm laps 2 and 4.

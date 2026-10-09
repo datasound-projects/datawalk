@@ -44,10 +44,12 @@ Do these steps in this order for each release. Stop when a step fails.
 
 ## 5. Publish
 
-0. Confirm the distribution name on PyPI. The name `datawalk` belongs to another project:
-   use the chosen name in `pyproject.toml`, the install commands in the documentation, and
-   the hints of `datawalk doctor`.
-1. Write the release notes: new features, changes in behavior, known limitations, and the
-   archive format version.
-2. Tag the release. Publish the wheel and the sdist, then the hub package and image.
-3. Update [roadmap.md](roadmap.md) and [production-readiness.md](production-readiness.md).
+1. Write the release notes in [CHANGELOG.md](../CHANGELOG.md): new features, changes in
+   behavior, known limitations, and the archive format version.
+2. Push a tag with the version, for example `git tag v0.1.0a1 && git push origin v0.1.0a1`.
+   The release workflow builds the viewer and the packages, installs the wheel in a clean
+   environment, writes checksums and a signed build provenance, and publishes the GitHub
+   release with the install command.
+3. PyPI: the name `datawalk` belongs to another project. Choose a distribution name first,
+   then add a publishing step with PyPI trusted publishing.
+4. Update [roadmap.md](roadmap.md) and [production-readiness.md](production-readiness.md).
