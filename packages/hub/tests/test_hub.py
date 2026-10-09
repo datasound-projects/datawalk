@@ -455,10 +455,9 @@ def test_oidc_sign_in(hub, unused_tcp_port_factory=None):
     from authlib.jose import JsonWebKey, jwt
     from fastapi import FastAPI, Form
 
-    sock = socket.socket()
+    sock = socket.socket()  # stays open: the server gets it, so no other process takes the port
     sock.bind(("127.0.0.1", 0))
     port = sock.getsockname()[1]
-    sock.close()
     issuer = f"http://127.0.0.1:{port}"
     key = JsonWebKey.generate_key("RSA", 2048, is_private=True)
     key_dict = key.as_dict(is_private=True) | {"kid": "k1", "alg": "RS256", "use": "sig"}
@@ -502,11 +501,14 @@ def test_oidc_sign_in(hub, unused_tcp_port_factory=None):
             "expires_in": 300,
         }
 
-    server = uvicorn.Server(uvicorn.Config(idp, host="127.0.0.1", port=port, log_level="warning"))
-    thread = threading.Thread(target=server.run, daemon=True)
+    server = uvicorn.Server(uvicorn.Config(idp, log_level="warning"))
+    thread = threading.Thread(target=server.run, kwargs={"sockets": [sock]}, daemon=True)
     thread.start()
-    while not server.started:
+    for _ in range(200):  # 10 s at most: a server that fails to start must not hang the tests
+        if server.started or not thread.is_alive():
+            break
         time.sleep(0.05)
+    assert server.started, "the test identity provider did not start"
     try:
         hub.cfg.oidc = OidcConfig(issuer, "hub", "secret")
         app = create_app(hub.cfg)

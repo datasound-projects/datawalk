@@ -83,6 +83,7 @@ artifacts = ["packages/python/datawalk/server/static/**", "packages/python/dataw
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "packages/hub/tests"]
+faulthandler_timeout = 300  # a test that hangs prints the stack of every thread
 
 [tool.ruff]
 line-length = 100
