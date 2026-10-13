@@ -24,6 +24,7 @@ export default defineConfig({
   use: {
     viewport: { width: 1280, height: 800 },
     locale: 'en-US', // the viewer follows the browser language; the tests read English text
+    trace: slow ? 'retain-on-failure' : 'off', // CI uploads it: open with `npx playwright show-trace`
   },
   webServer: [
     server(8766),

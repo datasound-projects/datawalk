@@ -99,6 +99,12 @@ jobs:
       - run: uv sync --all-packages --all-extras
       - run: npx playwright install --with-deps ${{ matrix.browser }}
       - run: npx playwright test ${{ matrix.args }} --reporter=list
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: e2e-traces-${{ strategy.job-index }}
+          path: apps/web/test-results/
+          retention-days: 7
 
   # Tests that need the web build and a browser (PDF, PPTX, world files, the CI recipe), and
   # the wheel, which must contain the viewer and work without Node.js.
