@@ -38,7 +38,7 @@ function watchErrors(page: Page) {
 }
 
 test('the guide presents the demo: plan, camera, narration, questions, and interruptions', async ({ page }) => {
-  test.setTimeout(240_000)
+  test.setTimeout(360_000) // a whole presentation; CI renders at about one frame per second
   const errors = watchErrors(page)
   const clips: { face: { names: string[]; frames: number[][] } | null; seconds: number }[] = []
   page.on('response', (r) => {
