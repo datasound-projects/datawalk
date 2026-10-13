@@ -4,6 +4,7 @@ A fake model stands in for Ollama. The test with the real model runs only when
 DATAWALK_TEST_OLLAMA=1 (it needs `ollama serve` and the model)."""
 
 import base64
+import importlib.util
 import json
 import os
 import threading
@@ -353,11 +354,45 @@ def test_speech_with_and_without_audio2face():
         speech(FakeVoice(), None, "   ", "en")
 
 
-def test_kokoro_explains_what_is_missing(tmp_path):
+def test_kokoro_says_what_happens_without_its_files(tmp_path):
     ok, detail_text = Kokoro(folder=tmp_path).check()
-    assert not ok and ("kokoro-onnx" in detail_text or str(tmp_path) in detail_text)
+    if importlib.util.find_spec("kokoro_onnx"):  # the voice extra: the files come on first use
+        assert ok and "download on first use" in detail_text
+    else:
+        assert not ok and "datawalk[voice]" in detail_text
     with pytest.raises(GuideError):
         Kokoro(folder=tmp_path).speak("Hello.", "de")  # no German voice
+
+
+def test_kokoro_files_download_once_and_must_match_their_checksum(tmp_path, monkeypatch):
+    import hashlib
+
+    import datawalk.guide.voice as voice
+
+    files = {"kokoro-v1.0.int8.onnx": b"model", "voices-v1.0.bin": b"voices"}
+    server, url = serve({f"GET /{n}": (200, data) for n, data in files.items()})
+    try:
+        monkeypatch.setattr(voice, "RELEASE", url + "/")
+        good = {n: hashlib.sha256(data).hexdigest() for n, data in files.items()}
+        monkeypatch.setattr(voice, "MODEL_FILES", good)
+        kokoro = Kokoro(folder=tmp_path / "kokoro")
+        kokoro._download()
+        assert kokoro._files() is not None
+        assert (tmp_path / "kokoro" / "voices-v1.0.bin").read_bytes() == b"voices"
+        requests = len(server.bodies)
+        kokoro._download()  # the files are there: nothing to get
+        assert len(server.bodies) == requests
+        # A file that does not match its checksum is not kept.
+        monkeypatch.setattr(voice, "MODEL_FILES", {**good, "voices-v1.0.bin": "0" * 64})
+        (tmp_path / "kokoro" / "voices-v1.0.bin").unlink()
+        with pytest.raises(GuideError, match="unexpected checksum"):
+            kokoro._download()
+        assert not list((tmp_path / "kokoro").glob("voices*"))
+    finally:
+        server.shutdown()
+        server.server_close()  # the port refuses connections now, like a machine offline
+    with pytest.raises(GuideError, match="Cannot download"):  # offline: the browser voice speaks
+        Kokoro(folder=tmp_path / "offline")._download()
 
 
 # -- server --------------------------------------------------------------------------------
