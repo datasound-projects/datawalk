@@ -12,9 +12,9 @@ import socket
 import threading
 import webbrowser
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Annotated, Literal
 
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -25,6 +25,7 @@ from ..core.models import ReportModel
 if TYPE_CHECKING:
     import uvicorn
 
+    from ..guide import Guide
     from ..reports.report import Report
 
 STATIC = Path(__file__).parent / "static"
@@ -47,7 +48,39 @@ class ExportRequest(BaseModel):
     confirmed: bool = False  # the author saw the review of exactly these options
 
 
-def create_app(report: Report, token: str | None = None) -> FastAPI:
+RefId = Annotated[str, Field(pattern=r"^[0-9a-f]{32}$")]
+Lang = Literal["en", "de"]
+
+
+class PlanRequest(BaseModel):
+    minutes: Literal[3, 5, 10] = 3
+    lang: Lang = "en"
+    refresh: bool = False
+
+
+class AskRequest(BaseModel):
+    question: str = Field(min_length=1, max_length=500)
+    current: RefId | None = None  # the tour stop on screen
+    inspecting: RefId | None = None  # the chart in the inspector
+    stops: list[RefId] = Field(default=[], max_length=1000)  # the tour being presented
+    lang: Lang = "en"
+
+
+class SpeechRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=600)
+    lang: Lang = "en"
+
+
+def same_site_json(request: Request) -> None:
+    """Guide requests run a local model: only this page may send them. A cross-site page can
+    send a POST without a preflight when it has no JSON content type, so both are checked."""
+    if request.headers.get("sec-fetch-site", "same-origin") not in ("same-origin", "none"):
+        raise HTTPException(403, "Cross-site requests are not accepted.")
+    if request.headers.get("content-type", "").split(";")[0].strip() != "application/json":
+        raise HTTPException(415, "Send JSON (Content-Type: application/json).")
+
+
+def create_app(report: Report, token: str | None = None, guide: Guide | None = None) -> FastAPI:
     from ..reports.report import RevisionConflict
     from ..serialization.archive import write
 
@@ -77,6 +110,8 @@ def create_app(report: Report, token: str | None = None) -> FastAPI:
         editable = editor(request)
         path = report._path if editable else None  # the file name is for the editor only
         session = {"editable": editable, "saves_to": path.name if path else None}
+        if guide is not None:
+            session["guide"] = True  # the viewer loads the AI guide (opt-in: --guide)
         if editable:
             from ..policy import labels
 
@@ -213,6 +248,9 @@ def create_app(report: Report, token: str | None = None) -> FastAPI:
             raise HTTPException(404)
         return Response(report._previews[vid], media_type="image/png")
 
+    if guide is not None:
+        _guide_routes(app, report, guide)
+
     if (STATIC / "index.html").exists():
         app.mount("/", StaticFiles(directory=STATIC, html=True), name="viewer")
     else:
@@ -225,6 +263,40 @@ def create_app(report: Report, token: str | None = None) -> FastAPI:
             )
 
     return app
+
+
+def _guide_routes(app: FastAPI, report: Report, guide: Guide) -> None:
+    """The AI guide: status, plan, questions, speech. Plain `def`: the model calls block, so
+    FastAPI runs them in its thread pool."""
+    from ..guide import GuideError
+
+    checked = [Depends(same_site_json)]
+
+    @app.get("/api/guide/status")
+    def guide_status() -> dict:
+        return guide.status()
+
+    @app.post("/api/guide/plan", dependencies=checked)
+    def guide_plan(body: PlanRequest) -> dict:
+        try:
+            return guide.plan(report, body.minutes, body.lang, body.refresh).to_json()
+        except GuideError as e:
+            raise HTTPException(503, str(e)) from None
+
+    @app.post("/api/guide/ask", dependencies=checked)
+    def guide_ask(body: AskRequest) -> dict:
+        context = body.model_dump(exclude={"question"})
+        try:
+            return guide.ask(report, body.question, **context)
+        except GuideError as e:
+            raise HTTPException(503, str(e)) from None
+
+    @app.post("/api/guide/speech", dependencies=checked)
+    def guide_speech(body: SpeechRequest) -> dict:
+        try:
+            return guide.speech(body.text, body.lang)
+        except GuideError as e:
+            raise HTTPException(503, str(e)) from None
 
 
 def _in_event_loop() -> bool:
@@ -244,6 +316,7 @@ def serve(
     open_browser: bool = True,
     block: bool | None = None,
     edit: bool = False,
+    guide: bool = False,
 ) -> str:
     import uvicorn
 
@@ -257,7 +330,14 @@ def serve(
     sock.listen(128)  # accept early connections (the browser) before uvicorn starts
     token = secrets.token_urlsafe(24) if edit else None
     url = f"http://127.0.0.1:{sock.getsockname()[1]}/" + (f"#edit={token}" if token else "")
-    server = uvicorn.Server(uvicorn.Config(create_app(report, token), log_level="warning"))
+    helper = None
+    if guide:
+        from ..guide import Guide
+
+        helper = Guide()
+        print(f"AI guide: {helper.llm.model} (local)", flush=True)
+        threading.Thread(target=helper.warm, daemon=True).start()
+    server = uvicorn.Server(uvicorn.Config(create_app(report, token, helper), log_level="warning"))
     if not (STATIC / "index.html").exists():
         print("warning: the viewer is not built (npm run build in apps/web).", flush=True)
     print(f"DataWalk {'editor' if edit else 'viewer'}: {url}", flush=True)

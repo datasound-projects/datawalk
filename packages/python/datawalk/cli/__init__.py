@@ -41,6 +41,7 @@ def main(argv: list[str] | None = None) -> None:
     de.add_argument("--port", type=int, help="port (default: a free port)")
     de.add_argument("--no-browser", action="store_true", help="print the address only")
     de.add_argument("--view-only", action="store_true", help="the stakeholder view, no editor")
+    de.add_argument("--guide", action="store_true", help="add the AI guide (local model, Ollama)")
     op = sub.add_parser(
         "open", help="open a report (.dwk) or a Jupyter notebook (.ipynb) in the browser"
     )
@@ -49,6 +50,7 @@ def main(argv: list[str] | None = None) -> None:
     op.add_argument("--no-browser", action="store_true", help="print the address only")
     op.add_argument("--edit", action="store_true", help="open the editor; edits save to the file")
     op.add_argument("--execute", action="store_true", help="notebooks: run the notebook first")
+    op.add_argument("--guide", action="store_true", help="add the AI guide (local model, Ollama)")
     ex = sub.add_parser(
         "export",
         help="export a report for people without Python (default: one HTML file)",
@@ -163,7 +165,11 @@ def demo(args: argparse.Namespace) -> int:
     report = build()
     print(f"Saved {report.save(args.save)}", flush=True)
     report.show(
-        port=args.port, open_browser=not args.no_browser, block=True, edit=not args.view_only
+        port=args.port,
+        open_browser=not args.no_browser,
+        block=True,
+        edit=not args.view_only,
+        guide=args.guide,
     )
     return 0
 
@@ -183,7 +189,13 @@ def open_report(args: argparse.Namespace) -> int:
             report = Report.load(args.path)
     except (ArchiveError, NotebookError, MergeConflict, OSError) as e:
         return _failed(e)
-    report.show(port=args.port, open_browser=not args.no_browser, block=True, edit=args.edit)
+    report.show(
+        port=args.port,
+        open_browser=not args.no_browser,
+        block=True,
+        edit=args.edit,
+        guide=args.guide,
+    )
     return 0
 
 
