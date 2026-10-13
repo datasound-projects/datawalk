@@ -2,7 +2,8 @@
 
 The default uses stand-ins that answer at once and always the same: a scripted model, a voice
 that returns short tones (real WAV audio), and an Audio2Face-3D stand-in with frames.
-`down`: the real adapters, pointed at nothing: no model, no Kokoro, no Audio2Face.
+`down`: the real adapters, pointed at nothing: no model, no Kokoro files (offline), no
+Audio2Face.
 """
 
 import math
@@ -118,6 +119,9 @@ class FaceStandIn:
 
 
 if sys.argv[2:] == ["down"]:
+    import datawalk.guide.voice as voice
+
+    voice.RELEASE = "http://127.0.0.1:9/"  # offline: the voice files cannot download
     guide = Guide(
         llm=Ollama("http://127.0.0.1:9"), voice=Kokoro(folder=Path(tempfile.mkdtemp())), face=None
     )
