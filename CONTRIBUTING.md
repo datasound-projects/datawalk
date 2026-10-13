@@ -2,8 +2,9 @@
 
 ## Set up
 
-You need [uv](https://docs.astral.sh/uv/) and Node.js 22 or later. Users of the published
-package do not need Node.js.
+You need [uv](https://docs.astral.sh/uv/) and Node.js 22 or later. `uv sync` alone already
+gives a working DataWalk: when the viewer is missing, the build hook (`hatch_build.py`) builds
+it with Node.js from a wheel. To change the viewer and run its tests, use your own Node.js:
 
 ```bash
 uv sync --all-packages --all-extras   # library, hub, every extra, and the dev tools

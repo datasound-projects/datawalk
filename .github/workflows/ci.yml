@@ -23,6 +23,8 @@ jobs:
           - { os: macos-latest, python: "3.13" }
           - { os: windows-latest, python: "3.13" }
     name: python (${{ matrix.python }}, ${{ matrix.os }})
+    env:
+      DATAWALK_SKIP_VIEWER_BUILD: "1"  # the browser tests run in the e2e and package jobs
     steps:
       - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v6
@@ -133,6 +135,35 @@ jobs:
           name: wheel
           path: dist/datawalk-*.whl
           retention-days: 7
+
+  # The README's install command: uv alone builds and installs DataWalk from the source (the
+  # viewer is built with Node.js from a wheel), on Linux, macOS, and Windows.
+  source-install:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    name: source install (${{ matrix.os }})
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+      - run: |
+          uv tool install ".[all]"
+          uv tool dir --bin >> "$GITHUB_PATH"
+      - name: The viewer is built, and a notebook becomes an HTML file
+        run: |
+          datawalk doctor > doctor.txt || true  # a machine without a GPU or browser is fine here
+          cat doctor.txt
+          grep -E "^\[ok\] Viewer +built" doctor.txt
+          grep -E "^\[ok\] Export viewer +built" doctor.txt
+          datawalk import examples/notebook/retail_analysis.ipynb -o "$RUNNER_TEMP/r.dwk"
+          datawalk export "$RUNNER_TEMP/r.dwk" --html "$RUNNER_TEMP/r.html" --yes
+          test -s "$RUNNER_TEMP/r.html"
 
   # The wheel of this commit, installed as users do, on Linux, macOS, and Windows.
   install:
