@@ -132,6 +132,21 @@ datawalk open thematic_sectors.ipynb --edit
 `datawalk export report.dwk` makes the HTML file. Every export first shows what data leaves
 your computer. Details: [docs/exports.md](docs/exports.md).
 
+## AI guide (optional)
+
+Start with `--guide`, and a small avatar presents the report: it plans a 3, 5, or 10-minute
+tour, moves the camera, explains each stop aloud, and answers questions such as "Explain this
+chart" or "Show the best model". A local model (Ollama, `nemotron-3-nano:4b`) writes the text;
+DataWalk checks every stop and every number against the report. Nothing leaves your computer.
+
+```bash
+ollama pull nemotron-3-nano:4b
+datawalk demo --guide
+```
+
+Voice (Kokoro), facial animation (NVIDIA Audio2Face-3D), and spoken questions are optional.
+Details: [docs/guide.md](docs/guide.md).
+
 ## Good to know
 
 - **Your edits are safe.** Run your analysis again: names, rooms, and the tour stay.
@@ -141,7 +156,7 @@ your computer. Details: [docs/exports.md](docs/exports.md).
 
 ## Learn more
 
-[Sources](docs/sources.md) · [Presenting](docs/presenting.md) · [Exports](docs/exports.md) ·
+[Sources](docs/sources.md) · [Presenting](docs/presenting.md) · [AI guide](docs/guide.md) · [Exports](docs/exports.md) ·
 [Team hub](docs/hub.md) · [Governance](docs/governance.md) · [Install options](docs/install.md) ·
 [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Changelog](CHANGELOG.md)
 

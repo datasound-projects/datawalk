@@ -42,7 +42,8 @@ command for your installation.
 | `pdf` | Playwright | PDF, GLB, USDZ, and video exports; preview images for "preview only" |
 | `pptx` | python-pptx, Playwright | PowerPoint export |
 | `pdf-import` | pypdfium2 | PDF pages as charts |
-| `all` | All of the above | Everything |
+| `all` | All of the above | Everything except `voice` |
+| `voice` | kokoro-onnx | The AI guide's local voice (Kokoro-82M). Not in `all`: its phonemizer is GPL-3.0. See [guide.md](guide.md) |
 
 Altair, Bokeh, and MLflow are not extras: install them as usual when you use them.
 

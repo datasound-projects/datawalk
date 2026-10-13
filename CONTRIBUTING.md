@@ -32,6 +32,10 @@ Firefox and WebKit for the export projects. CI uses Playwright's browsers. The s
 its own servers: demo reports (`apps/web/e2e/serve.py`, test-only editor token `e2e-token`),
 the notebook example, the other-sources example, and a hub (`apps/web/e2e/hub_serve.py`).
 
+The AI guide's tests use stand-ins for the model and the voice (`e2e/guide_serve.py`). To
+test with the real model too, run `ollama serve` and `DATAWALK_TEST_OLLAMA=1 uv run pytest
+tests/test_guide.py`.
+
 The Python tests include the hub (`packages/hub/tests`). Some tests need the web build and a
 browser (PDF, world files, the CI recipe); they skip themselves without them.
 

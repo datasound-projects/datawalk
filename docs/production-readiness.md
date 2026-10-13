@@ -18,9 +18,9 @@ evidence for it, and the limitations that remain. It does not claim more than th
 
 | Suite | Result |
 |---|---|
-| pytest: library and hub | 91 tests pass |
-| Vitest: viewer logic | 86 tests pass |
-| Playwright: end to end, 8 projects (Chromium, Firefox, WebKit) | 27 tests pass |
+| pytest: library and hub | 124 tests pass (one more with the real model: `DATAWALK_TEST_OLLAMA=1`) |
+| Vitest: viewer logic | 96 tests pass |
+| Playwright: end to end, 9 projects (Chromium, Firefox, WebKit) | 30 tests pass |
 | ruff (lint and format), TypeScript (`tsc`), ESLint | No findings |
 
 The end-to-end tests cover: walking, doors, mouse look after a door, inspection, the map,
@@ -28,7 +28,8 @@ the navigator, all 10 themes, GPU memory over repeated room changes, chart color
 the flat view with an automated WCAG 2.2 AA check (axe), the guided tour with a clicker, the
 presenter view, kiosk mode, the editor (rename, undo, arrange, save, reload, themes, tour,
 export review and download), offline single-file and static-site exports with zero network
-requests in three browser engines, notebook and other sources, and live follow on the hub.
+requests in three browser engines, notebook and other sources, live follow on the hub, and
+the AI guide (plan, camera, narration, questions, interruptions, and its fallbacks).
 
 ### 2. The package installs and runs in a clean environment
 
@@ -143,6 +144,14 @@ Classification labels limit exports and public links. The hub encrypts archives 
 at rest (AES-256-GCM) and keeps an audit log.
 
 ## Remaining limitations
+
+- **AI guide (unreleased, opt-in).** Tested with the real model (nemotron-3-nano:4b) and the
+  Kokoro voice on an Apple M2, and with stand-ins in CI. **NVIDIA Audio2Face-3D is not
+  verified on NVIDIA hardware**: the adapter and the frame checks are tested with a stand-in
+  bridge, and DataWalk does not include a bridge for the SDK. A small model can put a correct
+  number in a wrong sentence; the number check finds invented numbers only. Review a plan
+  before you present it. Over 12 guided presentations in a row, the page's memory after
+  garbage collection grew by about 2 MB in total (tapering). See [guide.md](guide.md).
 
 - **PyPI name.** `datawalk` on PyPI is another project. Until a name is chosen, install from
   a wheel or a source checkout.

@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- AI guide (opt-in, `--guide`): a small animated avatar plans a 3, 5, or 10-minute
+  presentation, moves the camera from stop to stop, explains each stop aloud with captions,
+  and answers questions. A local model (Ollama, `nemotron-3-nano:4b`) writes the text;
+  DataWalk checks every stop, number, and action. Without a model it presents with the
+  report's own text. Optional: Kokoro-82M voice (`voice` extra), NVIDIA Audio2Face-3D facial
+  animation (not verified on NVIDIA hardware), spoken questions with on-device recognition.
+  `datawalk doctor` checks the components. See docs/guide.md.
+
 ## 0.1.0a2 (2026-10-09): installs that work everywhere
 
 - Windows: text files are UTF-8 everywhere (a web-folder export with a title such as
