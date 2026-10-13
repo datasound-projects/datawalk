@@ -7,7 +7,7 @@ requires-python = ">=3.11"
 dependencies = [
     "datawalk==0.1.0a2",  # exact: "datawalk" on PyPI is another project
     "fastapi>=0.115",
-    "uvicorn[standard]>=0.30",
+    "uvicorn[standard]>=0.54.0",
     "jinja2>=3.1",
     "python-multipart>=0.0.9",
     "cryptography>=43",
