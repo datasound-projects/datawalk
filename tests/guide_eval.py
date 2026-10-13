@@ -230,10 +230,10 @@ def main(argv: list[str] | None = None) -> int:
     from datawalk.demo import build
     from datawalk.guide.llm import Ollama
 
-    if args.rescore:
+    if args.rescore:  # with the refs of the report that answered: each build has new ids
         saved = json.loads(args.rescore.read_text(encoding="utf-8"))
         cases = {c["id"]: c for c in json.loads(args.cases.read_text(encoding="utf-8"))["cases"]}
-        keys = ref_keys(build())
+        keys = {ref: set(k) for ref, k in saved["keys"].items()}
         results = [
             r | (score(cases[r["id"]], r["output"], keys) if not r["error"] else {})
             for r in saved["results"]
@@ -259,7 +259,15 @@ def main(argv: list[str] | None = None) -> int:
     print("\n" + text)
     if args.out:
         args.out.write_text(
-            json.dumps({"summary": text, "results": results}, indent=1), encoding="utf-8"
+            json.dumps(
+                {
+                    "summary": text,
+                    "keys": {ref: sorted(k) for ref, k in ref_keys(report).items()},
+                    "results": results,
+                },
+                indent=1,
+            ),
+            encoding="utf-8",
         )
     return 0
 

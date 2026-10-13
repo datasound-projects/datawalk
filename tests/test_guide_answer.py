@@ -95,6 +95,10 @@ def test_navigation_goes_to_the_named_chart(demo, kb):
     out = answer(demo, kb, None, "What does the drawdown chart show?")
     assert out.action is None  # a question, not a request to go there
     assert answer(demo, kb, None, "Next stop, please.").action["name"] == "next_stop"
+    assert answer(demo, kb, None, "Please pause the presentation.").action["name"] == "pause_tour"
+    assert answer(demo, kb, None, "Next, tell me about the trading volume").action is None
+    assert answer(demo, kb, None, "Will you explain the volatility?").source == "template"
+    assert "forecast" not in answer(demo, kb, None, "Will you explain the volatility?").answer
 
 
 def test_the_model_phrases_and_every_number_is_checked(demo, kb):
@@ -131,6 +135,7 @@ def test_the_conversation_cannot_add_numbers(demo, kb):
     model = Model({"answer": "The AUC is 0.99.", "interpretation": "", "caveat": "", "used": []})
     out = answer(demo, kb, model, "And the AUC?", history=history)
     assert "0.99" not in out.answer
+
 
 def test_the_question_set_passes_without_a_model(demo):
     """The regression gate: the deterministic part of the guide answers the question set."""

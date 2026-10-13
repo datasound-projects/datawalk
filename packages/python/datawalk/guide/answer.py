@@ -75,22 +75,24 @@ OVERVIEW = re.compile(r"\b(summar|overview|conclusion|takeaway|main (point|findi
                       r"(figure|finding|point)|zusammenfass|fazit)", re.I)  # fmt: skip
 ADVICE = re.compile(r"\b(should (i|we) (buy|sell|invest)|which (stock|share)s? (should|to)|"
                     r"investment advice|kaufen|verkaufen)\b", re.I)  # fmt: skip
-FUTURE = re.compile(r"\b(will|forecast|predict(ion)? (for|of)|next (year|month|week)|"
+FUTURE = re.compile(r"\b(will(?! you)|forecast|predict(ion)? (for|of)|next (year|month|week)|"
                     r"in the future|wird|prognose)\b", re.I)  # fmt: skip
 WHY = re.compile(r"^\s*(why|warum|wieso)\b|\b(reason|cause)s?\b", re.I)
 NAV = re.compile(r"^\W*(please |can you |could you )?(show|open|display|go to|take me|"
                  r"jump to|bring up|zeig|öffne|gehe zu)\b", re.I)  # fmt: skip
 FOLLOW = re.compile(r"\b(it|that|this|those|these|then|there|they|them|es|das|dies|dann|"
                     r"dort)\b", re.I)  # fmt: skip
-NEXT = re.compile(r"^\W*(next|weiter|nächste)\b", re.I)
-PAUSE = re.compile(r"\b(pause|halt|anhalten)\b", re.I)
-RESUME = re.compile(r"^\W*(resume|continue|fortsetzen|weitermachen)\b", re.I)
+# commands, not questions: "Next stop, please." but not "Next, tell me about the volume"
+NEXT = re.compile(r"^\W*(next( stop)?|weiter|nächste( station)?)\W*(please|bitte)?\W*$", re.I)
+PAUSE = re.compile(r"^\W*(please |bitte )?(pause|halt|stop|anhalten)\b", re.I)
+RESUME = re.compile(r"^\W*(please |bitte )?(resume|continue|go on|fortsetzen|weitermachen)\W*"
+                    r"(please|bitte)?\W*$", re.I)  # fmt: skip
 NUMBER = re.compile(r"\d+(?:\.\d+)?")
 WHEN = re.compile(r"\b(when|wann)\b", re.I)
 YEAR = re.compile(r"\b(19\d\d|20\d\d)\b")
 ISO_DATE = re.compile(r"\b(\d{4}-\d{2}-\d{2})\b")
 
-RULES = """You answer an audience's questions about a data report, in plain spoken sentences.
+SYSTEM = """You answer an audience's questions about a data report, in plain spoken sentences.
 Rules:
 - Use only the numbered facts and interpretations in <facts>. Never add a number, name, or
   date that is not written there. Copy numbers exactly as written.
@@ -401,7 +403,7 @@ def _phrase(
     error = ""
     if llm is not None:
         try:
-            data = llm.chat(RULES, user, _schema(list(by_id)), timeout=TIMEOUT)
+            data = llm.chat(SYSTEM, user, _schema(list(by_id)), timeout=TIMEOUT)
         except GuideError as e:
             error = str(e)
     decimal_comma = lang == "de"
