@@ -1,6 +1,9 @@
 """The fact-first guide: facts (insights.py), their meaning (rules.py), answers (answer.py)."""
 
+import json
+
 import pytest
+from guide_eval import CASES, run, template_engine
 
 from datawalk.guide.answer import Knowledge, answer
 from datawalk.guide.llm import GuideError
@@ -129,3 +132,9 @@ def test_the_conversation_cannot_add_numbers(demo, kb):
     out = answer(demo, kb, model, "And the AUC?", history=history)
     assert "0.99" not in out.answer
 
+def test_the_question_set_passes_without_a_model(demo):
+    """The regression gate: the deterministic part of the guide answers the question set."""
+    cases = json.loads(CASES.read_text(encoding="utf-8"))["cases"]
+    results = run(template_engine(None), demo, cases)
+    failed = [(r["id"], r["failures"]) for r in results if r["score"] < 1]
+    assert sum(r["score"] for r in results) / len(results) >= 0.95, failed

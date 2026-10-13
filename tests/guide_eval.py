@@ -3,6 +3,8 @@
     uv run python tests/guide_eval.py                      # the current engine, the real model
     uv run python tests/guide_eval.py --engine baseline --out baseline.json
     uv run python tests/guide_eval.py --limit 5 --only compare,interpret
+    uv run python tests/guide_eval.py --engine template --cases tests/guide_eval_holdout.json
+    uv run python tests/guide_eval.py --rescore baseline.json   # saved answers, today's scoring
 
 Every case is scored automatically, and each failure gets a category, so a change to the guide
 shows where it helps and where it hurts:
@@ -10,7 +12,7 @@ shows where it helps and where it hurts:
     wrong_chart     no cited chart (or action target) is one of the expected charts
     missing_number  an expected number is not in the answer
     shallow         none of the expected ideas (for example "chance") is in the answer
-    should_abstain  the report cannot answer, but the answer does not say so
+    should_abstain  the report cannot answer, but the answer (not a caveat) does not say so
     wrong_action    the expected tool or target is missing
     unsafe          forbidden text is in the answer (prompt injection)
     invented        the number check removed a statement (the model made something up)
@@ -72,8 +74,9 @@ def score(case: dict[str, Any], out: dict[str, Any], keys: dict[str, set[str]]) 
         checks["numbers_any"] = float(any(mentions(text, v) for v in case["numbers_any"]))
     if case.get("concepts"):
         checks["concepts"] = float(any(c.lower() in low for c in case["concepts"]))
-    if case.get("abstain"):
-        checks["abstain"] = float(any(p in low for p in ABSTAIN))
+    if case.get("abstain"):  # in the answer itself: a caveat that says "not" is no refusal
+        said = str(out.get("answer") or "").lower()
+        checks["abstain"] = float(any(p in said for p in ABSTAIN))
     if case.get("must_not"):
         checks["must_not"] = float(not any(m.lower() in low for m in case["must_not"]))
     if case.get("action"):
@@ -184,7 +187,32 @@ def baseline_engine(llm: Any) -> Engine:
     ).to_json()
 
 
-ENGINES: dict[str, Callable[[Any], Engine]] = {"baseline": baseline_engine}
+def facts_engine(llm: Any) -> Engine:
+    """The fact-first guide (answer.py): retrieved facts and expert interpretations, phrased by
+    the model, checked, with a template from the facts as the fallback."""
+    from datawalk.guide.answer import Knowledge, answer
+
+    known: dict[int, Knowledge] = {}
+
+    def engine(report: Any, case: dict[str, Any]) -> dict[str, Any]:
+        kb = known.setdefault(id(report), Knowledge.of(report))
+        history = case.get("history", [])
+        out = answer(report, kb, llm, case["question"], history=history, **_context(report, case))
+        return out.to_json()
+
+    return engine
+
+
+def template_engine(_llm: Any) -> Engine:
+    """The fact-first guide without a model: what the audience gets when the model fails."""
+    return facts_engine(None)
+
+
+ENGINES: dict[str, Callable[[Any], Engine]] = {
+    "baseline": baseline_engine,
+    "facts": facts_engine,
+    "template": template_engine,
+}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -193,27 +221,41 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--model", help="Ollama model (default: the guide's)")
     p.add_argument("--only", help="categories, comma-separated")
     p.add_argument("--limit", type=int, help="at most this many cases")
+    p.add_argument("--cases", type=Path, default=CASES, help="the question set (JSON)")
     p.add_argument("--out", type=Path, help="write every answer and score to this JSON file")
+    p.add_argument("--rescore", type=Path, help="score the answers saved in this file again")
     args = p.parse_args(argv)
 
     os.environ.setdefault("MPLBACKEND", "Agg")
     from datawalk.demo import build
     from datawalk.guide.llm import Ollama
 
+    if args.rescore:
+        saved = json.loads(args.rescore.read_text(encoding="utf-8"))
+        cases = {c["id"]: c for c in json.loads(args.cases.read_text(encoding="utf-8"))["cases"]}
+        keys = ref_keys(build())
+        results = [
+            r | (score(cases[r["id"]], r["output"], keys) if not r["error"] else {})
+            for r in saved["results"]
+        ]
+        print(summary(results, f"{args.rescore.name}, scored again"))
+        return 0
+
     llm = Ollama.from_env()
     if args.model:
         llm.model = args.model
-    ok, detail = llm.check()
+    ok, detail = llm.check() if args.engine != "template" else (True, "")
     if not ok:
         print(f"error: {detail}", file=sys.stderr)
         return 1
-    cases = json.loads(CASES.read_text(encoding="utf-8"))["cases"]
+    cases = json.loads(args.cases.read_text(encoding="utf-8"))["cases"]
     if args.only:
         cases = [c for c in cases if c["category"] in args.only.split(",")]
     cases = cases[: args.limit] if args.limit else cases
     report = build()
     results = run(ENGINES[args.engine](llm), report, cases, echo=True)
-    text = summary(results, f"engine {args.engine} · model {llm.model} · {len(results)} cases")
+    model = llm.model if args.engine != "template" else "none"
+    text = summary(results, f"{args.cases.stem} · engine {args.engine} · model {model}")
     print("\n" + text)
     if args.out:
         args.out.write_text(
