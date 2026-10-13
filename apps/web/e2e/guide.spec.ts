@@ -77,6 +77,9 @@ test('the guide presents the demo: plan, camera, narration, questions, and inter
   await panel.getByRole('button', { name: 'Present', exact: true }).click()
   await expect.poll(async () => (await viewer(page)).presenting).toBe(true)
   await expect(page.locator('.tour-title')).toContainText('/ 4')
+  await expect(panel).toHaveCount(0) // the room is the stage: captions and compact controls only
+  const mini = page.getByRole('toolbar', { name: 'AI guide controls' })
+  await expect(mini.getByRole('button', { name: 'Pause' })).toBeVisible()
   await expect.poll(async () => (await captions()).map((c) => c.text), { timeout: 90_000 }).toContain('The price moves from 100.4 to 87.5 USD.')
   const seen = await captions()
   expect(seen.slice(0, 3)).toEqual([
@@ -96,7 +99,8 @@ test('the guide presents the demo: plan, camera, narration, questions, and inter
   await expect(page.locator('.guide-caption')).toHaveText(plan[before + 1], { timeout: 60_000 })
 
   // A question pauses; "which model is best" goes to that stop and keeps the pause.
-  await panel.getByRole('tab', { name: 'Questions' }).click()
+  await mini.getByRole('button', { name: 'Ask' }).click()
+  await expect(panel.getByRole('tab', { name: 'Questions' })).toHaveAttribute('aria-selected', 'true')
   const input = panel.getByRole('textbox', { name: 'Question for the AI guide' })
   await input.fill('Which model is best?')
   await input.press('Enter')
@@ -148,6 +152,7 @@ test('without a model and a voice the guide presents with the report text and ca
   await panel.getByRole('button', { name: 'Present', exact: true }).click()
   await expect.poll(async () => (await viewer(page)).presenting, { timeout: 30_000 }).toBe(true)
   await expect(page.locator('.guide-caption')).toBeVisible({ timeout: 60_000 }) // browser voice or captions
+  await avatar.click() // the panel closed for the presentation
   await panel.getByRole('tab', { name: 'Plan' }).click()
   await expect(panel.getByText(/Plan from the report text/)).toBeVisible()
   await expect(panel.getByText(/No AI model: Cannot reach Ollama/)).toBeVisible()

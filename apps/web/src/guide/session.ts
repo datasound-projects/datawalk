@@ -117,7 +117,7 @@ export async function present(report: Report, minutes = useGuide.getState().minu
   end()
   const ctl = (session = new AbortController())
   resumeAt = null
-  useGuide.getState().set({ running: true, paused: false, error: null })
+  useGuide.getState().set({ running: true, paused: false, error: null, open: false }) // the room is the stage: only the captions and the compact controls stay
   const v = useViewer.getState()
   v.set({ guideTour: planTour(plan) })
   if (v.flat) {

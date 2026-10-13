@@ -431,6 +431,7 @@ export const de: Partial<typeof en> = {
   'guide.presentFrom': 'Ab hier präsentieren',
   'guide.narrationFor': 'Text für {title}',
   'guide.fromReport': 'Text aus dem Bericht (die Daten belegten den Modelltext nicht).',
+  'guide.controls': 'Steuerung des KI-Guides',
   'guide.phase.idle': 'Bereit',
   'guide.phase.loading': 'Lädt',
   'guide.phase.thinking': 'Denkt nach',

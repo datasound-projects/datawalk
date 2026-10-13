@@ -1482,6 +1482,9 @@ body.classified :is(.hud-title, .hub-bar) {
   border: 1px solid var(--line);
   box-shadow: 0 10px 34px rgba(0, 0, 0, 0.5);
 }
+.guide-panel > :is(header, .guide-controls, .tabs, .guide-error, .guide-ask, .guide-health) {
+  flex-shrink: 0; /* only the list scrolls */
+}
 .guide-panel header {
   display: flex;
   justify-content: space-between;
@@ -1556,11 +1559,26 @@ body.classified :is(.hud-title, .hub-bar) {
   min-width: 0;
 }
 .guide-plan {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 8px;
   min-height: 0;
   overflow: hidden;
+}
+.guide-mini {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 10px;
+  background: var(--panel);
+}
+.guide-mini button {
+  padding: 0.35em 0.8em;
+  font-size: 0.85rem;
+}
+.guide-mini button.primary {
+  padding: 0.35em 0.9em;
 }
 .guide-stops textarea {
   width: 100%;
@@ -1579,6 +1597,9 @@ body.classified :is(.hud-title, .hub-bar) {
   padding-left: 18px;
 }
 @media (max-width: 520px) {
+  .guide {
+    bottom: 128px; /* above the tour bar */
+  }
   .guide-avatar {
     width: 64px;
     height: 64px;

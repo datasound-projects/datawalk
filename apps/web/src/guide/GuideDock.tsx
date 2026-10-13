@@ -35,6 +35,7 @@ export function GuideDock({ report }: { report: Report }) {
           {g.caption}
         </p>
       )}
+      {g.running && !g.open && <MiniControls />}
       <button
         className="guide-avatar"
         onClick={() => {
@@ -51,6 +52,40 @@ export function GuideDock({ report }: { report: Report }) {
         </span>
       </button>
     </aside>
+  )
+}
+
+const toggleMute = () => {
+  const g = useGuide.getState()
+  setMuted(!g.muted)
+  g.set({ muted: !g.muted })
+}
+
+/** While the guide presents: the few controls that a presenter needs, next to the captions. */
+function MiniControls() {
+  const g = useGuide()
+  return (
+    <div className="guide-mini" role="toolbar" aria-label={t('guide.controls')}>
+      {g.paused ? (
+        <button className="primary" onClick={resume}>
+          {t('guide.resume')}
+        </button>
+      ) : (
+        <button onClick={() => pause()}>{t('guide.pause')}</button>
+      )}
+      <button
+        onClick={() => {
+          pause('question')
+          g.set({ open: true, tab: 'ask' })
+        }}
+      >
+        {t('guide.ask')}
+      </button>
+      <button onClick={stop}>{t('guide.stop')}</button>
+      <button aria-pressed={g.muted} onClick={toggleMute}>
+        {g.muted ? t('guide.unmute') : t('guide.mute')}
+      </button>
+    </div>
   )
 }
 
@@ -102,13 +137,7 @@ function Panel({ report }: { report: Report }) {
         >
           {t('guide.ask')}
         </button>
-        <button
-          aria-pressed={g.muted}
-          onClick={() => {
-            setMuted(!g.muted)
-            g.set({ muted: !g.muted })
-          }}
-        >
+        <button aria-pressed={g.muted} onClick={toggleMute}>
           {g.muted ? t('guide.unmute') : t('guide.mute')}
         </button>
       </div>

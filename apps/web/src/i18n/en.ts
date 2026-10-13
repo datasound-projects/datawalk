@@ -429,6 +429,7 @@ export const en = {
   'guide.presentFrom': 'Present from here',
   'guide.narrationFor': 'Narration for {title}',
   'guide.fromReport': 'Text from the report (the model text was not supported by the data).',
+  'guide.controls': 'AI guide controls',
   'guide.phase.idle': 'Ready',
   'guide.phase.loading': 'Loading',
   'guide.phase.thinking': 'Thinking',

@@ -128,7 +128,7 @@ export function Avatar({ phase, webgl }: { phase: Phase; webgl: boolean }) {
   const accent = useMemo(() => accentColor(), [])
   if (!webgl) return <FlatFace />
   return (
-    <Canvas className="guide-canvas" dpr={[1, 2]} camera={{ position: [0, -0.05, 5.4], fov: 28 }} gl={{ alpha: true, antialias: true, powerPreference: 'low-power' }}>
+    <Canvas className="guide-canvas" dpr={[1, 2]} camera={{ position: [0, -0.3, 5.4], fov: 28 }} gl={{ alpha: true, antialias: true, powerPreference: 'low-power' }}>
       <ambientLight intensity={1.1} />
       <directionalLight position={[2, 3, 4]} intensity={1.8} />
       <directionalLight position={[-3, 1, -2]} intensity={0.8} color={accent} />
