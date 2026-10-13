@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- The README's install section says in three commands how to add the AI guide. The guide's
+  Kokoro voice files now download on first use (SHA-256 checked); no manual download.
+
 - One command installs DataWalk from GitHub, and one updates it:
   `uv tool install "datawalk[all] @ git+https://github.com/datasound-projects/datawalk"` and
   `uv tool upgrade datawalk`. uv builds the viewer with its own Node.js; nothing else to

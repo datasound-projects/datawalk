@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/banner.svg" alt="DataWalk: walk through your data. Share it. Explore your insights." width="820">
+  <img src="docs/images/banner.webp" alt="DataWalk: walk through your data. Share it. Explore your insights." width="820">
 </p>
 
 <p align="center">
@@ -35,6 +35,17 @@ The first install takes a few minutes. Try it with the demo report:
 datawalk demo
 ```
 
+**For the AI guide** (optional): install [Ollama](https://ollama.com/download), then run:
+
+```bash
+ollama pull nemotron-3-nano:4b
+uv tool install "datawalk[all,voice] @ git+https://github.com/datasound-projects/datawalk"
+datawalk demo --guide
+```
+
+The first line gets the AI model, the second adds the voice (its files download on the first
+start), the third starts the demo with the guide.
+
 **Update** (optional) to the latest version:
 
 ```bash
@@ -57,12 +68,7 @@ the evidence. Pause, resume, or take over with the clicker whenever you want.
 Everything runs on your computer. A local AI model writes the text, and DataWalk checks every
 stop and every number against your report, so the guide does not invent results.
 
-```bash
-ollama pull nemotron-3-nano:4b   # once, after you install Ollama (ollama.com)
-datawalk demo --guide
-```
-
-More: [docs/guide.md](docs/guide.md).
+Set it up: [Install](#install), "For the AI guide". More: [docs/guide.md](docs/guide.md).
 
 ## Use
 

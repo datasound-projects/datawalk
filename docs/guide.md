@@ -149,20 +149,17 @@ you present it to an audience.
 
 ## Voice: Kokoro-82M
 
-```bash
-pip install "datawalk[voice]"
-```
-
-With `uv tool`, add `voice` to the extras of your install command. Then get the model files
-(about 120 MB):
+Install DataWalk with the `voice` extra:
 
 ```bash
-mkdir -p ~/.cache/datawalk/kokoro && cd ~/.cache/datawalk/kokoro
-curl -LO https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.int8.onnx
-curl -LO https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin
+uv tool install "datawalk[all,voice] @ git+https://github.com/datasound-projects/datawalk"
 ```
 
-SHA-256 of these files:
+The model files (about 120 MB) download once, on the first start with `--guide`, from the
+kokoro-onnx release into `~/.cache/datawalk/kokoro` (`DATAWALK_KOKORO_DIR`). DataWalk checks
+each file's SHA-256 and never uses a file that does not match. The first sentence waits for
+the download (about 15 s on a fast connection); if it fails, the browser's voice speaks. On a
+computer without internet, copy the files into that folder:
 
 ```text
 6e742170d309016e5891a994e1ce1559c702a2ccd0075e67ef7157974f6406cb  kokoro-v1.0.int8.onnx
