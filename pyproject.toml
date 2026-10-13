@@ -75,6 +75,9 @@ members = ["packages/hub"]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+# hatch_build.py: a source install builds the viewer (Node.js comes from a wheel).
+[tool.hatch.build.hooks.custom]
+
 [tool.hatch.build.targets.wheel]
 packages = ["packages/python/datawalk"]
 # The compiled frontend is gitignored but must ship in the wheel.
