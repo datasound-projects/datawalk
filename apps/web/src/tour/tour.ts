@@ -26,8 +26,7 @@ export function defaultTour(report: Report): TourStop[] {
 
 /** The report's tour (or the default order), resolved to rooms and displays. Stops whose
  *  target is removed or in no room are skipped. */
-export function tourStops(report: Report): Stop[] {
-  const stops = report.tour.length ? report.tour : defaultTour(report)
+export function tourStops(report: Report, stops: TourStop[] = report.tour.length ? report.tour : defaultTour(report)): Stop[] {
   return stops.flatMap((stop): Stop[] => {
     const room = report.rooms.find((r) => r.id === stop.ref)
     if (room) return [{ stop, roomId: room.id, targetId: null, kind: 'room', title: room.name }]
@@ -53,17 +52,23 @@ export function tourStops(report: Report): Stop[] {
   })
 }
 
+/** The stops being presented: the AI guide's plan while it presents, else the report's tour. */
+export function activeStops(report: Report): Stop[] {
+  const guide = useViewer.getState().guideTour
+  return guide ? tourStops(report, guide) : tourStops(report)
+}
+
 export function currentStop(): Stop | null {
   const { report, presenting, stopIndex } = useViewer.getState()
   if (!report || !presenting) return null
-  return tourStops(report)[stopIndex] ?? null
+  return activeStops(report)[stopIndex] ?? null
 }
 
 /** Show stop i (clamped). Kiosk mode wraps around. */
 export function goTo(i: number) {
   const s = useViewer.getState()
   if (!s.report) return
-  const stops = tourStops(s.report)
+  const stops = activeStops(s.report)
   if (!stops.length) return
   const index = s.kiosk ? (i + stops.length) % stops.length : Math.min(Math.max(i, 0), stops.length - 1)
   const stop = stops[index]
@@ -81,7 +86,7 @@ export function startTour(index = 0, kiosk = false) {
 }
 
 export function stopTour() {
-  useViewer.getState().set({ presenting: false, kiosk: false })
+  useViewer.getState().set({ presenting: false, kiosk: false, guideTour: null })
   useViewer.getState().setOverlay('lobby')
   broadcast()
 }
