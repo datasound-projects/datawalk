@@ -105,6 +105,7 @@ export interface Session {
   saves_to: string | null // archive file name; null: edits stay in the Python session only
   hub?: HubInfo
   labels?: string[] // classification labels of the organization's policy (editor only)
+  guide?: boolean // the AI guide is on (local server started with --guide)
 }
 
 /** The hub answers 401 when a sign-in is necessary. */
