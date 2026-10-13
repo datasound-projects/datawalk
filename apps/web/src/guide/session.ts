@@ -9,7 +9,7 @@ import { unlockPointer } from '../navigation/input'
 import type { Report, TourStop } from '../state/schema'
 import { useViewer } from '../state/store'
 import { activeStops, currentStop, goTo, startTour, stopTour, type Stop } from '../tour/tour'
-import { type Answer, type GuideStatus, type Plan, requestAnswer, requestPlan } from './api'
+import { type Answer, type GuideStatus, type Plan, requestAnswer, requestPlan, type Turn } from './api'
 import { isAbort, say, silence, unlockAudio } from './speech'
 
 export type Phase = 'idle' | 'loading' | 'thinking' | 'speaking' | 'listening' | 'paused' | 'error'
@@ -245,6 +245,7 @@ export async function ask(question: string) {
   pause('question')
   answering?.abort()
   const ctl = (answering = new AbortController())
+  const history = conversation(g.messages)
   g.set({ phase: 'thinking', error: null, messages: [...g.messages, { id: ++messageId, role: 'visitor', text: question }] })
   try {
     const v = useViewer.getState()
@@ -255,6 +256,7 @@ export async function ask(question: string) {
         inspecting: v.overlay === 'inspector' ? v.inspectId : null,
         stops: activeStops(report).map((s) => s.stop.ref),
         lang: lang(),
+        history,
       },
       ctl.signal,
     )
@@ -273,6 +275,17 @@ export async function ask(question: string) {
     const now = useGuide.getState()
     now.set({ caption: '', phase: now.error ? 'error' : now.paused ? 'paused' : 'idle' })
   }
+}
+
+/** The last three questions with their answers, for follow-ups ("When did it happen?"). */
+function conversation(messages: Message[]): Turn[] {
+  const turns: Turn[] = []
+  messages.forEach((m, i) => {
+    const q = messages[i - 1]
+    if (m.role === 'guide' && m.answer && q?.role === 'visitor')
+      turns.push({ q: q.text, a: m.answer.answer.slice(0, 2000), refs: m.answer.evidence.map((e) => e.ref).slice(0, 10) })
+  })
+  return turns.slice(-3)
 }
 
 /** Run a navigation action that the model proposed and the server validated. DataWalk does

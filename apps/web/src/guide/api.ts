@@ -31,10 +31,20 @@ export type Tool = 'go_to_stop' | 'inspect_chart' | 'next_stop' | 'pause_tour' |
 export interface Answer {
   answer: string
   interpretation: string
+  caveats: string
   evidence: { ref: string; title: string }[]
+  facts: { id: string; text: string; ref: string }[] // what the answer rests on
   action: { name: Tool; ref: string } | null
   removed: number
   model: string
+  source: 'model' | 'template' | 'rule' // template: the model failed, the facts answered
+}
+
+/** An earlier question and answer: what "it" and "that" refer to. */
+export interface Turn {
+  q: string
+  a: string
+  refs: string[]
 }
 
 /** Facial animation from Audio2Face-3D: ARKit blendshape weights per frame. */
@@ -75,7 +85,10 @@ export async function loadStatus(): Promise<GuideStatus> {
 
 export const requestPlan = (minutes: number, lang: string, refresh = false) => post<Plan>('plan', { minutes, lang, refresh })
 
-export const requestAnswer = (body: { question: string; current: string | null; inspecting: string | null; stops: string[]; lang: string }, signal?: AbortSignal) =>
+export const requestAnswer = (
+  body: { question: string; current: string | null; inspecting: string | null; stops: string[]; lang: string; history: Turn[] },
+  signal?: AbortSignal,
+) =>
   post<Answer>('ask', body, signal)
 
 export const requestSpeech = (text: string, lang: string, signal?: AbortSignal) => post<Clip>('speech', { text, lang }, signal)
