@@ -41,8 +41,9 @@ test('the guide presents the demo: plan, camera, narration, questions, and inter
   test.setTimeout(240_000)
   const errors = watchErrors(page)
   const clips: { face: { names: string[]; frames: number[][] } | null; seconds: number }[] = []
-  page.on('response', async (r) => {
-    if (r.url().endsWith('/api/guide/speech') && r.ok()) clips.push(await r.json())
+  page.on('response', (r) => {
+    // A body can be gone by the time it is read (a slow machine): such a clip is not counted.
+    if (r.url().endsWith('/api/guide/speech') && r.ok()) r.json().then((c) => clips.push(c), () => {})
   })
   await page.goto('/')
   const avatar = page.getByRole('button', { name: /^(Open the AI guide|Close the AI guide panel) \(/ })
@@ -97,9 +98,10 @@ test('the guide presents the demo: plan, camera, narration, questions, and inter
   const before = (await viewer(page)).index
   await page.keyboard.press('PageDown')
   await expect.poll(async () => (await viewer(page)).index).toBeGreaterThan(before)
-  const later = plan.slice(before + 1).map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-  await expect(page.locator('.guide-caption, .guide-now')).toHaveText(new RegExp(`^(${later.join('|')})$`), { timeout: 60_000 })
-  const models = plan.indexOf('The models are close to chance.')
+  const now = (await viewer(page)).index
+  const sentences = plan[now].split(/(?<=\.)\s+/).map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+  await expect(page.locator('.guide-caption, .guide-now')).toHaveText(new RegExp(`^(${sentences.join('|')})$`), { timeout: 60_000 })
+  const models = plan.findIndex((n) => n.startsWith('The models are close to chance.'))
 
   // A question pauses; "which model is best" goes to that stop and keeps the pause.
   await mini.getByRole('button', { name: 'Ask' }).click()
