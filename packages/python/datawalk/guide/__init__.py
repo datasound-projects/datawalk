@@ -12,8 +12,8 @@ from __future__ import annotations
 import threading
 from typing import TYPE_CHECKING, Any
 
+from . import answer as answering  # not the function: it would hide the module
 from .agent import LENGTHS, Plan, model_plan, report_plan
-from .answer import Knowledge, answer
 from .llm import LLM, GuideError, Ollama
 from .voice import Audio2Face, Kokoro, Voice, speech
 
@@ -35,7 +35,7 @@ class Guide:
         # ponytail: one model call at a time; a laptop GPU runs one anyway
         self._model = threading.Lock()
         self._plans: dict[tuple, Plan] = {}
-        self._known: tuple[tuple, Knowledge] | None = None
+        self._known: tuple[tuple, answering.Knowledge] | None = None
 
     def warm(self) -> None:
         """Load the voice and the model now (a background thread at server start): the first
@@ -95,8 +95,9 @@ class Guide:
         with self._model:
             key = (report.id, report.revision)
             if self._known is None or self._known[0] != key:
-                self._known = (key, Knowledge.of(report))
-            return answer(report, self._known[1], self.llm, question, **context).to_json()
+                self._known = (key, answering.Knowledge.of(report))
+            kb = self._known[1]
+            return answering.answer(report, kb, self.llm, question, **context).to_json()
 
     def speech(self, text: str, lang: str = "en") -> dict[str, Any]:
         return speech(self.voice, self.face, text, lang)

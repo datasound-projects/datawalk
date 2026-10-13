@@ -24,6 +24,7 @@ Needs Ollama and the model, like the guide. pytest checks the scoring with stand
 from __future__ import annotations
 
 import argparse
+import importlib
 import json
 import os
 import statistics
@@ -117,9 +118,17 @@ def ref_keys(report: Any) -> dict[str, set[str]]:
     return keys
 
 
-def run(engine: Engine, report: Any, cases: list[dict[str, Any]], echo: bool = False) -> list[dict]:
+def run(
+    engine: Engine,
+    report: Any,
+    cases: list[dict[str, Any]],
+    echo: bool = False,
+    after: Callable[[list[dict]], None] | None = None,
+) -> list[dict]:
+    """Every case's answer and score. `after` gets the results after each case (to save them:
+    a long run on a laptop can be interrupted)."""
     keys = ref_keys(report)
-    results = []
+    results: list[dict] = []
     for case in cases:
         started = time.perf_counter()
         try:
@@ -138,10 +147,16 @@ def run(engine: Engine, report: Any, cases: list[dict[str, Any]], echo: bool = F
             "output": out,
         }
         results.append(result)
+        if after:
+            after(results)
         if echo:
             mark = "ok " if result["score"] == 1 else f"{result['score']:.2f}"
             failed = ",".join(result["failures"])
-            print(f"{mark} {case['id']:<24} {result['seconds']:>5.1f}s {failed}", flush=True)
+            source = out.get("source", "")
+            print(
+                f"{mark} {case['id']:<24} {result['seconds']:>5.1f}s {source:<8} {failed}",
+                flush=True,
+            )
     return results
 
 
@@ -223,6 +238,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--limit", type=int, help="at most this many cases")
     p.add_argument("--cases", type=Path, default=CASES, help="the question set (JSON)")
     p.add_argument("--out", type=Path, help="write every answer and score to this JSON file")
+    p.add_argument("--resume", action="store_true", help="keep the answers already in --out")
     p.add_argument("--rescore", type=Path, help="score the answers saved in this file again")
     p.add_argument(
         "--timeout", type=float, help="seconds the facts engine waits for the model (default 60)"
@@ -245,9 +261,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.timeout:  # a busy computer: measure the answers, not the waiting
-        import datawalk.guide.answer
-
-        datawalk.guide.answer.TIMEOUT = args.timeout
+        importlib.import_module("datawalk.guide.answer").TIMEOUT = args.timeout
     llm = Ollama.from_env()
     if args.model:
         llm.model = args.model
@@ -260,22 +274,23 @@ def main(argv: list[str] | None = None) -> int:
         cases = [c for c in cases if c["category"] in args.only.split(",")]
     cases = cases[: args.limit] if args.limit else cases
     report = build()
-    results = run(ENGINES[args.engine](llm), report, cases, echo=True)
+    # each build has new ids: keep the refs of earlier runs to score their answers again
+    saved = json.loads(args.out.read_text(encoding="utf-8")) if args.resume else {}
+    kept = saved.get("results", [])
+    keys = saved.get("keys", {}) | {ref: sorted(k) for ref, k in ref_keys(report).items()}
+    done = {r["id"] for r in kept}
     model = llm.model if args.engine != "template" else "none"
-    text = summary(results, f"{args.cases.stem} · engine {args.engine} · model {model}")
-    print("\n" + text)
-    if args.out:
-        args.out.write_text(
-            json.dumps(
-                {
-                    "summary": text,
-                    "keys": {ref: sorted(k) for ref, k in ref_keys(report).items()},
-                    "results": results,
-                },
-                indent=1,
-            ),
-            encoding="utf-8",
-        )
+    title = f"{args.cases.stem} · engine {args.engine} · model {model}"
+
+    def save(results: list[dict]) -> None:
+        if args.out:
+            body = {"summary": summary(kept + results, title), "keys": keys}
+            text = json.dumps(body | {"results": kept + results}, indent=1)
+            args.out.write_text(text, encoding="utf-8")
+
+    todo = [c for c in cases if c["id"] not in done]
+    results = kept + run(ENGINES[args.engine](llm), report, todo, echo=True, after=save)
+    print("\n" + summary(results, title))
     return 0
 
 
