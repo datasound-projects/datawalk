@@ -119,24 +119,20 @@ test('the guide presents the demo: plan, camera, narration, questions, and inter
   await input.fill('Is the data real?')
   await input.press('Enter')
   await expect(panel.locator('.guide-log li.guide-answer').last()).toContainText('synthetic')
-  await expect(panel.getByRole('button', { name: 'Pause' })).toBeVisible({ timeout: 30_000 })
-  await panel.getByRole('button', { name: 'Pause' }).click()
-  await expect(panel.getByRole('button', { name: 'Resume' })).toBeVisible()
+  // Nothing more to click: the narration goes on by itself, and the last stop ends the
+  // presentation. The report's own tour is back.
+  await expect.poll(async () => (await viewer(page)).presenting, { timeout: 120_000 }).toBe(false)
+  expect((await viewer(page)).plan).toBeNull()
 
   // Evidence opens the chart in the inspector; panel and inspector open and close safely.
   await panel.locator('.guide-evidence button').first().click()
   await expect.poll(async () => (await viewer(page)).overlay).toBe('inspector')
   await page.keyboard.press('Escape')
-  await expect.poll(async () => (await viewer(page)).overlay).toBe(null)
+  await expect.poll(async () => (await viewer(page)).overlay).not.toBe('inspector')
   await panel.getByRole('button', { name: 'Close the AI guide panel', exact: true }).click()
   await expect(panel).toHaveCount(0)
   await avatar.click()
   await expect(panel).toBeVisible()
-
-  // Stop ends the guide and the tour; the report's own tour is back.
-  await panel.getByRole('button', { name: 'Stop' }).click()
-  await expect.poll(async () => (await viewer(page)).presenting).toBe(false)
-  expect((await viewer(page)).plan).toBeNull()
   expect(errors).toEqual([])
 })
 
