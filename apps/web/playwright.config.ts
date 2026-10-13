@@ -24,7 +24,9 @@ export default defineConfig({
   use: {
     viewport: { width: 1280, height: 800 },
     locale: 'en-US', // the viewer follows the browser language; the tests read English text
-    trace: slow ? 'retain-on-failure' : 'off', // CI uploads it: open with `npx playwright show-trace`
+    // CI uploads a failed test's trace (`npx playwright show-trace`): actions, console, and
+    // network only. Screenshots and DOM snapshots doubled the time of the 3D tests on CI.
+    trace: slow ? { mode: 'retain-on-failure', screenshots: false, snapshots: false } : 'off',
   },
   webServer: [
     server(8766),
