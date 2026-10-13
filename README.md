@@ -41,6 +41,29 @@ datawalk demo
 uv tool upgrade datawalk
 ```
 
+## AI-assisted walkthrough
+
+<p align="center">
+  <img src="docs/images/ai-guide.gif" alt="The AI guide presents the demo report: it explains a room aloud with captions, moves to the next chart, and answers the question 'Which model performs best?' with the evidence" width="820">
+  <br><sub>A real run with the local model on a laptop (Apple M2). The model's thinking time before the answer is cut.</sub>
+</p>
+
+The AI guide presents your report for you. Click the avatar in the corner and choose
+**Present**: it plans a short tour (3, 5, or 10 minutes), moves from chart to chart, and
+explains each one aloud with captions. Ask a question at any time, for example "Explain this
+chart" or "Which model performs best?": the guide answers from your report's data and opens
+the evidence. Pause, resume, or take over with the clicker whenever you want.
+
+Everything runs on your computer. A local AI model writes the text, and DataWalk checks every
+stop and every number against your report, so the guide does not invent results.
+
+```bash
+ollama pull nemotron-3-nano:4b   # once, after you install Ollama (ollama.com)
+datawalk demo --guide
+```
+
+More: [docs/guide.md](docs/guide.md).
+
 ## Use
 
 ```bash
@@ -61,19 +84,6 @@ report.show()  # opens the report in your browser
 
 **In the room:** W A S D and the mouse walk, **E** looks closer at a chart, **Tab** lists the
 rooms, **M** shows a map, **Page Down** starts the guided tour.
-
-## AI guide (optional)
-
-A small avatar presents your report: it plans a short tour, moves through the rooms, explains
-each chart aloud, and answers questions. A local model writes the text, and DataWalk checks
-every number against the report. Nothing leaves your computer.
-
-```bash
-ollama pull nemotron-3-nano:4b   # once, with Ollama installed
-datawalk demo --guide
-```
-
-More: [docs/guide.md](docs/guide.md).
 
 ## Room styles
 
