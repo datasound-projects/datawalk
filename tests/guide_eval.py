@@ -224,6 +224,9 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--cases", type=Path, default=CASES, help="the question set (JSON)")
     p.add_argument("--out", type=Path, help="write every answer and score to this JSON file")
     p.add_argument("--rescore", type=Path, help="score the answers saved in this file again")
+    p.add_argument(
+        "--timeout", type=float, help="seconds the facts engine waits for the model (default 60)"
+    )
     args = p.parse_args(argv)
 
     os.environ.setdefault("MPLBACKEND", "Agg")
@@ -241,6 +244,10 @@ def main(argv: list[str] | None = None) -> int:
         print(summary(results, f"{args.rescore.name}, scored again"))
         return 0
 
+    if args.timeout:  # a busy computer: measure the answers, not the waiting
+        import datawalk.guide.answer
+
+        datawalk.guide.answer.TIMEOUT = args.timeout
     llm = Ollama.from_env()
     if args.model:
         llm.model = args.model

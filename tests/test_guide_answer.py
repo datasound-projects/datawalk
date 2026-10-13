@@ -128,6 +128,9 @@ def test_a_failing_or_inventing_model_falls_back_to_the_facts(demo, kb):
     invented = Model({"answer": "It was 77.7%.", "interpretation": "", "caveat": "", "used": []})
     out = answer(demo, kb, invented, "What was the maximum drawdown?")
     assert out.source == "template" and "77.7" not in out.answer and out.removed == 1
+    gave_up = Model({"answer": "The report does not show this.", "used": []})
+    out = answer(demo, kb, gave_up, "Which model performs best?")  # the facts were found
+    assert out.source == "template" and "Gradient boosting" in out.answer
 
 
 def test_the_conversation_cannot_add_numbers(demo, kb):
