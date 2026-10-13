@@ -3,10 +3,10 @@
 Both are optional. Without Kokoro the viewer speaks with the browser's own voices; without
 Audio2Face the avatar's mouth follows the loudness of the audio that plays.
 
-Kokoro runs with kokoro-onnx and two model files (about 120 MB, not part of DataWalk):
-    pip install kokoro-onnx
-    DATAWALK_KOKORO_DIR (default ~/.cache/datawalk/kokoro) holds kokoro-v1.0.int8.onnx (or
-    kokoro-v1.0.onnx) and voices-v1.0.bin. docs/guide.md has the download commands.
+Kokoro runs with kokoro-onnx (the `voice` extra) and two model files (about 120 MB, not part
+of DataWalk). DataWalk downloads them on first use from the kokoro-onnx release, checks their
+SHA-256, and keeps them in DATAWALK_KOKORO_DIR (default ~/.cache/datawalk/kokoro). Without a
+network, copy kokoro-v1.0.int8.onnx (or kokoro-v1.0.onnx) and voices-v1.0.bin there.
 
 Audio2Face-3D is a C++/CUDA SDK for Linux and Windows with an NVIDIA GPU. DataWalk does not
 link it. A separate local bridge process (not part of DataWalk) runs the SDK and answers
@@ -18,6 +18,7 @@ with ARKit blendshape names and one weight row per frame (0..1).
 from __future__ import annotations
 
 import base64
+import hashlib
 import io
 import json
 import os
@@ -63,8 +64,16 @@ def wav_seconds(wav: bytes) -> float:
         return w.getnframes() / w.getframerate()
 
 
+RELEASE = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/"
+MODEL_FILES = {  # downloaded on first use; a file with another checksum is never used
+    "kokoro-v1.0.int8.onnx": "6e742170d309016e5891a994e1ce1559c702a2ccd0075e67ef7157974f6406cb",
+    "voices-v1.0.bin": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d",
+}
+
+
 class Kokoro:
-    """Kokoro-82M through kokoro-onnx. Loads the model on first use (about 1 s)."""
+    """Kokoro-82M through kokoro-onnx. Loads the model on first use (about 1 s), and gets
+    the model files first when they are missing."""
 
     LANGS = {"en": "en-us"}  # Kokoro v1.0 has no German voice: German uses the browser
 
@@ -96,8 +105,38 @@ class Kokoro:
             how = install("datawalk[voice]")
             return False, f"Kokoro is not installed ({how}). The browser voice speaks."
         if self._files() is None:
-            return False, f"The Kokoro model files are not in {self.folder} (docs/guide.md)."
+            return (
+                True,
+                f"Kokoro-82M ({self.voice}): the model files (120 MB) download on first use",
+            )
         return True, f"Kokoro-82M ({self.voice})"
+
+    def _download(self) -> None:
+        """Get the missing model files into the folder, each checked against its SHA-256."""
+        self.folder.mkdir(parents=True, exist_ok=True)
+        for name, sha256 in MODEL_FILES.items():
+            target = self.folder / name
+            if target.is_file():
+                continue
+            part = target.with_name(name + ".part")
+            digest = hashlib.sha256()
+            try:
+                with (
+                    urllib.request.urlopen(RELEASE + name, timeout=60) as res,
+                    open(part, "wb") as out,
+                ):
+                    while chunk := res.read(1 << 20):
+                        digest.update(chunk)
+                        out.write(chunk)
+            except (urllib.error.URLError, OSError) as e:
+                part.unlink(missing_ok=True)
+                raise GuideError(
+                    f"Cannot download the Kokoro voice ({getattr(e, 'reason', e)})."
+                ) from None
+            if digest.hexdigest() != sha256:
+                part.unlink(missing_ok=True)
+                raise GuideError(f"The Kokoro file {name} has an unexpected checksum: not used.")
+            part.replace(target)
 
     def speak(self, text: str, lang: str) -> bytes:
         if lang not in self.LANGS:
@@ -107,6 +146,8 @@ class Kokoro:
                 ok, why = self.check()
                 if not ok:
                     raise GuideError(why)
+                if self._files() is None:
+                    self._download()  # once (server start, in the background); then cached
                 from kokoro_onnx import Kokoro as Engine
 
                 model, voices = self._files()  # type: ignore[misc]

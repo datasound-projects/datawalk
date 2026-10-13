@@ -26,7 +26,7 @@ all tests).
 ## The AI guide's voice (optional)
 
 The AI guide speaks with the browser's voice. For the Kokoro voice, install with the `voice`
-extra, then get its model files ([guide.md](guide.md#voice-kokoro-82m)):
+extra. Its model files (120 MB) download on the first start of the guide:
 
 ```bash
 uv tool install "datawalk[all,voice] @ git+https://github.com/datasound-projects/datawalk"
