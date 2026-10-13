@@ -1,6 +1,6 @@
 // The presenter's window: speaker notes, the current and the next stop, and a timer.
 // It controls the audience window through the tour channel (see tour.ts).
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { asset } from '../app/assets'
 import { chartImageUrl } from '../charts/images'
 import { t } from '../i18n'
@@ -8,6 +8,8 @@ import { activeMembers } from '../layouts/items'
 import type { Report } from '../state/schema'
 import { roomTheme } from '../state/store'
 import { connect, sendGo, sendHello, type Stop, type TourMessage, tourStops } from './tour'
+
+type TourState = Extract<TourMessage, { type: 'state' }>
 
 function Thumb({ report, stop }: { report: Report; stop: Stop | undefined }) {
   const [url, setUrl] = useState<string | null>(null)
@@ -38,11 +40,18 @@ const clock = (ms: number) => {
 
 export function PresenterView({ report }: { report: Report }) {
   const stops = useMemo(() => tourStops(report), [report]) // stable: the clock re-renders twice a second
-  const [state, setState] = useState<{ presenting: boolean; index: number; startedAt: number } | null>(null)
+  const [state, setState] = useState<TourState | null>(null)
+  // The audience window's latest state for the keys, also before React renders it. Until it
+  // arrives the stop is unknown: a guess would send the audience back to the first stop.
+  const known = useRef<TourState | null>(null)
   const [now, setNow] = useState(() => Date.now())
 
   useEffect(() => {
-    const off = connect(report.id, (m: TourMessage) => m.type === 'state' && setState(m))
+    const off = connect(report.id, (m: TourMessage) => {
+      if (m.type !== 'state') return
+      known.current = m
+      setState(m)
+    })
     sendHello()
     const t = setInterval(() => setNow(Date.now()), 500)
     return () => {
@@ -51,22 +60,24 @@ export function PresenterView({ report }: { report: Report }) {
     }
   }, [report.id])
 
-  const index = state?.index ?? 0
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      const s = known.current
+      if (!s) return
       const go = (i: number) => {
         e.preventDefault()
         sendGo(Math.min(Math.max(i, 0), stops.length - 1))
       }
-      if (['ArrowRight', 'PageDown', 'Space'].includes(e.code)) go(state?.presenting ? index + 1 : index)
-      else if (['ArrowLeft', 'PageUp'].includes(e.code)) go(index - 1)
+      if (['ArrowRight', 'PageDown', 'Space'].includes(e.code)) go(s.presenting ? s.index + 1 : s.index)
+      else if (['ArrowLeft', 'PageUp'].includes(e.code)) go(s.index - 1)
       else if (e.code === 'Home') go(0)
       else if (e.code === 'End') go(stops.length - 1)
     }
     addEventListener('keydown', onKey)
     return () => removeEventListener('keydown', onKey)
-  }, [index, state?.presenting, stops.length])
+  }, [stops.length])
 
+  const index = state?.index ?? 0
   const current = stops[index]
   return (
     <div className="presenter">
@@ -78,28 +89,32 @@ export function PresenterView({ report }: { report: Report }) {
       </header>
       {!state && <p className="notice">{t('presenter.waiting')}</p>}
       {state && !state.presenting && <p className="notice">{t('presenter.notStarted')}</p>}
-      <div className="presenter-grid">
-        <section aria-label={t('presenter.current')}>
-          <h2>
-            {index + 1} / {stops.length} · {current?.title}
-          </h2>
-          <Thumb report={report} stop={current} />
-        </section>
-        <section aria-label={t('presenter.next')}>
-          <h2 className="muted">{t('presenter.nextTitle', { title: stops[index + 1]?.title ?? '—' })}</h2>
-          <Thumb report={report} stop={stops[index + 1]} />
-        </section>
-      </div>
-      <section className="notes" aria-label={t('presenter.speakerNotes')}>
-        <h2>{t('presenter.notes')}</h2>
-        {current?.stop.notes ? <p>{current.stop.notes}</p> : <p className="muted">{t('presenter.noNotes')}</p>}
-      </section>
-      <div className="row">
-        <button onClick={() => sendGo(Math.max(index - 1, 0))}>{t('presenter.back')}</button>
-        <button className="primary" onClick={() => sendGo(state?.presenting ? Math.min(index + 1, stops.length - 1) : index)}>
-          {t('presenter.forward')}
-        </button>
-      </div>
+      {state && (
+        <>
+          <div className="presenter-grid">
+            <section aria-label={t('presenter.current')}>
+              <h2>
+                {index + 1} / {stops.length} · {current?.title}
+              </h2>
+              <Thumb report={report} stop={current} />
+            </section>
+            <section aria-label={t('presenter.next')}>
+              <h2 className="muted">{t('presenter.nextTitle', { title: stops[index + 1]?.title ?? '—' })}</h2>
+              <Thumb report={report} stop={stops[index + 1]} />
+            </section>
+          </div>
+          <section className="notes" aria-label={t('presenter.speakerNotes')}>
+            <h2>{t('presenter.notes')}</h2>
+            {current?.stop.notes ? <p>{current.stop.notes}</p> : <p className="muted">{t('presenter.noNotes')}</p>}
+          </section>
+          <div className="row">
+            <button onClick={() => sendGo(Math.max(index - 1, 0))}>{t('presenter.back')}</button>
+            <button className="primary" onClick={() => sendGo(state?.presenting ? Math.min(index + 1, stops.length - 1) : index)}>
+              {t('presenter.forward')}
+            </button>
+          </div>
+        </>
+      )}
     </div>
   )
 }
