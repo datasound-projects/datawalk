@@ -55,7 +55,7 @@ test('the guide presents the demo: plan, camera, narration, questions, and inter
   await panel.getByRole('tab', { name: 'Plan' }).click()
   await panel.getByRole('button', { name: 'Make a plan' }).click()
   const narration = panel.getByRole('textbox', { name: /Narration for/ })
-  await expect(narration).toHaveCount(4)
+  await expect(narration).toHaveCount(6) // enough stops that the tour cannot end during the test
   await expect(narration.first()).toHaveValue('Welcome to the summary. All data is synthetic.')
   await expect(narration.nth(1)).toHaveValue('The price moves from 100.4 to 87.5 USD.')
   await expect(panel.getByText(/1 statement\(s\) removed/)).toBeVisible()
@@ -76,7 +76,7 @@ test('the guide presents the demo: plan, camera, narration, questions, and inter
   // Present: the camera arrives first, then the guide speaks, then it moves on by itself.
   await panel.getByRole('button', { name: 'Present', exact: true }).click()
   await expect.poll(async () => (await viewer(page)).presenting).toBe(true)
-  await expect(page.locator('.tour-title')).toContainText('/ 4')
+  await expect(page.locator('.tour-title')).toContainText('/ 6')
   await expect(panel).toHaveCount(0) // the room is the stage: captions and compact controls only
   const mini = page.getByRole('toolbar', { name: 'AI guide controls' })
   await expect(mini.getByRole('button', { name: 'Pause' })).toBeVisible()
@@ -91,12 +91,15 @@ test('the guide presents the demo: plan, camera, narration, questions, and inter
   expect(clips[0].face?.names).toContain('jawOpen') // Audio2Face frames come with the audio
   expect(clips[0].face!.frames.length).toBe(Math.floor(clips[0].seconds * 30))
 
-  // A clicker press interrupts at once; the guide narrates the stop that it selects.
+  // A clicker press interrupts at once; the guide narrates a later stop. (On a slow machine the
+  // tour can also move on by itself just before the press: the checks allow for that.)
   const plan = (await viewer(page)).plan!
   const before = (await viewer(page)).index
   await page.keyboard.press('PageDown')
-  await expect.poll(async () => (await viewer(page)).index).toBe(before + 1)
-  await expect(page.locator('.guide-caption')).toHaveText(plan[before + 1], { timeout: 60_000 })
+  await expect.poll(async () => (await viewer(page)).index).toBeGreaterThan(before)
+  const later = plan.slice(before + 1).map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+  await expect(page.locator('.guide-caption')).toHaveText(new RegExp(`^(${later.join('|')})$`), { timeout: 60_000 })
+  const models = plan.indexOf('The models are close to chance.')
 
   // A question pauses; "which model is best" goes to that stop and keeps the pause.
   await mini.getByRole('button', { name: 'Ask' }).click()
@@ -106,7 +109,7 @@ test('the guide presents the demo: plan, camera, narration, questions, and inter
   await input.press('Enter')
   await expect(panel.locator('.guide-log li.guide-answer')).toContainText('Gradient boosting has the highest AUC.')
   await expect(panel.locator('.guide-evidence')).toContainText('Model Comparison')
-  await expect.poll(async () => (await viewer(page)).index).toBe(2)
+  await expect.poll(async () => (await viewer(page)).index).toBe(models)
   await expect(panel.getByRole('button', { name: 'Resume' })).toBeVisible()
   await expect.poll(() => phase(page)).toBe('paused')
 

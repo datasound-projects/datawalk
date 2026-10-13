@@ -43,6 +43,10 @@ class ScriptedModel:
         summary = alias("Room 'Summary'")
         price, models = alias("Chart 'Historical Price'"), alias("Chart 'Model Comparison'")
         metrics = alias("Chart 'Model Metrics'")
+        volatility, drawdown = (
+            alias("Chart 'Rolling Volatility'"),
+            alias("Chart 'Drawdown from Peak'"),
+        )
         if "stops" in schema["properties"]:
             return {
                 "stops": [
@@ -52,6 +56,8 @@ class ScriptedModel:
                         "Then it doubles to 999.9 USD.",  # no data supports this sentence
                     },
                     {"ref": summary, "narration": "Welcome to the summary. All data is synthetic."},
+                    {"ref": volatility, "narration": "Volatility changes over time."},
+                    {"ref": drawdown, "narration": "The drawdown shows the losses from the peak."},
                     {"ref": models, "narration": "The models are close to chance."},
                     {"ref": metrics, "narration": "These are the model metrics."},
                 ]
