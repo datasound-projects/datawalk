@@ -132,7 +132,7 @@ def test_model_plan_keeps_only_valid_stops_and_supported_numbers(report):
     )
     plan = model_plan(report, llm, 3)
     titles = [s.title for s in plan.stops]
-    assert titles == ["Best AUC", "Summary", "Model comparison"]  # room by room
+    assert titles == ["Summary", "Best AUC", "Model comparison"]  # room by room, rooms first
     by = {s.title: s for s in plan.stops}
     assert by["Model comparison"].narration == "Boosting reaches 0.6123."
     assert by["Model comparison"].removed == 1
@@ -143,6 +143,23 @@ def test_model_plan_keeps_only_valid_stops_and_supported_numbers(report):
     assert set(schema["properties"]["stops"]["items"]["properties"]["ref"]["enum"]) == {
         i.alias for i in build_items(report)
     }
+
+
+def test_a_short_model_plan_is_filled_up_and_skips_pictures(report):
+    report.add(go.Figure(), key="picture", name="Just a picture", room="Models")
+    report.get("picture").source.mode = "static"
+    llm = FakeLLM(
+        {
+            "stops": [
+                {"ref": alias(report, "Just a picture"), "narration": "A nice picture."},
+                {"ref": alias(report, "Best AUC"), "narration": "The best AUC is 0.61."},
+            ]
+        }
+    )
+    plan = model_plan(report, llm, 10)  # about 16 stops wanted, the model chose one usable
+    assert "Just a picture" not in [s.title for s in plan.stops]
+    assert len(plan.stops) > 1 and plan.stops[0].title == "Summary"
+    assert any("added from the report" in n for n in plan.notes)
 
 
 def test_guide_plan_without_model_uses_report_text_and_is_not_cached(report):
@@ -378,8 +395,9 @@ def test_guide_routes(report):
     assert status["model"]["ok"] and status["voice"]["engine"] == "kokoro"
     assert status["face"]["engine"] == "lipsync" and status["lengths"] == [3, 5, 10]
     plan = client.post("/api/guide/plan", json={"minutes": 3}).json()
-    assert plan["stops"][0]["narration"] == "The best AUC is 0.61."
-    assert len(plan["stops"][0]["id"]) == 32  # a tour stop id: the viewer presents it as is
+    auc = next(s for s in plan["stops"] if s["title"] == "Best AUC")
+    assert auc["narration"] == "The best AUC is 0.61." and auc["source"] == "model"
+    assert len(auc["id"]) == 32  # a tour stop id: the viewer presents it as is
     answer = client.post("/api/guide/ask", json={"question": "AUC?", "stops": []}).json()
     assert answer["answer"] == "The AUC is 0.61."
     clip = client.post("/api/guide/speech", json={"text": "Hello."}).json()

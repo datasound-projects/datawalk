@@ -18,6 +18,9 @@ from urllib.parse import urlsplit
 DEFAULT_URL = "http://127.0.0.1:11434"
 DEFAULT_MODEL = "nemotron-3-nano:4b"
 LOOPBACK = {"127.0.0.1", "localhost", "::1"}
+# The same options for every request: a different context size makes Ollama load the model
+# again, and the prompt cache (the report data that every request starts with) is lost.
+OPTIONS = {"temperature": 0.2, "num_ctx": 16384}
 
 
 class GuideError(Exception):
@@ -30,7 +33,8 @@ class LLM(Protocol):
     def load(self) -> None:
         """Load the model into memory (an empty generate request), and keep it there."""
         try:
-            self._request("/api/generate", {"model": self.model, "keep_alive": "15m"}, timeout=120)
+            body = {"model": self.model, "keep_alive": "15m", "options": OPTIONS}
+            self._request("/api/generate", body, timeout=120)
         except GuideError:
             pass
 
@@ -102,7 +106,8 @@ class Ollama:
     def load(self) -> None:
         """Load the model into memory (an empty generate request), and keep it there."""
         try:
-            self._request("/api/generate", {"model": self.model, "keep_alive": "15m"}, timeout=120)
+            body = {"model": self.model, "keep_alive": "15m", "options": OPTIONS}
+            self._request("/api/generate", body, timeout=120)
         except GuideError:
             pass
 
@@ -112,7 +117,7 @@ class Ollama:
             "stream": False,
             "think": False,  # a reasoning trace costs minutes on a laptop; the schema guides
             "format": schema,
-            "options": {"temperature": 0.2, "num_ctx": 16384},
+            "options": OPTIONS,
             "keep_alive": "15m",
             "messages": [
                 {"role": "system", "content": system},

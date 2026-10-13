@@ -178,8 +178,8 @@ def model_plan(report: Report, llm: LLM, minutes: int, lang: str = "en") -> Plan
     removed_total = 0
     for raw in data.get("stops", []) if isinstance(data.get("stops"), list) else []:
         item = by_alias.get(str(raw.get("ref", "")).strip()) if isinstance(raw, dict) else None
-        if item is None or item.ref in seen:
-            continue  # unknown or repeated stop: never shown
+        if item is None or item.ref in seen or item.image_only:
+            continue  # unknown, repeated, or nothing to say: never shown
         seen.add(item.ref)
         text, removed = ground(
             str(raw.get("narration", ""))[:2000], _evidence(report, item, by_alias), lang == "de"
@@ -195,18 +195,23 @@ def model_plan(report: Report, llm: LLM, minutes: int, lang: str = "en") -> Plan
         )
         if len(stops) >= count * 2:
             break
+    if not stops:
+        return report_plan(report, minutes, "The model returned no usable stops.", lang)
+    notes = []
+    if len(stops) < count // 2:  # too short for the length: the report's own text fills it up
+        added = [s for s in report_plan(report, minutes, lang=lang).stops if s.ref not in seen]
+        added = added[: count - len(stops)]
+        stops += added
+        notes.append(f"{len(added)} stop(s) added from the report's text: the model chose few.")
     # Room by room, in the report's order (the model's order within a room): the camera never
     # walks back to a room that it left.
     room_order = {i.room: n for n, i in enumerate(items) if i.kind == "room"}
     room_of = {i.ref: i.room for i in items}
-    stops.sort(key=lambda s: room_order.get(room_of[s.ref], 0))
-    notes = []
+    stops.sort(key=lambda s: (room_order.get(room_of[s.ref], 0), s.kind != "room"))  # room first
     if removed_total:
-        notes.append(
-            f"{removed_total} statement(s) removed: the report data does not support them."
+        notes.insert(
+            0, f"{removed_total} statement(s) removed: the report data does not support them."
         )
-    if not stops:
-        return report_plan(report, minutes, "The model returned no usable stops.", lang)
     return Plan(report.revision, minutes, llm.model, stops, notes)
 
 
