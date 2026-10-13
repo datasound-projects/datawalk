@@ -91,10 +91,10 @@ class Kokoro:
         try:
             import kokoro_onnx  # noqa: F401
         except ImportError:
-            return (
-                False,
-                "Kokoro is not installed (pip install kokoro-onnx). The browser voice speaks.",
-            )
+            from ..hints import install
+
+            how = install("datawalk[voice]")
+            return False, f"Kokoro is not installed ({how}). The browser voice speaks."
         if self._files() is None:
             return False, f"The Kokoro model files are not in {self.folder} (docs/guide.md)."
         return True, f"Kokoro-82M ({self.voice})"
