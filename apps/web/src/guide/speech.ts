@@ -150,6 +150,7 @@ function speakBrowser(text: string, o: SayOptions): Promise<void> {
     if (voice) u.voice = voice
     u.volume = muted ? 0 : 1
     let done = false
+    const started = performance.now()
     const finish = (ok: boolean) => {
       if (done) return
       done = true
@@ -168,8 +169,18 @@ function speakBrowser(text: string, o: SayOptions): Promise<void> {
       face.pulse = performance.now()
     }
     u.onboundary = () => void (face.pulse = performance.now())
-    u.onend = () => finish(true)
-    u.onerror = () => finish(true) // no voice on this system: go on with the captions' timing
+    // A system without voices fails or "ends" at once: the caption then stays for its reading
+    // time (a real voice cannot be three times faster than that).
+    const atLeast = (part: number) => () => {
+      const left = ms * part - (performance.now() - started)
+      if (left <= 0) finish(true)
+      else {
+        face.mode = 'captions'
+        setTimeout(() => finish(true), left)
+      }
+    }
+    u.onend = atLeast(0.3)
+    u.onerror = atLeast(1)
     // Some systems have no voice and never end an utterance: the reading time ends it.
     const safety = setTimeout(() => finish(true), ms * 1.5 + 3000)
     o.signal.addEventListener('abort', abort, { once: true })
