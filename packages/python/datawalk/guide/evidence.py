@@ -58,7 +58,9 @@ def _num(x: Any) -> str:
     if x == int(x) and abs(x) < 1e15:
         return str(int(x))
     digits = max(0, 3 - int(math.floor(math.log10(abs(x))))) if x else 0
-    return f"{x:.{min(digits, 6)}f}".rstrip("0").rstrip(".")
+    text = f"{x:.{min(digits, 6)}f}"
+    # Trailing zeros go only after a decimal point: 6626290 must not become 662629.
+    return text.rstrip("0").rstrip(".") if "." in text else text
 
 
 def _viz_text(report: Report, viz: Visualization, notes: str) -> str:

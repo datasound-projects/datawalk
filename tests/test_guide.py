@@ -84,6 +84,19 @@ def test_items_cover_every_stop_once_with_values(report):
     assert training.notes == "Point at the steep start." and training.findings
 
 
+def test_numbers_keep_their_digits():
+    from datawalk.guide.evidence import _num
+
+    assert _num(6626289.78) == "6626290"  # was "662629": zeros stripped from a whole number
+    assert _num(109.97) == "110"  # was "11"
+    assert (_num(0.5098), _num(87.4935), _num(-0.4116), _num(1000.0)) == (
+        "0.5098",
+        "87.49",
+        "-0.4116",
+        "1000",
+    )
+
+
 def test_detail_reads_plotly_typed_arrays(report):
     models = detail(report, report.get("models").id)
     assert "Logistic: 0.55, Boosting: 0.6123" in models
