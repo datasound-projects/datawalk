@@ -65,7 +65,7 @@ test('the guide presents the demo: plan, camera, narration, questions, and inter
     const w = window as unknown as Win & { captions: { text: string; index: number; arrived: boolean }[] }
     w.captions = []
     new MutationObserver(() => {
-      const text = document.querySelector('.guide-caption')?.textContent
+      const text = document.querySelector('.guide-caption, .guide-now')?.textContent
       if (!text || w.captions.at(-1)?.text === text) return
       const s = w.datawalk.getState()
       w.captions.push({ text, index: s.stopIndex, arrived: s.tourArrived === s.guideTour?.[s.stopIndex]?.id })
@@ -98,7 +98,7 @@ test('the guide presents the demo: plan, camera, narration, questions, and inter
   await page.keyboard.press('PageDown')
   await expect.poll(async () => (await viewer(page)).index).toBeGreaterThan(before)
   const later = plan.slice(before + 1).map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-  await expect(page.locator('.guide-caption')).toHaveText(new RegExp(`^(${later.join('|')})$`), { timeout: 60_000 })
+  await expect(page.locator('.guide-caption, .guide-now')).toHaveText(new RegExp(`^(${later.join('|')})$`), { timeout: 60_000 })
   const models = plan.indexOf('The models are close to chance.')
 
   // A question pauses; "which model is best" goes to that stop and keeps the pause.
@@ -115,7 +115,7 @@ test('the guide presents the demo: plan, camera, narration, questions, and inter
 
   // Resume: the narration of the stop on screen. A plain answer then goes on by itself.
   await panel.getByRole('button', { name: 'Resume' }).click()
-  await expect(page.locator('.guide-caption')).toHaveText('The models are close to chance.')
+  await expect(page.locator('.guide-caption, .guide-now')).toHaveText('The models are close to chance.')
   await input.fill('Is the data real?')
   await input.press('Enter')
   await expect(panel.locator('.guide-log li.guide-answer').last()).toContainText('synthetic')
@@ -154,7 +154,7 @@ test('without a model and a voice the guide presents with the report text and ca
   await expect(panel.locator('.guide-health')).toContainText('lip sync follows the audio')
   await panel.getByRole('button', { name: 'Present', exact: true }).click()
   await expect.poll(async () => (await viewer(page)).presenting, { timeout: 30_000 }).toBe(true)
-  await expect(page.locator('.guide-caption')).toBeVisible({ timeout: 60_000 }) // browser voice or captions
+  await expect(page.locator('.guide-caption, .guide-now')).toBeVisible({ timeout: 60_000 }) // browser voice or captions
   await avatar.click() // the panel closed for the presentation
   await panel.getByRole('tab', { name: 'Plan' }).click()
   await expect(panel.getByText(/Plan from the report text/)).toBeVisible()

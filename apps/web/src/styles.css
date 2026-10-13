@@ -1475,7 +1475,7 @@ body.classified :is(.hud-title, .hub-bar) {
 }
 .guide-panel {
   width: min(390px, calc(100vw - 32px));
-  max-height: min(600px, calc(100vh - 140px));
+  height: min(560px, calc(100vh - 140px)); /* a fixed box: the buttons never move under the pointer */
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -1485,7 +1485,14 @@ body.classified :is(.hud-title, .hub-bar) {
   border: 1px solid var(--line);
   box-shadow: 0 10px 34px rgba(0, 0, 0, 0.5);
 }
-.guide-panel > :is(header, .guide-controls, .tabs, .guide-error, .guide-ask, .guide-health) {
+.guide-now {
+  margin: 0;
+  padding: 8px 10px;
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+}
+.guide-panel > :is(header, .guide-controls, .guide-now, .tabs, .guide-error, .guide-ask, .guide-health) {
   flex-shrink: 0; /* only the list scrolls */
 }
 .guide-panel header {

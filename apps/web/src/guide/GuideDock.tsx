@@ -30,7 +30,9 @@ export function GuideDock({ report, hidden }: { report: Report; hidden: boolean 
   return (
     <aside className={`guide${g.open ? ' open' : ''}`} data-phase={g.phase} aria-label={t('guide.title')} hidden={hidden}>
       {g.open && <Panel report={report} />}
-      {g.caption && (
+      {/* With the panel open, the caption shows inside it: a bubble here would move the panel
+          (and its buttons) with every sentence. */}
+      {g.caption && !g.open && (
         <p className="guide-caption" role="status" aria-live="polite">
           {g.caption}
         </p>
@@ -142,6 +144,11 @@ function Panel({ report }: { report: Report }) {
         </button>
       </div>
 
+      {g.caption && (
+        <p className="guide-now" role="status" aria-live="polite">
+          {g.caption}
+        </p>
+      )}
       {g.error && (
         <p className="guide-error" role="alert">
           {g.error}
