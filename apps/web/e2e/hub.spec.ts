@@ -1,5 +1,6 @@
 import { type Browser, type Page } from '@playwright/test'
 import { expect, test } from './fixtures'
+import { sceneReady } from './helpers'
 
 type Win = { datawalk: { getState: () => { stopIndex: number; presenting: boolean; live: { following: boolean; followers: { name: string; following: boolean }[] } | null } } }
 const state = (p: Page) => page_(p, () => (window as unknown as Win).datawalk.getState())
@@ -26,6 +27,10 @@ test('live follow: the attendee follows, breaks away, and snaps back', async ({ 
   const ben = await signIn(browser, 'ben') // viewer: follows
   await expect(ben.getByRole('button', { name: 'Present live' })).toHaveCount(0) // viewers do not present
   await ben.getByRole('button', { name: 'Enter room' }).click()
+  // Both rooms drawn before the follow is timed: with software WebGL (CI), the first frame
+  // of a room can take more than 15 s, and the page runs no scripts until it is done.
+  await sceneReady(ana)
+  await sceneReady(ben)
 
   await ana.getByRole('button', { name: 'Present live' }).click()
   await expect(ana.getByText(/Live · 1 of 1 follow/)).toBeVisible({ timeout: 20_000 })
@@ -57,7 +62,8 @@ test('live follow: the attendee follows, breaks away, and snaps back', async ({ 
     s.inspect(s.report.visualizations.find((v) => v.key === 'price')!.id)
   })
   const dialog = ben.getByRole('dialog', { name: 'Historical Price' })
-  await dialog.getByLabel(/New comment/).fill('Why the drop in 2023?')
+  const question = `Why the drop in 2023? (${test.info().repeatEachIndex})` // --repeat-each shares the hub
+  await dialog.getByLabel(/New comment/).fill(question)
   await dialog.getByRole('button', { name: 'Ask a question' }).click()
-  await expect(dialog.getByText('Why the drop in 2023?')).toBeVisible()
+  await expect(dialog.getByText(question)).toBeVisible()
 })
