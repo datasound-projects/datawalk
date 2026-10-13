@@ -2,8 +2,9 @@
 
 ## Set up
 
-You need [uv](https://docs.astral.sh/uv/) and Node.js 22 or later. Users of the published
-package do not need Node.js.
+You need [uv](https://docs.astral.sh/uv/) and Node.js 22 or later. `uv sync` alone already
+gives a working DataWalk: when the viewer is missing, the build hook (`hatch_build.py`) builds
+it with Node.js from a wheel. To change the viewer and run its tests, use your own Node.js:
 
 ```bash
 uv sync --all-packages --all-extras   # library, hub, every extra, and the dev tools
@@ -31,6 +32,10 @@ cd apps/web && npm run lint && npm run build && npm test && npm run test:e2e
 Firefox and WebKit for the export projects. CI uses Playwright's browsers. The suite starts
 its own servers: demo reports (`apps/web/e2e/serve.py`, test-only editor token `e2e-token`),
 the notebook example, the other-sources example, and a hub (`apps/web/e2e/hub_serve.py`).
+
+The AI guide's tests use stand-ins for the model and the voice (`e2e/guide_serve.py`). To
+test with the real model too, run `ollama serve` and `DATAWALK_TEST_OLLAMA=1 uv run pytest
+tests/test_guide.py`.
 
 The Python tests include the hub (`packages/hub/tests`). Some tests need the web build and a
 browser (PDF, world files, the CI recipe); they skip themselves without them.

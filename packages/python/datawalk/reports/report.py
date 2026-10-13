@@ -948,13 +948,17 @@ class Report(ReportModel):
         open_browser: bool = True,
         block: bool | None = None,
         edit: bool = True,
+        guide: bool = False,
     ) -> str:
         """Start the local viewer on 127.0.0.1 and return its URL.
 
         edit=True opens the editor. Editor changes apply to this object, and to the
         archive file when the report was saved or loaded. edit=False is the read-only
         stakeholder view. block=None blocks in scripts and runs in a background thread
-        when an event loop is already running (Jupyter)."""
+        when an event loop is already running (Jupyter). guide=True adds the AI guide: a local
+        model (Ollama) presents the report and answers questions (docs/guide.md)."""
         from ..server import serve
 
-        return serve(self, port=port, open_browser=open_browser, block=block, edit=edit)
+        return serve(
+            self, port=port, open_browser=open_browser, block=block, edit=edit, guide=guide
+        )

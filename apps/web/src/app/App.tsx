@@ -12,7 +12,7 @@ import { Classification, Hud, Lobby, Navigator } from '../viewer/Overlays'
 import { THEMES } from '../state/schema'
 import type { ThemeId } from '../themes/themes'
 import { PresenterView } from '../tour/PresenterView'
-import { connectMain, inspectStop, next, openPresenter, prev, startTour, stopTour, tourStops, goTo } from '../tour/tour'
+import { activeStops, connectMain, inspectStop, next, openPresenter, prev, startTour, stopTour, goTo } from '../tour/tour'
 import { TourHud } from '../tour/TourHud'
 import { breakAwayOnInput, joinLive } from '../hub/live'
 import { HubBar, SignIn } from '../hub/HubUI'
@@ -22,6 +22,8 @@ import { readableAccent } from './contrast'
 
 // `vite build --mode viewer`: the bundle for exports. The editor is left out (tree-shaken).
 const VIEWER_ONLY = import.meta.env.MODE === 'viewer'
+// The AI guide needs the local server: no export build contains it (not even as a chunk).
+const GuideDock = import.meta.env.MODE.startsWith('viewer') ? null : lazy(() => import('../guide/GuideDock').then((m) => ({ default: m.GuideDock })))
 
 // The 3D scene (three.js, Rapier, drei) is a separate chunk: overlays and the inspector load first.
 const RoomScene = lazy(() => import('../scenes/RoomScene').then((m) => ({ default: m.RoomScene })))
@@ -30,7 +32,7 @@ async function start() {
   const token = takeEditToken()
   const [report, session, exportInfo] = await Promise.all([loadReport(), loadSession(token), loadExportInfo()])
   useViewer.getState().load(report, session.editable && !VIEWER_ONLY ? token : null, session.saves_to)
-  useViewer.setState({ exportInfo, hub: session.hub ?? null, labels: session.labels ?? [] })
+  useViewer.setState({ exportInfo, hub: session.hub ?? null, labels: session.labels ?? [], guide: !!session.guide })
   // A customer brand's accent color for buttons and links, readable on the dark interface
   // (on screen; print keeps its own dark accent for white paper).
   if (report.brand?.accent) {
@@ -81,7 +83,7 @@ const PRESENTER = new URLSearchParams(location.search).has('presenter')
 const EXPORTING = new URLSearchParams(location.search).has('export') // Python drives exportHooks
 
 export function App() {
-  const { report, roomId, overlay, inspectId, arranging, flat, presenting, screenShare, roomLoading } = useViewerPick('report', 'roomId', 'overlay', 'inspectId', 'arranging', 'flat', 'presenting', 'screenShare', 'roomLoading')
+  const { report, roomId, overlay, inspectId, arranging, flat, presenting, screenShare, roomLoading, guide } = useViewerPick('report', 'roomId', 'overlay', 'inspectId', 'arranging', 'flat', 'presenting', 'screenShare', 'roomLoading', 'guide')
   useEffect(() => void document.body.classList.toggle('screen-share', screenShare), [screenShare])
   const [error, setError] = useState<string | null>(null)
   const [signIn, setSignIn] = useState(false)
@@ -121,16 +123,21 @@ export function App() {
       </>
     )
   if (EXPORTING) return <p className="muted">{t('app.exporting')}</p>
-  if (flat)
-    return (
-      <>
-        <FlatView report={report} />
-        {overlay === 'inspector' && viz && <Inspector key={viz.id} viz={viz} />}
-        <Classification report={report} />
-        <Watermark />
-      </>
-    )
-  return (
+  // One place in the tree for both views: switching flat <-> 3D (an answer can do that) must
+  // not remount the guide, which would end what it says. The editor hides it.
+  const dock = GuideDock && guide && (
+    <Suspense fallback={null}>
+      <GuideDock report={report} hidden={overlay === 'editor'} />
+    </Suspense>
+  )
+  const view = flat ? (
+    <>
+      <FlatView report={report} />
+      {overlay === 'inspector' && viz && <Inspector key={viz.id} viz={viz} />}
+      <Classification report={report} />
+      <Watermark />
+    </>
+  ) : (
     <>
       <div id="scene">
         <Suspense fallback={<p className="scene-loading muted">{t('app.loadingRoom')}</p>}>{room && <RoomScene report={report} room={room} />}</Suspense>
@@ -148,6 +155,12 @@ export function App() {
       {overlay === 'inspector' && viz && <Inspector key={viz.id} viz={viz} />}
       {!VIEWER_ONLY && overlay === 'editor' && <EditorPanel report={report} />}
       <Watermark />
+    </>
+  )
+  return (
+    <>
+      {view}
+      {dock}
     </>
   )
 }
@@ -261,7 +274,7 @@ function tourKey(e: KeyboardEvent): boolean {
   const back = ['ArrowLeft', 'PageUp'].includes(e.code)
   if (!s.presenting) {
     // Page Down in the lobby starts the tour: a clicker is enough to present.
-    if (s.overlay === 'lobby' && !s.arranging && e.code === 'PageDown' && s.report && tourStops(s.report).length) {
+    if (s.overlay === 'lobby' && !s.arranging && e.code === 'PageDown' && s.report && activeStops(s.report).length) {
       startTour(0)
       return true
     }

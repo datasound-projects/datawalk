@@ -5,7 +5,7 @@ import { currentRoomLayout } from './editor/arrangeOps'
 import { pose, requestTeleport } from './navigation/pose'
 import { useViewer } from './state/store'
 import { exportHooks } from './export/hooks'
-import { goTo, tourStops } from './tour/tour'
+import { activeStops, goTo } from './tour/tour'
 import './styles.css'
 
 // Access for end-to-end tests, theme thumbnails and debugging.
@@ -14,7 +14,7 @@ Object.assign(window, {
   datawalkPose: pose,
   datawalkTeleport: requestTeleport,
   datawalkLayout: currentRoomLayout,
-  datawalkTour: { tourStops: () => tourStops(useViewer.getState().report!), goTo },
+  datawalkTour: { tourStops: () => activeStops(useViewer.getState().report!), goTo },
   datawalkExport: exportHooks, // PPTX images and world files (Python drives a headless browser)
 })
 

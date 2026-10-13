@@ -2,12 +2,12 @@ import { useEffect } from 'react'
 import { t } from '../i18n'
 import type { Report } from '../state/schema'
 import { useViewerPick } from '../state/store'
-import { DEFAULT_DURATION, inspectStop, next, openPresenter, prev, stopTour, tourStops } from './tour'
+import { activeStops, DEFAULT_DURATION, inspectStop, next, openPresenter, prev, stopTour } from './tour'
 
 /** Presentation overlay: the stop title and position, and the keys. Kiosk mode advances itself. */
 export function TourHud({ report }: { report: Report }) {
-  const { stopIndex, kiosk, overlay } = useViewerPick('stopIndex', 'kiosk', 'overlay')
-  const stops = tourStops(report)
+  const { stopIndex, kiosk, overlay } = useViewerPick('stopIndex', 'kiosk', 'overlay', 'guideTour')
+  const stops = activeStops(report)
   const stop = stops[stopIndex]
 
   useEffect(() => {

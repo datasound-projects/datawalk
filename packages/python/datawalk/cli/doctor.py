@@ -84,6 +84,41 @@ def _browser_and_gpu() -> list[tuple[str, str, str]]:
     return rows
 
 
+def _guide() -> list[tuple[str, str, str]]:
+    """The AI guide (opt-in, --guide): its model, its voice, and Audio2Face-3D. All optional;
+    a component that is configured but does not answer is a problem."""
+    from datawalk.guide import GuideError
+    from datawalk.guide.llm import Ollama
+    from datawalk.guide.voice import Audio2Face, Kokoro
+
+    rows = []
+    try:
+        ok, detail = Ollama.from_env().check()
+        configured = "DATAWALK_OLLAMA_URL" in os.environ or "DATAWALK_GUIDE_MODEL" in os.environ
+        rows.append((OK if ok else FAIL if configured else INFO, "AI guide model (Ollama)", detail))
+    except GuideError as e:
+        rows.append((FAIL, "AI guide model (Ollama)", str(e)))
+    ok, detail = Kokoro().check()
+    rows.append((OK if ok else INFO, "AI guide voice (Kokoro)", detail))
+    try:
+        face = Audio2Face.from_env()
+    except GuideError as e:
+        rows.append((FAIL, "Audio2Face-3D", str(e)))
+        return rows
+    if face:
+        ok, detail = face.check()
+        rows.append((OK if ok else FAIL, "Audio2Face-3D", detail))
+    else:
+        gpu = shutil.which("nvidia-smi")
+        hint = (
+            "an NVIDIA GPU is present (nvidia-smi): see docs/guide.md for the bridge"
+            if gpu
+            else "needs Linux or Windows with an NVIDIA GPU (CUDA 12.8+)"
+        )
+        rows.append((INFO, "Audio2Face-3D", f"not configured: lip sync follows the audio ({hint})"))
+    return rows
+
+
 def checks() -> list[tuple[str, str, str]]:
     import datawalk
     from datawalk.export import STATIC, VIEWER
@@ -165,6 +200,7 @@ def checks() -> list[tuple[str, str, str]]:
                 rows.append((OK, "Hub", f"{hub} answers ({res.status})"))
         except Exception as e:
             rows.append((FAIL, "Hub", f"{hub}: {e}"))
+    rows += _guide()
     try:
         rows += _browser_and_gpu()
     except Exception as e:  # a broken browser install must not stop the report

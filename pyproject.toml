@@ -36,6 +36,9 @@ pptx = ["python-pptx>=1.0", "playwright>=1.55"]  # chart images come from the vi
 notebook = ["ipykernel>=6", "nbclient>=0.10", "nbformat>=5.10"]
 excel = ["openpyxl>=3.1", "xlrd>=2.0.1"]  # .xlsx and .xls
 pdf-import = ["pypdfium2>=4.30"]
+# The AI guide's local voice (Kokoro-82M). Not in `all`: its phonemizer (espeak-ng) is GPL-3.0,
+# and the guide speaks with the browser's voice without it. docs/guide.md.
+voice = ["kokoro-onnx>=0.6.1; python_version < '3.14'"]
 all = [  # every optional feature
     "datawalk[charts,pdf,pptx,notebook,excel,pdf-import]",
 ]
@@ -71,6 +74,9 @@ members = ["packages/hub"]
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+# hatch_build.py: a source install builds the viewer (Node.js comes from a wheel).
+[tool.hatch.build.hooks.custom]
 
 [tool.hatch.build.targets.wheel]
 packages = ["packages/python/datawalk"]

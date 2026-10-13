@@ -13,6 +13,7 @@
 | Policy | Python `datawalk.policy` | Classification labels and their export policies |
 | Viewer | TypeScript `apps/web` | Layout, rendering, navigation, inspection, editor, tour, flat view |
 | Hub (optional) | Python `packages/hub` | Sign-in, permissions, revisions, comments, audit, live follow |
+| AI guide (optional) | Python `datawalk.guide`, TypeScript `apps/web/src/guide` | Plans and narrates a presentation, answers questions (local model) |
 
 Python owns all data. TypeScript owns all geometry. The two layers share only the JSON contract:
 
@@ -26,6 +27,8 @@ Python owns all data. TypeScript owns all geometry. The two layers share only th
 - `PUT /api/report`: editor save. Needs the token. See ADR-10.
 - `PUT /api/visualizations/{id}/preview.png`: a preview that the editor rendered (Plotly).
 - `POST /api/export/review`, `POST /api/export/html`: the editor's export review and export.
+- With `--guide` only: `GET /api/guide/status`, `POST /api/guide/plan`, `POST /api/guide/ask`,
+  `POST /api/guide/speech`. See ADR-25.
 
 The same viewer runs in three ways (ADR-14): from the local server, as a static site
 (`data/...` files), and as one HTML file (`window.__DATAWALK_DATA__`).
@@ -173,6 +176,24 @@ views): 1.6 MB instead of 6.9 MB.
 text), `confirm`, and `run_export` serve the CLI, `Report.export`, the editor, and the hub.
 Each entry point shows the same review and enforces the same rules.
 
+**ADR-25: The AI guide proposes; DataWalk checks and acts.** The guide is opt-in (`--guide`)
+and local. Python (`datawalk.guide`) turns the report into a compact text with short aliases
+(S1, S2, ...) for each room, chart, and dashboard, and asks a local model (Ollama) for a plan or
+an answer in a JSON schema that allows only these aliases and five tools. Python then
+resolves every alias, validates every action, and removes each sentence with a number that
+the data of its stop does not contain; without a usable answer it uses the report's own text.
+Chart data goes to the model only on demand, as a few statistics. Every request starts with
+the same report text, so the model's prompt cache serves it. A plan is a list of `TourStop`s:
+the viewer presents it with the tour engine (`store.guideTour`, `activeStops`), and
+`TourCamera` reports arrival (`store.tourArrived`). The viewer's guide waits for events
+(arrival, the end of each audio clip) and follows `stopIndex`, so the clicker, the HUD, and the
+guide's own actions share one path. Speech: Kokoro-82M clips (WebAudio) or the browser's
+voices; facial animation: optional Audio2Face-3D frames (ARKit names) on the audio clock, else
+lip sync from the audio. The guide is a separate chunk and no export build contains it.
+Alternatives not chosen: a second navigation engine (two sources of truth), model-run tool
+calls (the model would act), a cloud model (the report would leave the computer). Details:
+[guide.md](guide.md).
+
 ## Security
 
 - The server binds to `127.0.0.1`. A port of 0 lets the OS pick a free port.
@@ -199,6 +220,12 @@ Each entry point shows the same review and enforces the same rules.
   BokehJS get a loader that refuses URLs. Inline JSON escapes `<`, U+2028 and U+2029.
 - Notebook import never runs code unless the author asks (`--execute`, separate process,
   timeout).
+- AI guide (opt-in): the routes exist only with `--guide`; they accept only same-site JSON
+  (`Content-Type: application/json`, `Sec-Fetch-Site`), so another website cannot start the
+  model with a form or a no-cors request. Model and Audio2Face addresses must be loopback
+  unless `DATAWALK_GUIDE_ALLOW_REMOTE=1`. Report text reaches the model as data; the model's
+  output is validated and runs no code. Audio2Face frames are validated (shape, count, range).
+  The microphone uses on-device recognition only (`processLocally`). The CSP is unchanged.
 - Hub: CSRF protection by origin check on every cookie-authenticated change; SAML responses
   must be signed by the configured certificate and are read from the signed element only,
   with replay protection by assertion id; OIDC uses PKCE, state, and nonce; an e-mail address
@@ -220,6 +247,10 @@ Each entry point shows the same review and enforces the same rules.
 | playwright, signxml | Apache-2.0 |
 | cryptography, pypdfium2 | Apache-2.0 or BSD-3-Clause |
 | matplotlib | Matplotlib license (PSF-style, permissive) |
+| kokoro-onnx (`voice` extra) | MIT; its dependencies phonemizer and espeak-ng are GPL-3.0, so `voice` is not in `all` and nothing is bundled |
+| Kokoro-82M weights (downloaded by the user) | Apache-2.0 |
+| nemotron-3-nano:4b (pulled by the user into Ollama) | NVIDIA Open Model License |
+| Audio2Face-3D SDK (not bundled; a separate bridge) | MIT; models: see NVIDIA's model cards |
 | Room assets (Poly Haven) | CC0-1.0, see [credits.md](credits.md) |
 
 All licenses are compatible with MIT distribution. MPL-2.0 applies to a test tool only.

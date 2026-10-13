@@ -16,7 +16,7 @@ RUN npm run build
 FROM python:3.13-slim
 ENV PYTHONDONTWRITEBYTECODE=1 PIP_NO_CACHE_DIR=1 HUB_DATA_DIR=/data
 WORKDIR /app
-COPY pyproject.toml README.md LICENSE ./
+COPY pyproject.toml README.md LICENSE hatch_build.py ./
 COPY packages/python packages/python
 COPY --from=web /src/packages/python/datawalk/server/static packages/python/datawalk/server/static
 COPY --from=web /src/packages/python/datawalk/server/viewer packages/python/datawalk/server/viewer

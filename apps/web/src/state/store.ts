@@ -4,7 +4,7 @@ import { type ExportInfo, type HubInfo, saveReport } from '../app/api'
 import { detectGpu, type GpuInfo, type Quality } from '../app/quality'
 import { locale } from '../i18n'
 import type { ThemeId } from '../themes/themes'
-import type { Placement, Report, Room } from './schema'
+import type { Placement, Report, Room, TourStop } from './schema'
 
 // null = walking in the room; any other value shows a DOM overlay.
 export type Overlay = 'lobby' | 'navigator' | 'inspector' | 'map' | 'editor' | null
@@ -54,6 +54,9 @@ interface ViewerState {
   presenting: boolean // guided tour: the camera moves from stop to stop
   stopIndex: number
   kiosk: boolean // auto-play: advance by stop duration, loop
+  guideTour: TourStop[] | null // the AI guide's plan while it presents; null: the report's tour
+  tourArrived: string | null // the tour stop where the camera came to rest (event for the AI guide)
+  guide: boolean // the server offers the AI guide (opt-in: --guide)
   hub: HubInfo | null // a DataWalk Hub serves this report
   screenShare: boolean // video calls: slower glides, larger text, fewer hints
   labels: string[] // classification labels that the editor offers
@@ -71,7 +74,7 @@ interface ViewerState {
   inspect: (id: string) => void
   setOverlay: (overlay: Overlay) => void
   set: (
-    s: Partial<Pick<ViewerState, 'speed' | 'sensitivity' | 'preview' | 'arranging' | 'selectedId' | 'drag' | 'quality' | 'previewTheme' | 'arrangeMessage' | 'editorTab' | 'flat' | 'presenting' | 'stopIndex' | 'kiosk' | 'screenShare' | 'lang'>>,
+    s: Partial<Pick<ViewerState, 'speed' | 'sensitivity' | 'preview' | 'arranging' | 'selectedId' | 'drag' | 'quality' | 'previewTheme' | 'arrangeMessage' | 'editorTab' | 'flat' | 'presenting' | 'stopIndex' | 'kiosk' | 'guideTour' | 'screenShare' | 'lang'>>,
   ) => void
 }
 
@@ -157,6 +160,9 @@ export const useViewer = create<ViewerState>()((set, get) => ({
   presenting: false,
   stopIndex: 0,
   kiosk: false,
+  guideTour: null,
+  tourArrived: null,
+  guide: false,
   hub: null,
   live: null,
   labels: [],

@@ -1,40 +1,58 @@
 # Installation
 
-DataWalk needs Python 3.11 or later. Viewers of an exported report need only a browser.
-
-As a command (works everywhere, also where the system Python refuses `pip install`, for
-example Python from Homebrew on macOS):
+You need [uv](https://docs.astral.sh/uv/getting-started/installation/) and git. One command
+installs DataWalk as the `datawalk` command (macOS, Windows, Linux):
 
 ```bash
-uv tool install "datawalk[all] @ https://github.com/datasound-projects/datawalk/releases/download/v0.1.0a2/datawalk-0.1.0a2-py3-none-any.whl"
+uv tool install "datawalk[all] @ git+https://github.com/datasound-projects/datawalk"
 datawalk demo                        # check: a demo report opens in the browser
 ```
 
-`pipx install` takes the same text. To use DataWalk in your own Python code or notebooks,
-install it in a virtual environment:
+uv gets a suitable Python, DataWalk, and its packages, and builds the viewer with its own copy
+of Node.js. The first install takes a few minutes. If the shell does not find `datawalk`, run
+`uv tool update-shell` and open a new terminal.
+
+Viewers of an exported report need only a browser.
+
+## Update
 
 ```bash
-python3 -m venv .venv && source .venv/bin/activate
-pip install "datawalk[all] @ https://github.com/datasound-projects/datawalk/releases/download/v0.1.0a2/datawalk-0.1.0a2-py3-none-any.whl"
+uv tool upgrade datawalk
 ```
 
-On Windows, activate with `.venv\Scripts\activate` instead.
+This installs the latest version from GitHub (the `main` branch: every change there passed
+all tests).
 
-To add an extra later, install again with the extras that you want. `datawalk doctor` shows the
-command for your installation.
+## The AI guide's voice (optional)
 
-> **Note:** The name `datawalk` on PyPI belongs to another project. Install DataWalk from its
-> [GitHub release](https://github.com/datasound-projects/datawalk/releases), never with a plain
+The AI guide speaks with the browser's voice. For the Kokoro voice, install with the `voice`
+extra, then get its model files ([guide.md](guide.md#voice-kokoro-82m)):
+
+```bash
+uv tool install "datawalk[all,voice] @ git+https://github.com/datasound-projects/datawalk"
+```
+
+## Other ways
+
+- **In your own Python code or notebooks:** in a virtual environment,
+  `pip install "datawalk[all] @ git+https://github.com/datasound-projects/datawalk"`.
+- **A fixed version:** the wheel of a [GitHub release](https://github.com/datasound-projects/datawalk/releases)
+  (the viewer is inside; no build), for example
+  `uv tool install "datawalk[all] @ https://github.com/datasound-projects/datawalk/releases/download/v0.1.0a2/datawalk-0.1.0a2-py3-none-any.whl"`.
+- **pipx:** `pipx install` takes the same text as `uv tool install`.
+- **From a clone, to develop:** see [CONTRIBUTING.md](../CONTRIBUTING.md).
+
+> **Note:** The name `datawalk` on PyPI belongs to another project. Never install with a plain
 > `pip install datawalk`.
 
 ## Extras
 
-`all` installs every extra. To install less, choose the extras that you use.
-`datawalk doctor` shows what is installed.
+`all` installs every extra except `voice`. `datawalk doctor` shows what is installed and the
+command that adds the rest.
 
 | Extra | Adds | Needed for |
 |---|---|---|
-| (none) | The core | Reports, the viewer and editor, HTML and static-site exports |
+| (none) | The core | Reports, the viewer and editor, HTML and static-site exports, the AI guide |
 | `charts` | Matplotlib, Seaborn, Plotly, pandas, NumPy | Charts from these libraries; `datawalk demo` |
 | `matplotlib`, `seaborn`, `plotly` | One plotting library each | Charts from that library |
 | `excel` | openpyxl, xlrd | Excel files (`.xlsx` and `.xls`) |
@@ -42,7 +60,7 @@ command for your installation.
 | `pdf` | Playwright | PDF, GLB, USDZ, and video exports; preview images for "preview only" |
 | `pptx` | python-pptx, Playwright | PowerPoint export |
 | `pdf-import` | pypdfium2 | PDF pages as charts |
-| `all` | All of the above | Everything |
+| `voice` | kokoro-onnx | The AI guide's Kokoro voice. Not in `all`: its phonemizer is GPL-3.0 |
 
 Altair, Bokeh, and MLflow are not extras: install them as usual when you use them.
 
@@ -57,8 +75,3 @@ zsh (the default macOS shell) reports `no matches found`.
 ## The hub
 
 The hub is a separate package and a Docker image. See [hub.md](hub.md).
-
-## From source
-
-See [CONTRIBUTING.md](../CONTRIBUTING.md). Building the viewer needs Node.js 22 or later; the
-published package does not.

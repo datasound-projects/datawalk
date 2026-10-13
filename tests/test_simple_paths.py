@@ -250,16 +250,22 @@ def test_a_used_port_is_a_clear_error():
 
 
 def test_install_hints_never_point_to_the_other_datawalk_on_pypi(tmp_path, monkeypatch):
+    import datawalk.hints as hints
     from datawalk.hints import install
 
-    wheel = f"releases/download/v{dw.__version__}/datawalk-{dw.__version__}-py3-none-any.whl"
-    assert install("datawalk[pdf]").startswith('pip install "datawalk[pdf] @ https://github.com/')
-    assert wheel in install("datawalk[pdf]") and install("pillow") == 'pip install "pillow"'
+    git = "git+https://github.com/datasound-projects/datawalk"
+    # The tests run from a clone: uv sync adds extras there.
+    assert install("datawalk[pdf]") == "uv sync --all-extras"
+    assert install("pillow") == 'uv pip install "pillow"'
+    monkeypatch.setattr(hints, "CHECKOUT", tmp_path / "installed")  # an installed package
+    assert install("datawalk[pdf]") == f'pip install "datawalk[pdf] @ {git}"'
+    assert install("pillow") == 'pip install "pillow"'
     monkeypatch.setattr("sys.prefix", str(tmp_path))
-    (tmp_path / "uv-receipt.toml").touch()  # a uv tool install
-    assert install("datawalk[pdf]").startswith('uv tool install "datawalk[all] @ https://')
+    (tmp_path / "uv-receipt.toml").touch()  # a uv tool install: the README's command
+    assert install("datawalk[pdf]") == f'uv tool install "datawalk[all] @ {git}"'
+    assert install("datawalk[voice]") == f'uv tool install "datawalk[all,voice] @ {git}"'
     assert install("bokeh==3.6.0").endswith(' --with "bokeh==3.6.0"')
     (tmp_path / "uv-receipt.toml").unlink()
     (tmp_path / "pipx_metadata.json").touch()  # a pipx install
-    assert install("datawalk[pptx]").startswith('pipx install --force "datawalk[all] @ https://')
+    assert install("datawalk[pptx]") == f'pipx install --force "datawalk[all] @ {git}"'
     assert install("pillow") == 'pipx inject datawalk "pillow"'

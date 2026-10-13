@@ -74,6 +74,7 @@ interface Glide {
   to: Pose
   t0: number
   duration: number
+  arrived: boolean
 }
 
 export function TourCamera({ layout }: { layout: RoomLayout }) {
@@ -107,7 +108,7 @@ export function TourCamera({ layout }: { layout: RoomLayout }) {
       // Screen sharing compresses video: slower moves stay readable for the audience.
       const slow = useViewer.getState().screenShare ? 1.8 : 1
       const duration = cut ? 0 : slow * Math.max(0.8, ((Math.PI / 2) * length) / MAX_SPEED, ((Math.PI / 2) * turn) / TURN_SPEED)
-      glide.current = { key, path, length, from, to, t0: now, duration }
+      glide.current = { key, path, length, from, to, t0: now, duration, arrived: false }
     }
     const g = glide.current
     const p = g.duration ? ease(Math.min(1, (now - g.t0) / g.duration)) : 1
@@ -116,6 +117,10 @@ export function TourCamera({ layout }: { layout: RoomLayout }) {
     camera.position.set(x, MathUtils.lerp(g.from.y, g.to.y, p), z)
     camera.quaternion.setFromEuler(euler.set(MathUtils.lerp(g.from.pitch, g.to.pitch, p), g.from.yaw + dyaw * p, 0))
     ;(window as { datawalkTourMoving?: boolean }).datawalkTourMoving = p < 1
+    if (p >= 1 && !g.arrived) {
+      g.arrived = true // once per glide: the AI guide speaks when the camera stands still
+      useViewer.setState({ tourArrived: stop.stop.id })
+    }
   })
   return null
 }

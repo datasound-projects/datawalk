@@ -24,6 +24,9 @@ export default defineConfig({
   use: {
     viewport: { width: 1280, height: 800 },
     locale: 'en-US', // the viewer follows the browser language; the tests read English text
+    // CI uploads a failed test's trace (`npx playwright show-trace`): actions, console, and
+    // network only. Screenshots and DOM snapshots doubled the time of the 3D tests on CI.
+    trace: slow ? { mode: 'retain-on-failure', screenshots: false, snapshots: false } : 'off',
   },
   webServer: [
     server(8766),
@@ -31,6 +34,9 @@ export default defineConfig({
     server(8768, 'notebook'),
     server(8769, 'sources'),
     { command: 'uv run python apps/web/e2e/hub_serve.py 8770', cwd: '../..', url: 'http://127.0.0.1:8770/login', timeout: 120_000, reuseExistingServer: false },
+    // The AI guide: stand-ins that answer at once (8772), and nothing to answer (8773).
+    { ...server(8772), command: 'uv run python apps/web/e2e/guide_serve.py 8772' },
+    { ...server(8773), command: 'uv run python apps/web/e2e/guide_serve.py 8773 down' },
   ],
   projects: [
     { name: 'viewer', testMatch: ['walkthrough.spec.ts', 'doors.spec.ts', 'themes.spec.ts', 'flat.spec.ts', 'tour.spec.ts', 'fidelity.spec.ts'], use: { ...chrome, baseURL: 'http://127.0.0.1:8766' } },
@@ -42,5 +48,6 @@ export default defineConfig({
     { name: 'notebook', testMatch: 'notebook.spec.ts', use: { ...chrome, baseURL: 'http://127.0.0.1:8768' } },
     { name: 'sources', testMatch: 'sources.spec.ts', use: { ...chrome, baseURL: 'http://127.0.0.1:8769' } },
     { name: 'hub', testMatch: 'hub.spec.ts', use: { ...chrome, baseURL: 'http://127.0.0.1:8770' } },
+    { name: 'guide', testMatch: 'guide.spec.ts', use: { ...chrome, baseURL: 'http://127.0.0.1:8772' } },
   ],
 })
