@@ -42,10 +42,13 @@ export function GuideDock({ report }: { report: Report }) {
           g.set({ open: !g.open })
         }}
         aria-expanded={g.open}
+        aria-label={`${g.open ? t('guide.collapse') : t('guide.expand')} (${t(`guide.phase.${g.phase}`)})`}
         title={g.open ? t('guide.collapse') : t('guide.expand')}
       >
         <Avatar phase={g.phase} webgl={gpu.webgl} />
-        <span className="guide-state">{t(`guide.phase.${g.phase}`)}</span>
+        <span className="guide-state" aria-hidden>
+          {t(`guide.phase.${g.phase}`)}
+        </span>
       </button>
     </aside>
   )
@@ -87,12 +90,12 @@ function Panel({ report }: { report: Report }) {
             {t('guide.resume')}
           </button>
         ) : (
-          <button onClick={pause}>{t('guide.pause')}</button>
+          <button onClick={() => pause()}>{t('guide.pause')}</button>
         )}
         {g.running && <button onClick={stop}>{t('guide.stop')}</button>}
         <button
           onClick={() => {
-            pause()
+            pause('question')
             g.set({ tab: 'ask' })
             setTimeout(() => input.current?.focus())
           }}
@@ -153,7 +156,7 @@ function AskTab({ inputRef }: { inputRef: React.RefObject<HTMLInputElement | nul
   }
   const speak = async () => {
     if (g.phase === 'listening') return stopListening()
-    pause()
+    pause('question')
     g.set({ phase: 'listening', error: null })
     try {
       const heard = await listen(lang, setText)
@@ -178,7 +181,7 @@ function AskTab({ inputRef }: { inputRef: React.RefObject<HTMLInputElement | nul
           value={text}
           maxLength={500}
           onChange={(e) => setText(e.target.value)}
-          onFocus={pause}
+          onFocus={() => pause('question')}
           placeholder={t('guide.askPlaceholder')}
           aria-label={t('guide.askLabel')}
         />

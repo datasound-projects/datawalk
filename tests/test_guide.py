@@ -430,3 +430,15 @@ def test_real_model_plans_and_answers_from_the_report(report):
     assert all(s.ref in refs and s.narration for s in plan.stops)
     answer = ask(report, llm, "Which model is best?", stops=[s.ref for s in plan.stops])
     assert "0.61" in answer.answer or "Boosting" in answer.answer
+
+
+def test_exports_contain_no_guide():
+    """The guide needs the local server: the export viewers must not contain it (ADR-25)."""
+    from datawalk.export import VIEWER
+
+    builds = [VIEWER / "viewer.js", VIEWER / "viewer-lite.js"]
+    if not all(b.exists() for b in builds):
+        pytest.skip("the export viewer is not built (npm run build)")
+    for build in builds:
+        code = build.read_bytes()
+        assert b"api/guide" not in code and b"guide-avatar" not in code, build.name

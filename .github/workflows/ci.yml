@@ -70,6 +70,9 @@ jobs:
           - name: notebook, sources, hub
             browser: chromium
             args: --project=notebook --project=sources --project=hub
+          - name: AI guide
+            browser: chromium
+            args: --project=guide
           - name: exports (Chromium)
             browser: chromium
             args: --project=export

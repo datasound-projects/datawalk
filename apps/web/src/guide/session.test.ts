@@ -160,6 +160,27 @@ test('after a plain answer the presentation goes on by itself', async () => {
   expect(said.at(-1)?.text).toBe('First stop.') // the interrupted narration again
 })
 
+test('a question typed after the field paused still resumes; a Pause click does not', async () => {
+  answer.mockResolvedValue({ answer: 'Yes.', interpretation: '', evidence: [], action: null, removed: 0, model: 'fake' })
+  await present(report, 3)
+  await arrive()
+  pause('question') // the visitor clicks into the question field
+  await tick()
+  const asking = ask('Is it real?')
+  await tick()
+  await tick()
+  said.at(-1)!.end()
+  await asking
+  expect(useGuide.getState().paused).toBe(false)
+  pause() // the Pause button
+  const again = ask('And now?')
+  await tick()
+  await tick()
+  said.at(-1)!.end()
+  await again
+  expect(useGuide.getState().paused).toBe(true)
+})
+
 test('a failed clip does not stop the presentation', async () => {
   await present(report, 3)
   await arrive()

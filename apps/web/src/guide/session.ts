@@ -106,6 +106,7 @@ let session: AbortController | null = null // the running presentation
 let speech: AbortController | null = null // what the guide says now
 let answering: AbortController | null = null // the answer to a question
 let resumeAt: { stopId: string; sentence: number } | null = null // where a pause interrupted
+let pausedFor: 'visitor' | 'question' = 'visitor' // a question's pause may resume by itself
 let messageId = 0
 
 /** Present the plan from stop `index`: the guide's plan becomes the tour while it runs. */
@@ -193,9 +194,12 @@ async function narrate(stop: Stop, index: number): Promise<boolean> {
   }
 }
 
-export function pause() {
+/** Pause the presentation. 'question': the visitor starts a question (the field, Ask, the
+ *  microphone); after a plain answer the presentation goes on. 'visitor': only Resume. */
+export function pause(reason: 'visitor' | 'question' = 'visitor') {
   const g = useGuide.getState()
   if (!g.running || g.paused) return
+  pausedFor = reason
   g.set({ paused: true, phase: 'paused' }) // first: the interrupted narration sees the pause
   speech?.abort()
 }
@@ -233,8 +237,8 @@ export async function ask(question: string) {
   if (!question || !report) return
   unlockAudio()
   const g = useGuide.getState()
-  const wasPlaying = g.running && !g.paused
-  pause()
+  const wasPlaying = g.running && (!g.paused || pausedFor === 'question')
+  pause('question')
   answering?.abort()
   const ctl = (answering = new AbortController())
   g.set({ phase: 'thinking', error: null, messages: [...g.messages, { id: ++messageId, role: 'visitor', text: question }] })
