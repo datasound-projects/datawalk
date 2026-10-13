@@ -49,7 +49,7 @@ class FakeLLM:
     def check(self):
         return (self.error is None, "fake model")
 
-    def chat(self, system, user, schema):
+    def chat(self, system, user, schema, timeout=None):
         self.calls.append((system, user, schema))
         if self.error:
             raise GuideError(self.error)
@@ -473,10 +473,11 @@ def test_guide_routes_reject_cross_site_and_bad_input(report):
     assert client.post("/api/guide/speech", json={"text": "x" * 2001}).status_code == 422
 
 
-def test_guide_errors_are_clear(report):
+def test_without_a_model_the_facts_still_answer(report):
     client = guide_client(report, FakeLLM(error="Cannot reach Ollama at http://127.0.0.1:1."))
-    res = client.post("/api/guide/ask", json={"question": "Why?"})
-    assert res.status_code == 503 and "Cannot reach Ollama" in res.json()["detail"]
+    res = client.post("/api/guide/ask", json={"question": "What is the best AUC?"}).json()
+    assert res["source"] == "template" and "0.61" in res["answer"]
+    assert "Cannot reach Ollama" in res["trace"]["error"]
     plan = client.post("/api/guide/plan", json={"minutes": 3}).json()
     assert plan["model"] == "" and plan["stops"]  # the report's own text still presents
 
