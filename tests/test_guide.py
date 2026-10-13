@@ -422,7 +422,7 @@ def test_guide_routes_reject_cross_site_and_bad_input(report):
     assert (
         client.post("/api/guide/ask", json={"question": "Hi", "current": "../x"}).status_code == 422
     )
-    assert client.post("/api/guide/speech", json={"text": "x" * 601}).status_code == 422
+    assert client.post("/api/guide/speech", json={"text": "x" * 2001}).status_code == 422
 
 
 def test_guide_errors_are_clear(report):
@@ -460,3 +460,50 @@ def test_exports_contain_no_guide():
     for build in builds:
         code = build.read_bytes()
         assert b"api/guide" not in code and b"guide-avatar" not in code, build.name
+
+
+def test_english_numbers_are_not_read_with_a_decimal_comma():
+    evidence = "Trades 2,654. Price 87.49. Change 12,9 %."
+    assert ground("It reaches 2.65.", evidence)[1] == 1  # 2,654 is two thousand, not 2.654
+    assert ground("The price is 8749.", evidence)[1] == 1
+    assert ground("Die Änderung ist 12,9 %.", evidence, decimal_comma=True)[1] == 0
+
+
+def test_a_chart_on_a_wall_belongs_to_that_room(report):
+    report.room("Models").items.append(report.get("auc").id)  # also on a wall of "Models"
+    auc = next(i for i in build_items(report) if i.title == "Best AUC")
+    assert auc.room == "Models"  # where the tour frames it, not the dashboard of "Summary"
+
+
+def test_a_model_without_the_thinking_option_still_answers():
+    reply = json.dumps({"message": {"content": '{"ok": true}'}}).encode()
+    bodies = []
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_POST(self):
+            body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+            bodies.append(body)
+            refuse = "think" in body
+            self.send_response(400 if refuse else 200)
+            self.end_headers()
+            self.wfile.write(
+                b'{"error": "\\"llama3.2\\" does not support thinking"}' if refuse else reply
+            )
+
+        def log_message(self, *args):
+            pass
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    try:
+        llm = Ollama(f"http://127.0.0.1:{server.server_address[1]}", model="llama3.2")
+        assert llm.chat("s", "u", {}) == {"ok": True}
+        assert llm.chat("s", "u", {}) == {"ok": True}
+        assert ["think" in b for b in bodies] == [True, False, False]  # asked once
+    finally:
+        server.shutdown()
+
+
+def test_a_long_sentence_is_spoken_by_the_same_voice(report):
+    client = guide_client(report, FakeLLM({"stops": []}))
+    assert client.post("/api/guide/speech", json={"text": "word " * 300}).status_code == 200

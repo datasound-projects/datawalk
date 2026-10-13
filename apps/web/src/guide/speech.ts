@@ -88,8 +88,13 @@ export async function say(text: string, o: SayOptions): Promise<void> {
     if (o.signal.aborted) throw abortError()
     next = load(i + 1)
     o.onSentence?.(i, parts[i])
-    if (clip) await playClip(clip, o.signal)
-    else await speakBrowser(parts[i], o)
+    try {
+      if (clip) await playClip(clip, o.signal)
+      else await speakBrowser(parts[i], o)
+    } catch (e) {
+      if (isAbort(e)) throw e
+      await speakBrowser(parts[i], o) // a clip that cannot play (bad audio): this sentence in the browser voice
+    }
   }
 }
 

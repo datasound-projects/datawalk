@@ -1397,6 +1397,9 @@ body.classified :is(.hud-title, .hub-bar) {
 .guide > * {
   pointer-events: auto;
 }
+.guide[hidden] {
+  display: none;
+}
 .guide-avatar {
   position: relative;
   width: 84px;

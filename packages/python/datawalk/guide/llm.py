@@ -64,6 +64,7 @@ class Ollama:
     url: str = DEFAULT_URL
     model: str = DEFAULT_MODEL
     timeout: float = 300.0  # a 10-minute plan on a laptop CPU takes a few minutes
+    think: bool | None = False  # None: the model has no thinking option (Ollama said so)
 
     @classmethod
     def from_env(cls) -> Ollama:
@@ -116,7 +117,7 @@ class Ollama:
         body = {
             "model": self.model,
             "stream": False,
-            "think": False,  # a reasoning trace costs minutes on a laptop; the schema guides
+            "think": self.think,  # a reasoning trace costs minutes on a laptop; the schema guides
             "format": schema,
             "options": OPTIONS,
             "keep_alive": "15m",
@@ -125,7 +126,15 @@ class Ollama:
                 {"role": "user", "content": user},
             ],
         }
-        reply = self._request("/api/chat", body, timeout=self.timeout)
+        if self.think is None:
+            del body["think"]
+        try:
+            reply = self._request("/api/chat", body, timeout=self.timeout)
+        except GuideError as e:
+            if self.think is None or "think" not in str(e):
+                raise
+            self.think = None  # a model without the option (for example llama3.2): ask again
+            return self.chat(system, user, schema)
         content = reply.get("message", {}).get("content", "")
         try:
             data = json.loads(content)

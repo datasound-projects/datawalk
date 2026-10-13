@@ -31,7 +31,7 @@ from typing import Any, Protocol
 
 from .llm import GuideError, local_url
 
-MAX_TEXT = 600  # characters per speech request: one or two sentences
+MAX_TEXT = 2000  # characters per speech request: one sentence, however long
 MAX_FACE_SECONDS = 120
 MAX_SHAPES = 64
 

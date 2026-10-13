@@ -14,7 +14,7 @@ import { setKokoro, setMuted } from './speech'
 
 const LENGTHS = [3, 5, 10]
 
-export function GuideDock({ report }: { report: Report }) {
+export function GuideDock({ report, hidden }: { report: Report; hidden: boolean }) {
   const g = useGuide()
   const { gpu } = useViewerPick('gpu')
   useEffect(() => {
@@ -28,7 +28,7 @@ export function GuideDock({ report }: { report: Report }) {
   }, [])
 
   return (
-    <aside className={`guide${g.open ? ' open' : ''}`} data-phase={g.phase} aria-label={t('guide.title')}>
+    <aside className={`guide${g.open ? ' open' : ''}`} data-phase={g.phase} aria-label={t('guide.title')} hidden={hidden}>
       {g.open && <Panel report={report} />}
       {g.caption && (
         <p className="guide-caption" role="status" aria-live="polite">

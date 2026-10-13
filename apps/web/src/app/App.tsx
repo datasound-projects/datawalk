@@ -123,22 +123,21 @@ export function App() {
       </>
     )
   if (EXPORTING) return <p className="muted">{t('app.exporting')}</p>
-  const dock = GuideDock && guide && overlay !== 'editor' && (
+  // One place in the tree for both views: switching flat <-> 3D (an answer can do that) must
+  // not remount the guide, which would end what it says. The editor hides it.
+  const dock = GuideDock && guide && (
     <Suspense fallback={null}>
-      <GuideDock report={report} />
+      <GuideDock report={report} hidden={overlay === 'editor'} />
     </Suspense>
   )
-  if (flat)
-    return (
-      <>
-        <FlatView report={report} />
-        {dock}
-        {overlay === 'inspector' && viz && <Inspector key={viz.id} viz={viz} />}
-        <Classification report={report} />
-        <Watermark />
-      </>
-    )
-  return (
+  const view = flat ? (
+    <>
+      <FlatView report={report} />
+      {overlay === 'inspector' && viz && <Inspector key={viz.id} viz={viz} />}
+      <Classification report={report} />
+      <Watermark />
+    </>
+  ) : (
     <>
       <div id="scene">
         <Suspense fallback={<p className="scene-loading muted">{t('app.loadingRoom')}</p>}>{room && <RoomScene report={report} room={room} />}</Suspense>
@@ -155,8 +154,13 @@ export function App() {
       {overlay === 'map' && room && <MapOverlay report={report} room={room} />}
       {overlay === 'inspector' && viz && <Inspector key={viz.id} viz={viz} />}
       {!VIEWER_ONLY && overlay === 'editor' && <EditorPanel report={report} />}
-      {dock}
       <Watermark />
+    </>
+  )
+  return (
+    <>
+      {view}
+      {dock}
     </>
   )
 }

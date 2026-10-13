@@ -78,7 +78,9 @@ def _data_block(report: Report, items: list[Item]) -> str:
 def _evidence(report: Report, item: Item, by_alias: dict[str, Item], extra: str = "") -> str:
     """What a statement about this item may use: its own text and data, the report header,
     and, for rooms and dashboards, the items that they contain."""
-    parts = [report_header(report), item.text, extra, detail(report, item.viz_id)]
+    if item.data is None:  # decoded once per request: rooms include all their charts
+        item.data = detail(report, item.viz_id)
+    parts = [report_header(report), item.text, extra, item.data]
     for alias in item.members:  # a room's dashboards, and their charts
         parts.append(_evidence(report, by_alias[alias], by_alias))
     return " ".join(parts)

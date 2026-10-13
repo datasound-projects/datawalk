@@ -119,7 +119,8 @@ export async function present(report: Report, minutes = useGuide.getState().minu
   resumeAt = null
   useGuide.getState().set({ running: true, paused: false, error: null, open: false }) // the room is the stage: only the captions and the compact controls stay
   const v = useViewer.getState()
-  v.set({ guideTour: planTour(plan) })
+  // A new presentation: an arrival from an earlier one (same stop ids) must not count.
+  useViewer.setState({ guideTour: planTour(plan), tourArrived: null })
   if (v.flat) {
     v.set({ kiosk: false })
     goTo(index)
@@ -191,9 +192,9 @@ async function narrate(stop: Stop, index: number): Promise<boolean> {
     unsubscribe()
     parent?.removeEventListener('abort', end)
     if (speech === ctl) speech = null
-    // Only a speaking phase ends here: a question that interrupted ("thinking") keeps its own.
+    // The caption always goes; only a speaking phase ends here (a question keeps "thinking").
     const now = useGuide.getState()
-    if (now.phase === 'speaking' || now.phase === 'paused') now.set({ caption: '', phase: now.paused ? 'paused' : 'idle' })
+    now.set({ caption: '', ...(now.phase === 'speaking' || now.phase === 'paused' ? { phase: now.paused ? 'paused' : 'idle' } : {}) })
   }
 }
 

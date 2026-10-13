@@ -67,7 +67,7 @@ class AskRequest(BaseModel):
 
 
 class SpeechRequest(BaseModel):
-    text: str = Field(min_length=1, max_length=600)
+    text: str = Field(min_length=1, max_length=2000)  # one sentence; a long one too
     lang: Lang = "en"
 
 

@@ -43,6 +43,7 @@ class Item:
     findings: list[str] = field(default_factory=list)
     summary: str = ""
     image_only: bool = False  # a picture without data or text: nothing to say about it
+    data: str | None = None  # detail() of its chart, computed once when a check needs it
 
 
 def _clip(text: str, limit: int = TEXT_LIMIT) -> str:
@@ -111,7 +112,8 @@ def build_items(report: Report) -> list[Item]:
     dashboards = {d.id: d for d in report.dashboards}
     notes = {s.ref: s.notes for s in report.tour if s.notes.strip()}
     items: list[Item] = []
-    alias_of: dict[str, str] = {}
+    by_ref: dict[str, Item] = {}
+    direct: set[str] = set()  # charts that a room shows on its own wall
 
     def add(kind: str, ref: str, title: str, room: Room, text: str, viz_id: str | None) -> Item:
         item = Item(f"S{len(items) + 1}", ref, kind, title, room.name, text, viz_id=viz_id)
@@ -127,7 +129,7 @@ def build_items(report: Report) -> list[Item]:
             owner = next((x for x in (*report.rooms, *report.dashboards) if x.id == ref), None)
             item.summary = _clip(owner.description) if owner else ""
         items.append(item)
-        alias_of[ref] = item.alias
+        by_ref[ref] = item
         return item
 
     for room in report.rooms:
@@ -136,30 +138,33 @@ def build_items(report: Report) -> list[Item]:
             head += " Presenter notes: " + _clip(notes[room.id])
         room_item = add("room", room.id, room.name, room, head, None)
         for ref in room.items:
-            if ref in alias_of:  # shown twice: one alias, so a stop is never visited twice
-                pass
+            if ref in by_ref:  # shown twice: one alias, so a stop is never visited twice
+                if ref in active and ref not in direct:  # the tour frames it on this wall
+                    by_ref[ref].room = room.name
+                    direct.add(ref)
             elif ref in active:
                 viz = active[ref]
                 add("chart", ref, viz.name, room, _viz_text(report, viz, notes.get(ref, "")), ref)
+                direct.add(ref)
             elif (dash := dashboards.get(ref)) and (
                 shown := [i for i in dash.items if i in active]
             ):
                 dash_item = _dashboard(add, report, dash, room, shown, notes.get(ref, ""))
                 for vid in shown:
-                    if vid not in alias_of:
+                    if vid not in by_ref:
                         viz = active[vid]
                         text = f"In dashboard '{dash.name}'. " + _viz_text(
                             report, viz, notes.get(vid, "")
                         )
                         add("chart", vid, viz.name, room, text, vid)
-                    member = items[int(alias_of[vid][1:]) - 1]
+                    member = by_ref[vid]
                     dash_item.members.append(member.alias)
                     if member.summary and not dash.description:  # key figures: their values
                         sep = "; " if dash_item.summary else ""
                         dash_item.summary += f"{sep}{member.title}: {member.summary}"
             else:
                 continue
-            room_item.members.append(alias_of[ref])
+            room_item.members.append(by_ref[ref].alias)
     for item in items:  # a room lists what it contains: the model can choose what to show
         if item.kind == "room" and item.members:
             names = {i.alias: i.title for i in items}
@@ -328,10 +333,19 @@ def split_sentences(text: str) -> list[str]:
     return [s.strip() for s in _SENTENCE.split(text.strip()) if s.strip()]
 
 
+def _comma_decimal(token: str) -> bool:
+    token = token.rstrip("%")
+    return "," in token and "." not in token and len(token.rsplit(",", 1)[1]) != 3
+
+
 def ground(text: str, evidence: str, decimal_comma: bool = False) -> tuple[str, int]:
     """Keep the sentences whose numbers all occur in the evidence. Returns the kept text and
     the number of sentences removed. Aliases (S3) are internal: they are taken out."""
-    known = numbers_in(evidence) + numbers_in(evidence, decimal_comma=True)
+    # The evidence is read as written in English; a number with a decimal comma (12,9 but not
+    # 2,654) is read as German too: reading every number both ways would invent values.
+    known = numbers_in(evidence) + [
+        n for t in _NUMBER.findall(evidence) if _comma_decimal(t) and (n := _parse(t, True))
+    ]
     kept, removed = [], 0
     text = re.sub(r"\s*\(\s*[,;]?\s*\)", "", _ALIAS.sub("", text))  # "(S3)" leaves nothing
     for sentence in split_sentences(re.sub(r" +([,.;])", r"\1", text).replace("  ", " ")):
