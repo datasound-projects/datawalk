@@ -25,6 +25,9 @@ report = runpy.run_path(str(examples / "financial_research.py"))["report"]
 report.save(Path(tempfile.mkdtemp()) / "e2e-guide.dwk")
 
 
+LONG = "%s Each part has a name. The lines show the values. The colors mark the series."
+
+
 class ScriptedModel:
     """Four stops; answers with one action. One sentence of the plan has a number that the
     report does not contain: the guide must remove it."""
@@ -56,10 +59,11 @@ class ScriptedModel:
                         "Then it doubles to 999.9 USD.",  # no data supports this sentence
                     },
                     {"ref": summary, "narration": "Welcome to the summary. All data is synthetic."},
-                    {"ref": volatility, "narration": "Volatility changes over time."},
-                    {"ref": drawdown, "narration": "The drawdown shows the losses from the peak."},
-                    {"ref": models, "narration": "The models are close to chance."},
-                    {"ref": metrics, "narration": "These are the model metrics."},
+                    # Several sentences each: on a slow machine the tour must outlast the test.
+                    {"ref": volatility, "narration": LONG % "Volatility changes over time."},
+                    {"ref": drawdown, "narration": LONG % "The drawdown shows the losses."},
+                    {"ref": models, "narration": LONG % "The models are close to chance."},
+                    {"ref": metrics, "narration": LONG % "These are the model metrics."},
                 ]
             }
         question = re.search(r"<question>(.*)</question>", user, re.S)[1].lower()
