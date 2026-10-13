@@ -171,7 +171,9 @@ async function narrate(stop: Stop, index: number): Promise<boolean> {
   const from = resumeAt?.stopId === stop.stop.id ? resumeAt.sentence : 0
   resumeAt = null
   const ctl = (speech = new AbortController())
-  session?.signal.addEventListener('abort', () => ctl.abort(), { once: true })
+  const parent = session?.signal
+  const end = () => ctl.abort()
+  parent?.addEventListener('abort', end, { once: true })
   const unsubscribe = useViewer.subscribe((s) => (s.stopIndex !== index || !s.presenting) && ctl.abort())
   let sentence = from
   g.set({ phase: 'speaking' })
@@ -187,6 +189,7 @@ async function narrate(stop: Stop, index: number): Promise<boolean> {
     return false
   } finally {
     unsubscribe()
+    parent?.removeEventListener('abort', end)
     if (speech === ctl) speech = null
     // Only a speaking phase ends here: a question that interrupted ("thinking") keeps its own.
     const now = useGuide.getState()

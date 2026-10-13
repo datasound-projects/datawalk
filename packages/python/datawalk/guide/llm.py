@@ -23,8 +23,9 @@ LOOPBACK = {"127.0.0.1", "localhost", "::1"}
 OPTIONS = {"temperature": 0.2, "num_ctx": 16384}
 
 
-class GuideError(Exception):
-    """A clear, user-facing reason why the guide cannot do something."""
+class GuideError(ValueError):
+    """A clear, user-facing reason why the guide cannot do something (the command line prints
+    it as an error, without a traceback)."""
 
 
 class LLM(Protocol):

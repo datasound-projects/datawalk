@@ -320,6 +320,11 @@ def serve(
 ) -> str:
     import uvicorn
 
+    helper = None
+    if guide:  # first: a configuration error stops before the port is taken
+        from ..guide import Guide
+
+        helper = Guide()
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     try:
@@ -330,11 +335,7 @@ def serve(
     sock.listen(128)  # accept early connections (the browser) before uvicorn starts
     token = secrets.token_urlsafe(24) if edit else None
     url = f"http://127.0.0.1:{sock.getsockname()[1]}/" + (f"#edit={token}" if token else "")
-    helper = None
-    if guide:
-        from ..guide import Guide
-
-        helper = Guide()
+    if helper is not None:
         print(f"AI guide: {helper.llm.model} (local)", flush=True)
         threading.Thread(target=helper.warm, daemon=True).start()
     server = uvicorn.Server(uvicorn.Config(create_app(report, token, helper), log_level="warning"))
