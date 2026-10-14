@@ -235,16 +235,6 @@ export function FlatView({ report }: { report: Report }) {
             </p>
           )}
         </div>
-        <div className="row no-print">
-          {gpu.webgl ? (
-            <button className="primary" onClick={() => setFlat(false)}>
-              {t('flat.walk3d')}
-            </button>
-          ) : (
-            <p className="muted">{t('flat.noWebgl')}</p>
-          )}
-          <button onClick={() => print()}>{t('flat.print')}</button>
-        </div>
         {gpu.webgl && gpu.software && (
           <p className="muted no-print">{t('flat.software')}</p>
         )}
@@ -269,6 +259,17 @@ export function FlatView({ report }: { report: Report }) {
         </ol>
       </nav>
       <main id="flat-main" tabIndex={-1}>
+        {/* Sticky: reaching "Walk in 3D" must not scroll away from the room being read. */}
+        <div className="flat-actions row no-print">
+          {gpu.webgl ? (
+            <button className="primary" onClick={() => setFlat(false)}>
+              {t('flat.walk3d')}
+            </button>
+          ) : (
+            <p className="muted">{t('flat.noWebgl')}</p>
+          )}
+          <button onClick={() => print()}>{t('flat.print')}</button>
+        </div>
         {!sections.length && <p className="muted">{t('lobby.noRooms')}</p>}
         {sections.map(({ room, entries }) => (
           <section key={room.id} id={roomAnchor(room)} className="flat-room" data-room={room.id} aria-labelledby={`${roomAnchor(room)}-title`}>

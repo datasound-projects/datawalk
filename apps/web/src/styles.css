@@ -964,8 +964,19 @@ body.shot .arrange-bar {
   grid-area: main;
   min-width: 0;
 }
+.flat-actions {
+  position: sticky;
+  top: -32px; /* flush with the top edge, over the padding of .flat */
+  z-index: 1;
+  padding: 8px 0;
+  background: var(--bg);
+}
 .flat-room {
   margin-bottom: 48px;
+}
+.flat-room,
+.flat-chart {
+  scroll-margin-top: 64px; /* deep links land below the sticky actions */
 }
 .flat-room > h2 {
   font-size: 1.6rem;
