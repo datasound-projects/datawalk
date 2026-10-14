@@ -245,6 +245,11 @@ function MessageItem({ message }: { message: Message }) {
           <strong>{t('guide.interpretation')}</strong> {a.interpretation}
         </p>
       )}
+      {a?.caveats && (
+        <p className="muted">
+          <strong>{t('guide.caveat')}</strong> {a.caveats}
+        </p>
+      )}
       {!!a?.evidence.length && (
         <p className="guide-evidence">
           <span className="muted">{t('guide.evidence')}</span>
@@ -255,6 +260,17 @@ function MessageItem({ message }: { message: Message }) {
           ))}
         </p>
       )}
+      {!!a?.facts?.length && (
+        <details className="guide-facts">
+          <summary className="muted small">{t('guide.facts', { n: a.facts.length })}</summary>
+          <ul className="small">
+            {a.facts.map((f) => (
+              <li key={f.id}>{f.text}</li>
+            ))}
+          </ul>
+        </details>
+      )}
+      {a?.trace?.fallback && <p className="muted small">{t('guide.fromFacts')}</p>}
       {!!a?.removed && <p className="muted small">{t('guide.removed', { n: a.removed })}</p>}
     </li>
   )

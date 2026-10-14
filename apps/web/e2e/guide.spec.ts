@@ -103,17 +103,18 @@ test('the guide presents the demo: plan, camera, narration, questions, and inter
   await expect(page.locator('.guide-caption, .guide-now')).toHaveText(new RegExp(`^(${sentences.join('|')})$`), { timeout: 60_000 })
   const models = plan.findIndex((n) => n.startsWith('The models are close to chance.'))
 
-  // A question pauses; "which model is best" goes to that stop and keeps the pause.
+  // A question pauses; "show me the model comparison" goes to that stop and keeps the pause.
   await mini.getByRole('button', { name: 'Ask' }).click()
   await expect(panel.getByRole('tab', { name: 'Questions' })).toHaveAttribute('aria-selected', 'true')
   const input = panel.getByRole('textbox', { name: 'Question for the AI guide' })
-  await input.fill('Which model is best?')
+  await input.fill('Show me the model comparison')
   await input.press('Enter')
   await expect(panel.locator('.guide-log li.guide-answer')).toContainText('Gradient boosting has the highest AUC.')
   await expect(panel.locator('.guide-evidence')).toContainText('Model Comparison')
   await expect.poll(async () => (await viewer(page)).index).toBe(models)
   await expect(panel.getByRole('button', { name: 'Resume' })).toBeVisible()
-  await expect.poll(() => phase(page)).toBe('paused')
+  // the answer is spoken with its interpretation (several sentences) before the pause shows
+  await expect.poll(() => phase(page), { timeout: 60_000 }).toBe('paused')
 
   // Resume: the narration of the stop on screen. A plain answer then goes on by itself.
   await panel.getByRole('button', { name: 'Resume' }).click()
@@ -157,12 +158,12 @@ test('without a model and a voice the guide presents with the report text and ca
   await panel.getByRole('tab', { name: 'Plan' }).click()
   await expect(panel.getByText(/Plan from the report text/)).toBeVisible()
   await expect(panel.getByText(/No AI model: Cannot reach Ollama/)).toBeVisible()
-  // A question without a model: a clear message, and the viewer keeps working.
+  // A question without a model: the report's facts answer, and the viewer keeps working.
   await panel.getByRole('tab', { name: 'Questions' }).click()
   const input = panel.getByRole('textbox', { name: 'Question for the AI guide' })
   await input.fill('What changed?')
   await input.press('Enter')
-  await expect(panel.locator('.guide-error')).toContainText('Cannot reach Ollama')
+  await expect(panel.locator('.guide-log li.guide-answer')).toContainText('straight from the report facts')
   await panel.getByRole('button', { name: 'Stop' }).click()
   await expect.poll(async () => (await viewer(page)).presenting).toBe(false)
   expect(errors).toEqual([])

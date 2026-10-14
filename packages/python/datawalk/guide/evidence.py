@@ -58,7 +58,9 @@ def _num(x: Any) -> str:
     if x == int(x) and abs(x) < 1e15:
         return str(int(x))
     digits = max(0, 3 - int(math.floor(math.log10(abs(x))))) if x else 0
-    return f"{x:.{min(digits, 6)}f}".rstrip("0").rstrip(".")
+    text = f"{x:.{min(digits, 6)}f}"
+    # Trailing zeros go only after a decimal point: 6626290 must not become 662629.
+    return text.rstrip("0").rstrip(".") if "." in text else text
 
 
 def _viz_text(report: Report, viz: Visualization, notes: str) -> str:
@@ -290,6 +292,7 @@ def detail(report: Report, viz_id: str | None) -> str:
 # A number as people write it: -12.9, 1,000, 0.61, 41%, 2021-03-04 (three numbers).
 _NUMBER = re.compile(r"(?<![\w.])[-+−]?\d[\d,]*(?:\.\d+)?%?")
 _ALIAS = re.compile(r"\bS\d{1,3}\b")
+_DOT_THOUSANDS = re.compile(r"^-?[1-9]\d{0,2}(\.\d{3})+$")  # German 1.234, not 41.2 or 0.538
 _SENTENCE = re.compile(r"(?<=[.!?])\s+(?=[\"'(\[]?[A-ZÄÖÜ0-9])")
 
 
@@ -297,7 +300,9 @@ def _parse(token: str, decimal_comma: bool) -> tuple[float, int, bool] | None:
     """(value, decimals, percent) of a written number."""
     percent = token.endswith("%")
     token = token.rstrip("%").replace("−", "-").lstrip("+")
-    if decimal_comma:
+    # German text: a comma is the decimal mark, a dot only groups thousands. A small model
+    # writes German sentences with English decimals ("-41.2%") too: those stay decimals.
+    if decimal_comma and ("," in token or _DOT_THOUSANDS.match(token)):
         token = token.replace(".", "").replace(",", ".")
     else:
         token = token.replace(",", "")

@@ -40,7 +40,7 @@ Each component is optional. Without one, the guide uses the next best thing.
 
 | Component | Gives | Without it |
 |---|---|---|
-| Ollama with `nemotron-3-nano:4b` (NVIDIA Open Model License) | Plans and answers | The guide presents with the report's own text (speaker notes, findings, values). Questions show a clear message |
+| Ollama with `nemotron-3-nano:4b` (NVIDIA Open Model License) | Plans, and answers in its own words | The guide presents with the report's own text (speaker notes, findings, values). Questions are answered with the report's facts, plainly worded |
 | Kokoro-82M voice (`datawalk[voice]`, about 120 MB of model files, Apache-2.0 weights) | A natural voice; the mouth follows the real audio | The browser's own voices speak (local voices first). Without any voice, captions show for their reading time |
 | NVIDIA Audio2Face-3D (Linux or Windows, NVIDIA GPU) | Facial animation from the speech audio | The mouth follows the loudness of the audio, or the words of the browser voice |
 | On-device speech recognition (Chrome 139 or later) | Spoken questions | Type the questions. The microphone shows only where the browser recognizes speech on the computer |
@@ -50,7 +50,7 @@ Measured on an Apple M2 (16 GB), no NVIDIA GPU:
 | Measurement | Result |
 |---|---|
 | A 3-minute plan of the demo report | 16 to 60 s (the model writes about 600 words) |
-| An answer to a question | about 10 to 25 s |
+| An answer to a question | about 11 s (median); without the model, at once |
 | Kokoro: one sentence of 3 s audio | 2 s (faster than real time; the next sentence loads while one plays) |
 | Frame rate in a room, with and without the guide | 60 fps (display limit) |
 | Guide code | 21 kB (7.6 kB compressed), loaded only with `--guide` |
@@ -76,14 +76,19 @@ Type a question, or click **Speak** where the microphone is available. Examples:
 - "What changed?"
 - "Show the best-performing model"
 
+Follow-up questions work: after "What was the maximum drawdown?", ask "When did it happen?".
+
 A question pauses the presentation. The answer shows:
 
 - the answer (facts from the report),
-- an **Interpretation** when the model adds one (what the facts may mean),
-- the **Evidence**: links to the charts that support the answer.
+- an **Interpretation**: what the facts mean, from a data scientist's or an analyst's view
+  (for example: every model is within 0.01 of chance, so the ranking is noise),
+- a **Caveat**: what the data cannot tell,
+- the **Evidence**: links to the charts that support the answer,
+- **The facts it used**: the exact sentences behind the answer.
 
-The model can propose one of five actions: go to a stop, inspect a chart, the next stop,
-pause, resume. DataWalk checks the action and runs it with its own tour engine and inspector.
+Commands ("Show me the drawdown chart", "Next stop", "Pause") go to the chart or stop that
+they name. DataWalk runs them with its own tour engine and inspector.
 When the answer shows a chart or a stop, the presentation stays paused; click **Resume** to
 go on. After an answer that shows nothing new, the presentation goes on by itself.
 
@@ -99,6 +104,41 @@ The **Plan** tab shows each stop and its narration.
   PowerPoint export, and the tour video use them.
 
 Plans are kept for each revision of the report. A saved change makes a new plan.
+
+## How the guide answers
+
+A small model answers well when it only has to put known facts into words. So DataWalk does
+the analysis itself, and the model only phrases it:
+
+1. **Facts.** When a report opens, DataWalk computes short, exact sentences from every chart,
+   value, table, and finding: changes, highs and lows with their dates, falls from a peak,
+   each year's move, rankings, gaps, and baselines.
+2. **Interpretations.** Rules written by domain experts read the facts: an AUC near 0.50 is
+   chance level; a fall of more than 40% is severe; an accuracy 3.8 points above a naive
+   baseline is a small edge. Each one names its facts and a caveat.
+3. **Retrieval.** For a question, DataWalk picks the 10 most relevant facts and up to four
+   interpretations, using the question's words, the chart on screen, and the conversation.
+4. **The model** writes one to three sentences from these facts only (about 1,000 tokens,
+   not the whole report). The interpretation and the caveat are the rules' own words.
+5. **The check.** Every number must be in the facts. Without a model, or when the model is
+   too slow (60 s), refuses, or writes something the facts do not support, the facts answer
+   directly.
+
+Questions that the report cannot answer are recognized by DataWalk, not by the model: dates
+outside the data ("What was the price in 2019?"), investment advice, causes ("Why did the
+price fall?": the data shows what happened, not why), and forecasts.
+
+**Measured.** `tests/guide_eval.py` asks the guide 64 questions about the demo report, and 28
+more that were written after the guide was tuned (held out), and scores each answer: the
+right chart, the expected numbers, the expert idea (for example "chance"), a refusal where the
+report cannot answer, no invented numbers, no obeyed injection. With `nemotron-3-nano:4b`:
+
+| | Demo questions (64) | Held-out questions (28) |
+|---|---|---|
+| The first guide (one model call over the whole report) | 0.77, 36 passed | 0.83, 17 passed |
+| Facts first | 1.00, 63 passed | 1.00, 28 passed (0.97 and 26 on the first run: two fixes followed) |
+
+An answer takes about the same time as before (median 10 to 12 s on an Apple M2).
 
 ## How the guide stays with the facts
 
@@ -222,6 +262,9 @@ when the speech stops.
 
 - The presenter view (second window) shows the report's tour, not the guide's plan.
 - The guide answers one question or makes one plan at a time.
+- The expert rules cover common ML, finance, and statistics charts. Other reports get facts
+  without interpretations.
+- Without a model, German questions are answered with English facts.
 - A small local model is fast and private, but its plans and answers are simpler than those
   of large models. Review the plan before you present it.
 - Kokoro v1.0 speaks English only (German uses the browser voice).

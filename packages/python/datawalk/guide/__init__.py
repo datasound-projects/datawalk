@@ -1,8 +1,9 @@
 """DataWalk AI Guide: a local presentation agent (opt-in: `datawalk demo --guide`).
 
 The guide plans a presentation of a report, narrates it, and answers questions about it. A
-local model (Ollama) writes the text; DataWalk checks every stop and every number against the
-report and runs every action itself. Speech and facial animation are optional (voice.py).
+local model (Ollama) writes the text; DataWalk computes the facts and their meaning (insights.py,
+rules.py), checks every stop and every number against the report, and runs every action itself
+(answer.py). Speech and facial animation are optional (voice.py).
 Nothing leaves this computer.
 """
 
@@ -11,7 +12,8 @@ from __future__ import annotations
 import threading
 from typing import TYPE_CHECKING, Any
 
-from .agent import LENGTHS, Plan, ask, model_plan, report_plan
+from . import answer as answering  # not the function: it would hide the module
+from .agent import LENGTHS, Plan, model_plan, report_plan
 from .llm import LLM, GuideError, Ollama
 from .voice import Audio2Face, Kokoro, Voice, speech
 
@@ -33,6 +35,7 @@ class Guide:
         # ponytail: one model call at a time; a laptop GPU runs one anyway
         self._model = threading.Lock()
         self._plans: dict[tuple, Plan] = {}
+        self._known: tuple[tuple, answering.Knowledge] | None = None
 
     def warm(self) -> None:
         """Load the voice and the model now (a background thread at server start): the first
@@ -88,8 +91,13 @@ class Guide:
         return plan
 
     def ask(self, report: Report, question: str, **context: Any) -> dict[str, Any]:
+        """An answer from the report's facts, phrased by the model when it can (answer.py)."""
         with self._model:
-            return ask(report, self.llm, question, **context).to_json()
+            key = (report.id, report.revision)
+            if self._known is None or self._known[0] != key:
+                self._known = (key, answering.Knowledge.of(report))
+            kb = self._known[1]
+            return answering.answer(report, kb, self.llm, question, **context).to_json()
 
     def speech(self, text: str, lang: str = "en") -> dict[str, Any]:
         return speech(self.voice, self.face, text, lang)

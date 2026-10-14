@@ -58,12 +58,21 @@ class PlanRequest(BaseModel):
     refresh: bool = False
 
 
+class Turn(BaseModel):
+    """An earlier question and its answer: what "it" and "that" refer to."""
+
+    q: str = Field(max_length=500)
+    a: str = Field(max_length=2000)
+    refs: list[RefId] = Field(default=[], max_length=10)  # the charts the answer cited
+
+
 class AskRequest(BaseModel):
     question: str = Field(min_length=1, max_length=500)
     current: RefId | None = None  # the tour stop on screen
     inspecting: RefId | None = None  # the chart in the inspector
     stops: list[RefId] = Field(default=[], max_length=1000)  # the tour being presented
     lang: Lang = "en"
+    history: list[Turn] = Field(default=[], max_length=3)
 
 
 class SpeechRequest(BaseModel):
