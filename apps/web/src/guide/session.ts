@@ -5,7 +5,7 @@
 // keys, the HUD, the presenter window, and the guide's own actions all call goTo(), and the
 // guide follows. A question pauses the presentation; the answer can resume it.
 import { create } from 'zustand'
-import { unlockPointer } from '../navigation/input'
+import { freePointer, lockPointer, typing, unlockPointer } from '../navigation/input'
 import type { Report, TourStop } from '../state/schema'
 import { useViewer } from '../state/store'
 import { activeStops, currentStop, goTo, startTour, stopTour, type Stop } from '../tour/tour'
@@ -108,6 +108,33 @@ let answering: AbortController | null = null // the answer to a question
 let resumeAt: { stopId: string; sentence: number } | null = null // where a pause interrupted
 let pausedFor: 'visitor' | 'question' = 'visitor' // a question's pause may resume by itself
 let messageId = 0
+let relock = false // the panel opened while the visitor walked with the mouse: closing goes back
+
+/** Open or close the guide's panel (X, or the avatar). Opening frees the mouse for the panel
+ *  without pausing: the room, the tour, and the guide's voice go on, and the keys still walk.
+ *  Closing gives the mouse back to the walk if the panel took it from there. */
+export function toggleGuide() {
+  const g = useGuide.getState()
+  if (g.open) {
+    g.set({ open: false })
+    if (relock) lockPointer()
+    relock = false
+  } else {
+    relock = !!document.pointerLockElement
+    freePointer()
+    g.set({ open: true })
+  }
+}
+
+/** X opens and closes the guide's panel, in the room and during a presentation; in a text field
+ *  it is just a letter. */
+export function guideKey(e: KeyboardEvent): boolean {
+  if (e.key.toLowerCase() !== 'x' || e.repeat || e.ctrlKey || e.metaKey || e.altKey || typing(e)) return false
+  const v = useViewer.getState()
+  if (v.flat || v.overlay === 'editor') return false // the document view and the editor have their own keys
+  toggleGuide()
+  return true
+}
 
 /** Present the plan from stop `index`: the guide's plan becomes the tour while it runs. */
 export async function present(report: Report, minutes = useGuide.getState().minutes, index = 0) {
@@ -117,6 +144,7 @@ export async function present(report: Report, minutes = useGuide.getState().minu
   end()
   const ctl = (session = new AbortController())
   resumeAt = null
+  relock = false // the tour moves the camera: no mouse look to go back to
   useGuide.getState().set({ running: true, paused: false, error: null, open: false }) // the room is the stage: only the captions and the compact controls stay
   const v = useViewer.getState()
   // A new presentation: an arrival from an earlier one (same stop ids) must not count.

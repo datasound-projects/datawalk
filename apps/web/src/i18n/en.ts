@@ -38,6 +38,7 @@ export const en = {
   'controls.key.doors': 'Doors',
   'controls.nextRoom': 'Walk through to the next room',
   'controls.present': 'Present: guided tour (clickers work)',
+  'controls.guide': 'AI guide: open or close its panel (the mouse is free for it)',
   'classification.label': 'Classification: {label}',
   'brand.logoOf': '{name} logo',
   'brand.logo': 'Logo',

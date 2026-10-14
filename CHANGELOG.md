@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- AI guide: **X** opens and closes its panel, also while you walk or while it speaks. The
+  mouse is free for the panel without the pause menu, and X again gives it back to the walk.
+  Keys typed into a text field (a question to the guide) no longer walk.
+
 - The AI guide answers questions from facts that DataWalk computes from the report (changes,
   highs and lows with dates, falls from a peak, yearly moves, rankings) and from expert rules
   that interpret them (an AUC near 0.50 is chance; a 41% fall is severe). The local model

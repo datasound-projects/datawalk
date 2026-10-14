@@ -57,6 +57,11 @@ Measured on an Apple M2 (16 GB), no NVIDIA GPU:
 
 ## Present
 
+**X** opens and closes the guide's panel at any time, also while you walk or while the guide
+speaks. The mouse is then free for the panel, without the pause menu: the room, the tour, and
+the voice go on, and W A S D still walk. **X** again closes the panel and gives the mouse back
+to the walk. In the question field, X is just a letter.
+
 - **Present** makes a plan (or uses the plan that you have) and starts. For each stop the
   camera moves, stops, and then the guide speaks. When the guide stops speaking, the camera
   moves to the next stop. Each step waits for an event, not a timer.

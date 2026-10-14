@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react'
 import { Euler } from 'three'
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js'
 import { useViewer } from '../state/store'
-import { markDragged } from './input'
+import { markDragged, quietUnlock } from './input'
 
 const DRAG_SPEED = 0.003 // rad per pixel at sensitivity 1
 const DRAG_THRESHOLD = 4 // pixels before a press becomes a drag
@@ -23,6 +23,7 @@ export function MouseLook() {
     c.isLocked = document.pointerLockElement === el
     c.addEventListener('lock', () => useViewer.getState().setOverlay(null))
     c.addEventListener('unlock', () => {
+      if (quietUnlock()) return // the AI guide's panel freed the mouse: no pause
       const { overlay, arranging, setOverlay } = useViewer.getState()
       if (overlay === null && !arranging) setOverlay('lobby') // Esc while walking pauses
     })
