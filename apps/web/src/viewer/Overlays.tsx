@@ -39,6 +39,7 @@ const controls = (): [string, string][] => [
   ['Esc', t('controls.pause')],
   [t('controls.key.doors'), t('controls.nextRoom')],
   ['Page Down', t('controls.present')],
+  ...(useViewer.getState().guide ? [['X', t('controls.guide')] as [string, string]] : []),
 ]
 
 /** Opening screen and pause menu. */

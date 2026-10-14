@@ -38,6 +38,7 @@ export const de: Partial<typeof en> = {
   'controls.key.doors': 'Türen',
   'controls.nextRoom': 'Hindurchgehen in den nächsten Raum',
   'controls.present': 'Präsentieren: geführte Tour (auch mit Presenter-Fernbedienung)',
+  'controls.guide': 'KI-Guide: Fenster öffnen oder schließen (die Maus ist dafür frei)',
   'classification.label': 'Klassifizierung: {label}',
   'brand.logoOf': 'Logo von {name}',
   'brand.logo': 'Logo',
