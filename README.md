@@ -44,7 +44,8 @@ datawalk demo --guide
 ```
 
 The first line gets the AI model, the second adds the voice (its files download on the first
-start), the third starts the demo with the guide.
+start), the third starts the demo with the guide. Another Ollama model:
+`datawalk demo --model qwen3:14b` (after `ollama pull qwen3:14b`).
 
 **Update** (optional) to the latest version:
 

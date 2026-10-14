@@ -378,6 +378,30 @@ def test_kokoro_files_download_once_and_must_match_their_checksum(tmp_path, monk
 # -- server --------------------------------------------------------------------------------
 
 
+def test_the_model_option_comes_before_the_variable_and_the_default(monkeypatch):
+    monkeypatch.setenv("DATAWALK_GUIDE_MODEL", "from-variable")
+    assert Ollama.from_env("from-option").model == "from-option"
+    assert Ollama.from_env().model == "from-variable"
+    monkeypatch.delenv("DATAWALK_GUIDE_MODEL")
+    assert Ollama.from_env().model == "nemotron-3-nano:4b"
+
+
+def test_a_chosen_model_that_is_not_there_stops_with_what_to_do(
+    report, tmp_path, monkeypatch, capsys
+):
+    from datawalk.cli import main
+
+    path = report.save(tmp_path / "r.dwk")
+    monkeypatch.setattr(Ollama, "check", lambda self: (False, self._missing()))
+    with pytest.raises(SystemExit) as stopped:  # before the port is taken: nothing runs
+        main(["open", str(path), "--model", "big-model:70b", "--no-browser"])
+    assert stopped.value.code == 1
+    assert capsys.readouterr().err.strip() == (
+        "error: The model big-model:70b is not available in Ollama. Download it with "
+        "`ollama pull big-model:70b`. Then run the command again."
+    )
+
+
 def test_guide_is_off_unless_asked(report):
     client = TestClient(create_app(report), base_url="http://127.0.0.1")
     assert "guide" not in client.get("/api/session").json()

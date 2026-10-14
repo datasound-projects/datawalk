@@ -34,6 +34,22 @@ A language model on your computer writes the text. Nothing leaves your computer.
 
 `datawalk doctor` checks the model, the voice, and Audio2Face-3D.
 
+**Another model.** Any Ollama model can be the guide: get it with `ollama pull`, then name it
+with `--model` (it turns the guide on):
+
+```bash
+datawalk demo --model qwen3:14b
+datawalk open report.dwk --model qwen3:14b
+```
+
+In Python: `report.show(model="qwen3:14b")`. A model that you name must be in Ollama: if it is
+not, DataWalk says how to get it and does not start. Without `--model`, the guide uses
+`DATAWALK_GUIDE_MODEL` or `nemotron-3-nano:4b`; when that one is missing, the guide still
+starts and presents with the report's own text. A larger model words its answers more
+naturally; on a laptop it can be slower than the 60 s that an answer may take, and then the
+report's facts answer. `tests/guide_eval.py --model NAME` measures a model on the guide's
+question set.
+
 ## Components
 
 Each component is optional. Without one, the guide uses the next best thing.
@@ -191,7 +207,7 @@ you present it to an audience.
 | Variable | Default | Meaning |
 |---|---|---|
 | `DATAWALK_OLLAMA_URL` | `http://127.0.0.1:11434` | The Ollama server |
-| `DATAWALK_GUIDE_MODEL` | `nemotron-3-nano:4b` | Any Ollama model with structured output |
+| `DATAWALK_GUIDE_MODEL` | `nemotron-3-nano:4b` | Any Ollama model with structured output (`--model` comes first) |
 | `DATAWALK_GUIDE_ALLOW_REMOTE` | (not set) | `1` permits an Ollama or Audio2Face address on another computer |
 | `DATAWALK_KOKORO_DIR` | `~/.cache/datawalk/kokoro` | The folder with the Kokoro model files |
 | `DATAWALK_KOKORO_VOICE` | `af_heart` | A Kokoro v1.0 voice |
@@ -261,7 +277,7 @@ when the speech stops.
 | You see | Do this |
 |---|---|
 | "Cannot reach Ollama at http://127.0.0.1:11434" | Start Ollama (`ollama serve`, or the desktop app) |
-| "The model nemotron-3-nano:4b is not installed" | `ollama pull nemotron-3-nano:4b` |
+| "The model nemotron-3-nano:4b is not available in Ollama" | `ollama pull nemotron-3-nano:4b` (or the model you chose with `--model`) |
 | The first plan takes long | The model loads into memory first. DataWalk loads it when the server starts; later plans and answers are faster |
 | "No local model. The guide uses the report text." | The guide presents with your report's text. Start Ollama and reload the page |
 | No microphone button, or "not available for this language" | Use Chrome 139 or later with on-device speech recognition, or type the question |

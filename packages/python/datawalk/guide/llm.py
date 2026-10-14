@@ -69,10 +69,11 @@ class Ollama:
     think: bool | None = False  # None: the model has no thinking option (Ollama said so)
 
     @classmethod
-    def from_env(cls) -> Ollama:
+    def from_env(cls, model: str | None = None) -> Ollama:
+        """`model` (the --model option) first, then DATAWALK_GUIDE_MODEL, then the default."""
         return cls(
             local_url(os.environ.get("DATAWALK_OLLAMA_URL", DEFAULT_URL), "DATAWALK_OLLAMA_URL"),
-            os.environ.get("DATAWALK_GUIDE_MODEL", DEFAULT_MODEL),
+            model or os.environ.get("DATAWALK_GUIDE_MODEL", DEFAULT_MODEL),
         )
 
     def _request(self, path: str, body: dict | None = None, timeout: float = 5.0) -> dict:
@@ -95,7 +96,10 @@ class Ollama:
             ) from None
 
     def _missing(self) -> str:
-        return f"The model {self.model} is not installed. Run `ollama pull {self.model}`."
+        return (
+            f"The model {self.model} is not available in Ollama. "
+            f"Download it with `ollama pull {self.model}`."
+        )
 
     def check(self) -> tuple[bool, str]:
         try:

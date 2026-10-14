@@ -949,6 +949,7 @@ class Report(ReportModel):
         block: bool | None = None,
         edit: bool = True,
         guide: bool = False,
+        model: str | None = None,
     ) -> str:
         """Start the local viewer on 127.0.0.1 and return its URL.
 
@@ -956,9 +957,16 @@ class Report(ReportModel):
         archive file when the report was saved or loaded. edit=False is the read-only
         stakeholder view. block=None blocks in scripts and runs in a background thread
         when an event loop is already running (Jupyter). guide=True adds the AI guide: a local
-        model (Ollama) presents the report and answers questions (docs/guide.md)."""
+        model (Ollama) presents the report and answers questions (docs/guide.md). model="..."
+        uses another Ollama model (and turns the guide on); it must be installed."""
         from ..server import serve
 
         return serve(
-            self, port=port, open_browser=open_browser, block=block, edit=edit, guide=guide
+            self,
+            port=port,
+            open_browser=open_browser,
+            block=block,
+            edit=edit,
+            guide=guide,
+            model=model,
         )

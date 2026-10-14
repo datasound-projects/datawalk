@@ -27,9 +27,13 @@ class Guide:
     """The guide of one served report. Thread-safe: the server calls it from a thread pool."""
 
     def __init__(
-        self, llm: LLM | None = None, voice: Voice | None = None, face: Audio2Face | None = None
+        self,
+        llm: LLM | None = None,
+        voice: Voice | None = None,
+        face: Audio2Face | None = None,
+        model: str | None = None,  # an Ollama model instead of the default (--model)
     ):
-        self.llm = llm if llm is not None else Ollama.from_env()
+        self.llm = llm if llm is not None else Ollama.from_env(model)
         self.voice = voice if voice is not None else Kokoro()
         self.face = face if face is not None else Audio2Face.from_env()
         # ponytail: one model call at a time; a laptop GPU runs one anyway
