@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- AI guide: `--model NAME` (on `datawalk demo` and `datawalk open`, and `report.show(model=...)`)
+  uses another Ollama model and turns the guide on. A model that you name must be in Ollama:
+  if it is not, DataWalk says `ollama pull NAME` and does not start. Without `--model`, the
+  default model is used, and the start says when it is missing.
+
 - Guided tours walk like a visitor: to a stop in another room, the camera walks to the door
   and in through the next room's door (through up to two rooms in between) instead of
   cutting. Displays are framed at a reading distance with the room around them (about 55 %

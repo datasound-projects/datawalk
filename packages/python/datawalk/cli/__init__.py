@@ -20,6 +20,12 @@ def schema() -> dict:
     }
 
 
+MODEL_HELP = (
+    "the AI guide's Ollama model, for example qwen3:14b (default: nemotron-3-nano:4b); "
+    "turns the guide on"
+)
+
+
 def main(argv: list[str] | None = None) -> None:
     from .. import __version__
 
@@ -42,6 +48,7 @@ def main(argv: list[str] | None = None) -> None:
     de.add_argument("--no-browser", action="store_true", help="print the address only")
     de.add_argument("--view-only", action="store_true", help="the stakeholder view, no editor")
     de.add_argument("--guide", action="store_true", help="add the AI guide (local model, Ollama)")
+    de.add_argument("--model", metavar="NAME", help=MODEL_HELP)
     op = sub.add_parser(
         "open", help="open a report (.dwk) or a Jupyter notebook (.ipynb) in the browser"
     )
@@ -51,6 +58,7 @@ def main(argv: list[str] | None = None) -> None:
     op.add_argument("--edit", action="store_true", help="open the editor; edits save to the file")
     op.add_argument("--execute", action="store_true", help="notebooks: run the notebook first")
     op.add_argument("--guide", action="store_true", help="add the AI guide (local model, Ollama)")
+    op.add_argument("--model", metavar="NAME", help=MODEL_HELP)
     ex = sub.add_parser(
         "export",
         help="export a report for people without Python (default: one HTML file)",
@@ -170,6 +178,7 @@ def demo(args: argparse.Namespace) -> int:
         block=True,
         edit=not args.view_only,
         guide=args.guide,
+        model=args.model,
     )
     return 0
 
@@ -195,6 +204,7 @@ def open_report(args: argparse.Namespace) -> int:
         block=True,
         edit=args.edit,
         guide=args.guide,
+        model=args.model,
     )
     return 0
 

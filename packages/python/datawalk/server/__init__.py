@@ -326,14 +326,21 @@ def serve(
     block: bool | None = None,
     edit: bool = False,
     guide: bool = False,
+    model: str | None = None,
 ) -> str:
+    """`model`: the AI guide's Ollama model (it turns the guide on). A model that was asked
+    for must be there: without it, nothing starts. Without the default model, the guide still
+    presents with the report's own text."""
     import uvicorn
 
     helper = None
-    if guide:  # first: a configuration error stops before the port is taken
-        from ..guide import Guide
+    if guide or model:  # first: a configuration error stops before the port is taken
+        from ..guide import Guide, GuideError
 
-        helper = Guide()
+        helper = Guide(model=model)
+        ready, detail = helper.llm.check()
+        if not ready and model:
+            raise GuideError(f"{detail} Then run the command again.")
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     try:
@@ -345,7 +352,10 @@ def serve(
     token = secrets.token_urlsafe(24) if edit else None
     url = f"http://127.0.0.1:{sock.getsockname()[1]}/" + (f"#edit={token}" if token else "")
     if helper is not None:
-        print(f"AI guide: {helper.llm.model} (local)", flush=True)
+        if ready:
+            print(f"AI guide: {helper.llm.model} (local)", flush=True)
+        else:
+            print(f"AI guide: {detail} Until then, it uses the report's own text.", flush=True)
         threading.Thread(target=helper.warm, daemon=True).start()
     server = uvicorn.Server(uvicorn.Config(create_app(report, token, helper), log_level="warning"))
     if not (STATIC / "index.html").exists():
