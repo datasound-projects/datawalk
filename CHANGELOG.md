@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- The AI guide answers questions from facts that DataWalk computes from the report (changes,
+  highs and lows with dates, falls from a peak, yearly moves, rankings) and from expert rules
+  that interpret them (an AUC near 0.50 is chance; a 41% fall is severe). The local model
+  only puts them into words, and every number is checked. Answers show a caveat and the facts
+  behind them; follow-up questions work; dates outside the data, advice, causes, and
+  forecasts are recognized by DataWalk. Without a model, the facts answer directly. Measured
+  on 92 questions (`tests/guide_eval.py`), 91 answers pass, against 53 before.
+
 - The README's install section says in three commands how to add the AI guide. The guide's
   Kokoro voice files now download on first use (SHA-256 checked); no manual download.
 
