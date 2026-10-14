@@ -1,10 +1,10 @@
 """Evaluate the AI guide's answers on a question set (tests/guide_eval_demo.json).
 
-    uv run python tests/guide_eval.py                      # the current engine, the real model
-    uv run python tests/guide_eval.py --engine baseline --out baseline.json
+    uv run python tests/guide_eval.py --out facts.json      # the guide with the real model
+    uv run python tests/guide_eval.py --out facts.json --resume   # go on after an interruption
     uv run python tests/guide_eval.py --limit 5 --only compare,interpret
     uv run python tests/guide_eval.py --engine template --cases tests/guide_eval_holdout.json
-    uv run python tests/guide_eval.py --rescore baseline.json   # saved answers, today's scoring
+    uv run python tests/guide_eval.py --rescore facts.json      # saved answers, today's scoring
 
 Every case is scored automatically, and each failure gets a category, so a change to the guide
 shows where it helps and where it hurts:
@@ -18,7 +18,15 @@ shows where it helps and where it hurts:
     invented        the number check removed a statement (the model made something up)
     error           the engine failed
 
-Needs Ollama and the model, like the guide. pytest checks the scoring with stand-ins.
+Needs Ollama and the model, like the guide ("template" needs neither). pytest checks the
+scoring with stand-ins, and that the template engine passes the question set.
+
+Results with nemotron-3-nano:4b on an Apple M2 (score · passed · median time per answer):
+
+    engine                          demo set (64)        held-out set (28)
+    one call over the whole report  0.77 · 36 · 11.6 s   0.83 · 17 · 10.5 s   (the first guide)
+    facts, with the model           1.00 · 63 · 11.9 s   1.00 · 28 ·  9.7 s   (first run: 0.97 · 26)
+    facts, no model (template)      1.00 · 64            0.96 · 26
 """
 
 from __future__ import annotations
@@ -192,16 +200,6 @@ def _context(report: Any, case: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def baseline_engine(llm: Any) -> Engine:
-    """The guide as it is on main: one model call over the whole report (agent.ask). It has no
-    conversation memory: follow-up cases get only their last question."""
-    from datawalk.guide.agent import ask
-
-    return lambda report, case: ask(
-        report, llm, case["question"], **_context(report, case)
-    ).to_json()
-
-
 def facts_engine(llm: Any) -> Engine:
     """The fact-first guide (answer.py): retrieved facts and expert interpretations, phrased by
     the model, checked, with a template from the facts as the fallback."""
@@ -224,7 +222,6 @@ def template_engine(_llm: Any) -> Engine:
 
 
 ENGINES: dict[str, Callable[[Any], Engine]] = {
-    "baseline": baseline_engine,
     "facts": facts_engine,
     "template": template_engine,
 }
@@ -232,7 +229,7 @@ ENGINES: dict[str, Callable[[Any], Engine]] = {
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    p.add_argument("--engine", default="baseline", choices=sorted(ENGINES))
+    p.add_argument("--engine", default="facts", choices=sorted(ENGINES))
     p.add_argument("--model", help="Ollama model (default: the guide's)")
     p.add_argument("--only", help="categories, comma-separated")
     p.add_argument("--limit", type=int, help="at most this many cases")
