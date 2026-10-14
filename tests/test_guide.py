@@ -125,6 +125,11 @@ def test_ground_reads_decimal_commas_and_drops_aliases():
         "Die AUC ist 0,61.",
         0,
     )
+    # German sentences with English decimals, as a small model writes them
+    evidence = "Max drawdown -41.2%. Accuracy 0.538. Trades 1234."
+    for german in ("Der Drawdown betrug -41.2%.", "Die Genauigkeit ist 0.538.", "Es gab 1.234."):
+        assert ground(german, evidence, decimal_comma=True) == (german, 0)
+    assert ground("Es waren 41.200 Trades.", evidence, decimal_comma=True)[1] == 1  # 41200
 
 
 # -- plans ---------------------------------------------------------------------------------
