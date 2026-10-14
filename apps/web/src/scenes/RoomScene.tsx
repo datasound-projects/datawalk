@@ -151,7 +151,7 @@ function RoomContent({ report, room }: { report: Report; room: Room }) {
       </>
       {quality.ao && <ContactShadows key={`${layout.width}x${layout.depth}`} width={layout.width} depth={layout.depth} />}
       <Focus targets={targets} />
-      <TourCamera layout={layout} />
+      <TourCamera layout={layout} roomId={room.id} doorRooms={doorRooms} />
       {arranging && <ArrangeLayer layout={layout} />}
     </DisplayContext.Provider>
   )

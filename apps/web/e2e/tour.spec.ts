@@ -1,12 +1,13 @@
 import { expect, test } from './fixtures'
 
-type Stop = { roomId: string; targetId: string | null; kind: string; title: string }
+type Stop = { stop: { id: string }; roomId: string; targetId: string | null; kind: string; title: string }
 type Win = {
   datawalkTourMoving?: boolean
   datawalk: {
     getState: () => {
       presenting: boolean
       stopIndex: number
+      tourArrived: string | null
       roomId: string
       focusedId: string | null
       overlay: string | null
@@ -27,10 +28,19 @@ test('present the whole demo with a clicker (Page Down / Page Up only)', async (
   expect(stops.length).toBeGreaterThan(20)
   expect(stops[0]).toMatchObject({ kind: 'room', title: 'Summary' }) // the summary room comes first
 
+  // The camera stands still at the stop (in another room, it walks there through the doors):
+  // the moment that the AI guide waits for before it speaks.
   const settle = async (index: number) => {
     await expect.poll(() => page.evaluate(() => (window as unknown as Win).datawalk.getState().stopIndex)).toBe(index)
     await expect
-      .poll(() => page.evaluate(() => (window as unknown as Win).datawalkTourMoving === false), { timeout: 30_000 })
+      .poll(
+        () =>
+          page.evaluate((id) => {
+            const w = window as unknown as Win
+            return w.datawalk.getState().tourArrived === id && w.datawalkTourMoving === false
+          }, stops[index].stop.id),
+        { timeout: 60_000 },
+      )
       .toBe(true)
   }
   for (let i = 0; i < stops.length; i++) {

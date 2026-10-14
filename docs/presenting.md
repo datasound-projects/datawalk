@@ -52,10 +52,17 @@ Presentation clickers send Page Up and Page Down. They work without configuratio
 at the bottom of the screen has the same actions as buttons, for a mouse or a touch screen
 (for example a tablet in a client meeting).
 
-The camera glides on a path inside the room, around furniture and exhibits, with
-ease-in-out motion and a speed limit. It does not roll or bob. A stop in another room fades
-in (0.45 s). With "reduce motion" set in the operating system, the camera cuts directly to
-each stop. The target fills about 70 % of the viewport height.
+The camera walks like a visitor: on a path inside the room, around furniture and exhibits,
+with ease-in-out motion and a speed limit. It does not roll or bob. A stop in another room is
+reached through the door: the camera walks to the door, the next room fades in (0.45 s), and
+the camera walks in from that room's door. It walks through up to two rooms in between; a
+longer jump (End) goes straight to the room behind the door. With "reduce motion" set in the
+operating system, the camera cuts directly to each stop.
+
+A display fills about 55 % of the viewport height and at most 65 % of its width, seen from a
+little to one side (6°, one side and then the other): close enough to read the axis labels,
+far enough that the wall, the floor, and the neighbors stay in view. The camera stays at least
+1.4 m from a display. A room stop stands a few steps in from the door.
 
 **Presenter view.** Press P. A second window shows the speaker notes, the current and the
 next stop, and a timer. The windows stay in step through `BroadcastChannel` (and directly,

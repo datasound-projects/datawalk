@@ -97,6 +97,74 @@ def _report_narration(item: Item, lang: str = "en") -> str:
     return f"{item.title}."
 
 
+# How the guide walks a visitor into a room: it names the room and what comes next there.
+# Several wordings, so that a presentation does not repeat itself.
+INTROS = {
+    "en": (
+        "Let's begin with “{room}”{what}.",
+        (
+            "And now let's take a look at “{room}”{what}.",
+            "Next, we move on to “{room}”{what}.",
+            "Let's continue with “{room}”{what}.",
+        ),
+        "Finally, let's take a look at “{room}”{what}.",
+    ),
+    "de": (
+        "Wir beginnen mit „{room}“{what}.",
+        (
+            "Und nun schauen wir uns „{room}“ an{what}.",
+            "Als Nächstes geht es weiter mit „{room}“{what}.",
+            "Weiter geht es mit „{room}“{what}.",
+        ),
+        "Zum Schluss schauen wir uns „{room}“ an{what}.",
+    ),
+}
+
+
+def _listing(titles: list[str], lang: str) -> str:
+    """': A, B, and C' (German: ': A, B und C'), or '' for none."""
+    if not titles:
+        return ""
+    if len(titles) == 1:
+        return f": {titles[0]}"
+    last = " und " if lang == "de" else (", and " if len(titles) > 2 else " and ")
+    return ": " + ", ".join(titles[:-1]) + last + titles[-1]
+
+
+def _with_rooms(stops: list[PlanStop], items: list[Item], lang: str) -> list[PlanStop]:
+    """Every room is entered with its own stop, where the guide introduces it: the camera walks
+    in through the door, and the guide names the room and what the visitor sees there. The
+    stops come room by room."""
+    by_ref = {i.ref: i for i in items}
+    by_alias = {i.alias: i for i in items}
+    rooms = {i.title: i for i in items if i.kind == "room"}
+    groups: list[tuple[Item, list[PlanStop]]] = []
+    for stop in stops:
+        room = rooms[by_ref[stop.ref].room]
+        if not groups or groups[-1][0] is not room:
+            groups.append((room, []))
+        groups[-1][1].append(stop)
+    first, middle, last = INTROS.get(lang, INTROS["en"])
+    out: list[PlanStop] = []
+    for n, (room, group) in enumerate(groups):
+        shown = [s.title for s in group if s.kind != "room"]
+        shown = shown or [by_alias[a].title for a in room.members if a in by_alias]
+        what = _listing(shown[:3], lang)
+        template = first if n == 0 else last if n == len(groups) - 1 else middle[(n - 1) % 3]
+        intro = template.format(room=room.title, what=what)
+        entry = next((s for s in group if s.kind == "room"), None)
+        if entry is None:
+            entry = PlanStop(uuid4().hex, room.ref, room.title, "room", "", 0.0, source="report")
+        else:
+            group.remove(entry)
+        # The model's words about the room follow the introduction; "Room: X." does not.
+        said = entry.narration if entry.source == "model" else ""
+        entry.narration = f"{intro} {said}".strip()
+        entry.duration = _duration(entry.narration)
+        out += [entry, *group]
+    return out
+
+
 def report_plan(report: Report, minutes: int, note: str = "", lang: str = "en") -> Plan:
     """A plan without a model: the report's tour order, narrated with its own text. Charts
     without any text of their author are left out; rooms stay when they show something."""
@@ -124,7 +192,9 @@ def report_plan(report: Report, minutes: int, note: str = "", lang: str = "en") 
         shown += 1
         if shown >= LENGTHS[minutes] or sum(s.duration for s in stops) >= minutes * 60:
             break
-    return Plan(report.revision, minutes, "", stops, [note] if note else [])
+    return Plan(
+        report.revision, minutes, "", _with_rooms(stops, items, lang), [note] if note else []
+    )
 
 
 def _plan_schema(aliases: list[str]) -> dict[str, Any]:
@@ -212,4 +282,4 @@ def model_plan(report: Report, llm: LLM, minutes: int, lang: str = "en") -> Plan
         notes.insert(
             0, f"{removed_total} statement(s) removed: the report data does not support them."
         )
-    return Plan(report.revision, minutes, llm.model, stops, notes)
+    return Plan(report.revision, minutes, llm.model, _with_rooms(stops, items, lang), notes)

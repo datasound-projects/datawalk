@@ -72,7 +72,9 @@ export function goTo(i: number) {
   if (!stops.length) return
   const index = s.kiosk ? (i + stops.length) % stops.length : Math.min(Math.max(i, 0), stops.length - 1)
   const stop = stops[index]
-  if (stop.roomId !== s.roomId) s.enterRoom(stop.roomId)
+  // In the rooms, the tour camera walks there through the doors (TourCamera); the document
+  // view has no doors.
+  if (stop.roomId !== s.roomId && s.flat) s.enterRoom(stop.roomId)
   s.set({ presenting: true, stopIndex: index })
   if (s.overlay !== null) s.setOverlay(null) // a clicker press leaves the inspector for the next stop
   broadcast()
