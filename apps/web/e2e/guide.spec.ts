@@ -1,4 +1,5 @@
 import { expect, type Page, test } from './fixtures'
+import { sceneReady } from './helpers'
 
 // The AI guide (opt-in, --guide) with stand-ins that answer at once (e2e/guide_serve.py):
 // the plan, the camera, the narration, questions, interruptions, and the fallbacks.
@@ -103,17 +104,18 @@ test('the guide presents the demo: plan, camera, narration, questions, and inter
   await expect(page.locator('.guide-caption, .guide-now')).toHaveText(new RegExp(`^(${sentences.join('|')})$`), { timeout: 60_000 })
   const models = plan.findIndex((n) => n.startsWith('The models are close to chance.'))
 
-  // A question pauses; "which model is best" goes to that stop and keeps the pause.
+  // A question pauses; "show me the model comparison" goes to that stop and keeps the pause.
   await mini.getByRole('button', { name: 'Ask' }).click()
   await expect(panel.getByRole('tab', { name: 'Questions' })).toHaveAttribute('aria-selected', 'true')
   const input = panel.getByRole('textbox', { name: 'Question for the AI guide' })
-  await input.fill('Which model is best?')
+  await input.fill('Show me the model comparison')
   await input.press('Enter')
   await expect(panel.locator('.guide-log li.guide-answer')).toContainText('Gradient boosting has the highest AUC.')
   await expect(panel.locator('.guide-evidence')).toContainText('Model Comparison')
   await expect.poll(async () => (await viewer(page)).index).toBe(models)
   await expect(panel.getByRole('button', { name: 'Resume' })).toBeVisible()
-  await expect.poll(() => phase(page)).toBe('paused')
+  // the answer is spoken with its interpretation (several sentences) before the pause shows
+  await expect.poll(() => phase(page), { timeout: 60_000 }).toBe('paused')
 
   // Resume: the narration of the stop on screen. A plain answer then goes on by itself.
   await panel.getByRole('button', { name: 'Resume' }).click()
@@ -157,14 +159,48 @@ test('without a model and a voice the guide presents with the report text and ca
   await panel.getByRole('tab', { name: 'Plan' }).click()
   await expect(panel.getByText(/Plan from the report text/)).toBeVisible()
   await expect(panel.getByText(/No AI model: Cannot reach Ollama/)).toBeVisible()
-  // A question without a model: a clear message, and the viewer keeps working.
+  // A question without a model: the report's facts answer, and the viewer keeps working.
   await panel.getByRole('tab', { name: 'Questions' }).click()
   const input = panel.getByRole('textbox', { name: 'Question for the AI guide' })
   await input.fill('What changed?')
   await input.press('Enter')
-  await expect(panel.locator('.guide-error')).toContainText('Cannot reach Ollama')
+  await expect(panel.locator('.guide-log li.guide-answer')).toContainText('straight from the report facts')
   await panel.getByRole('button', { name: 'Stop' }).click()
   await expect.poll(async () => (await viewer(page)).presenting).toBe(false)
+  expect(errors).toEqual([])
+})
+
+test('X opens the guide while walking, without the pause menu, and closes it back to walking', async ({ page }) => {
+  const errors = watchErrors(page)
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Enter room' }).click()
+  await sceneReady(page)
+  const locked = () => page.evaluate(() => document.pointerLockElement?.tagName ?? null)
+  await expect.poll(locked, { timeout: 5_000 }).toBe('CANVAS').catch(() => {}) // none on headless Linux
+  const walking = (await locked()) === 'CANVAS'
+  const panel = page.locator('.guide-panel')
+
+  // X: the panel opens and the mouse is free for it; the room stays (no pause menu).
+  await page.keyboard.press('x')
+  await expect(panel).toBeVisible()
+  expect(await locked()).toBeNull()
+  expect((await viewer(page)).overlay).toBeNull()
+
+  // A question typed into the panel is text: W does not walk, X does not close.
+  const pose = () => page.evaluate(() => (window as unknown as { datawalkPose: { x: number; z: number } }).datawalkPose)
+  const before = await pose()
+  const input = panel.getByRole('textbox', { name: 'Question for the AI guide' })
+  await input.pressSequentially('wwwx')
+  await expect(input).toHaveValue('wwwx')
+  await page.waitForTimeout(500)
+  expect(await pose()).toEqual(before)
+  await expect(panel).toBeVisible()
+
+  // X again (outside the text field): the panel closes, and the walk gets the mouse back.
+  await input.blur()
+  await page.keyboard.press('x')
+  await expect(panel).toHaveCount(0)
+  if (walking) await expect.poll(locked).toBe('CANVAS')
   expect(errors).toEqual([])
 })
 

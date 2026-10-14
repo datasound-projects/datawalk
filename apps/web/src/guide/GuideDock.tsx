@@ -9,7 +9,7 @@ import { activeStops, goTo, startTour } from '../tour/tour'
 import { loadStatus, type Plan } from './api'
 import { Avatar } from './Avatar'
 import { listen, micSupported, stopListening } from './mic'
-import { ask, editNarration, loadPlan, type Message, pause, planTour, present, resume, stop, useGuide } from './session'
+import { ask, editNarration, guideKey, loadPlan, type Message, pause, planTour, present, resume, stop, toggleGuide, useGuide } from './session'
 import { setKokoro, setMuted } from './speech'
 
 const LENGTHS = [3, 5, 10]
@@ -26,6 +26,11 @@ export function GuideDock({ report, hidden }: { report: Report; hidden: boolean 
       .catch((e) => useGuide.getState().set({ phase: 'error', error: String(e) }))
     return () => stop()
   }, [])
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => void (guideKey(e) && e.preventDefault())
+    addEventListener('keydown', onKey)
+    return () => removeEventListener('keydown', onKey)
+  }, [])
 
   return (
     <aside className={`guide${g.open ? ' open' : ''}`} data-phase={g.phase} aria-label={t('guide.title')} hidden={hidden}>
@@ -40,13 +45,11 @@ export function GuideDock({ report, hidden }: { report: Report; hidden: boolean 
       {g.running && !g.open && <MiniControls />}
       <button
         className="guide-avatar"
-        onClick={() => {
-          unlockPointer()
-          g.set({ open: !g.open })
-        }}
+        onClick={toggleGuide}
         aria-expanded={g.open}
+        aria-keyshortcuts="X"
         aria-label={`${g.open ? t('guide.collapse') : t('guide.expand')} (${t(`guide.phase.${g.phase}`)})`}
-        title={g.open ? t('guide.collapse') : t('guide.expand')}
+        title={`${g.open ? t('guide.collapse') : t('guide.expand')} (X)`}
       >
         <Avatar phase={g.phase} webgl={gpu.webgl} />
         <span className="guide-state" aria-hidden>
@@ -103,7 +106,7 @@ function Panel({ report }: { report: Report }) {
           <h2>{t('guide.title')}</h2>
           <p className="muted">{model ? (model.ok ? t('guide.modelReady', { model: model.name }) : t('guide.noModel')) : t('guide.checking')}</p>
         </div>
-        <button className="link" onClick={() => g.set({ open: false })} aria-label={t('guide.collapse')}>
+        <button className="link" onClick={toggleGuide} aria-label={t('guide.collapse')} aria-keyshortcuts="X" title={`${t('guide.collapse')} (X)`}>
           ✕
         </button>
       </header>
@@ -245,6 +248,11 @@ function MessageItem({ message }: { message: Message }) {
           <strong>{t('guide.interpretation')}</strong> {a.interpretation}
         </p>
       )}
+      {a?.caveats && (
+        <p className="muted">
+          <strong>{t('guide.caveat')}</strong> {a.caveats}
+        </p>
+      )}
       {!!a?.evidence.length && (
         <p className="guide-evidence">
           <span className="muted">{t('guide.evidence')}</span>
@@ -255,6 +263,17 @@ function MessageItem({ message }: { message: Message }) {
           ))}
         </p>
       )}
+      {!!a?.facts?.length && (
+        <details className="guide-facts">
+          <summary className="muted small">{t('guide.facts', { n: a.facts.length })}</summary>
+          <ul className="small">
+            {a.facts.map((f) => (
+              <li key={f.id}>{f.text}</li>
+            ))}
+          </ul>
+        </details>
+      )}
+      {a?.trace?.fallback && <p className="muted small">{t('guide.fromFacts')}</p>}
       {!!a?.removed && <p className="muted small">{t('guide.removed', { n: a.removed })}</p>}
     </li>
   )

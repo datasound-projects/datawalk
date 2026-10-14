@@ -3,7 +3,7 @@ import { arrange, currentRoomLayout, moveBy, resizeBy, select, toNextWall } from
 import { ArrangeToolbar, exitArrange } from '../editor/ArrangeToolbar'
 import { EditorPanel } from '../editor/EditorPanel'
 import { ThemePreviewBar } from '../editor/ThemePreviewBar'
-import { canvas, consumeDragged, unlockPointer } from '../navigation/input'
+import { canvas, consumeDragged, typing, unlockPointer } from '../navigation/input'
 import { canEdit, isDirty, useViewer, useViewerPick } from '../state/store'
 import { FlatView } from '../viewer/FlatView'
 import { Inspector } from '../viewer/Inspector'
@@ -178,7 +178,6 @@ function Watermark() {
   )
 }
 
-const typing = (e: Event) => e.target instanceof HTMLElement && e.target.matches('input, textarea, select')
 
 /** One-shot actions: E / click inspect, M map, Tab navigator, Esc back out, Ctrl+Z undo. */
 function useActionKeys() {

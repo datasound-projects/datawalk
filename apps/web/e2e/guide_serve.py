@@ -30,64 +30,58 @@ LONG = "%s Each part has a name. The lines show the values. The colors mark the 
 
 
 class ScriptedModel:
-    """Four stops; answers with one action. One sentence of the plan has a number that the
-    report does not contain: the guide must remove it."""
+    """A plan of six stops, one sentence of which has a number that the report does not
+    contain: the guide must remove it. Answers name the facts that they use."""
 
     model = "scripted-test-model"
 
     def check(self):
         return True, "scripted model (browser tests)"
 
-    def chat(self, system, user, schema):
+    def chat(self, system, user, schema, timeout=None):
+        if "stops" in schema["properties"]:
+            return {"stops": self._plan(user)}
+        question = re.search(r"<question>(.*)</question>", user, re.S)[1].lower()
+        ids = schema["properties"]["used"]["items"]["enum"]
+        if "model" in question:
+            about = [i for i in ids if re.search(rf"^{i} \[Model Comparison\]", user, re.M)]
+            return {"answer": "Gradient boosting has the highest AUC.", "used": about}
+        return {"answer": "All data in this report is synthetic.", "used": []}
+
+    def _plan(self, user):
         def alias(pattern):
             return re.search(
                 rf"^(S\d+) \[[^\]]*\]: (?:In dashboard '[^']*'\. )?{pattern}", user, re.M
             )[1]
 
-        summary = alias("Room 'Summary'")
-        price, models = alias("Chart 'Historical Price'"), alias("Chart 'Model Comparison'")
-        metrics = alias("Chart 'Model Metrics'")
-        volatility, drawdown = (
-            alias("Chart 'Rolling Volatility'"),
-            alias("Chart 'Drawdown from Peak'"),
-        )
-        if "stops" in schema["properties"]:
-            return {
-                "stops": [
-                    {
-                        "ref": price,
-                        "narration": "The price moves from 100.4 to 87.5 USD. "
-                        "Then it doubles to 999.9 USD.",  # no data supports this sentence
-                    },
-                    {"ref": summary, "narration": "Welcome to the summary. All data is synthetic."},
-                    # Several sentences each: on a slow machine the tour must outlast the test.
-                    {"ref": volatility, "narration": LONG % "Volatility changes over time."},
-                    {"ref": drawdown, "narration": LONG % "The drawdown shows the losses."},
-                    {"ref": models, "narration": LONG % "The models are close to chance."},
-                    {"ref": metrics, "narration": LONG % "These are the model metrics."},
-                ]
-            }
-        question = re.search(r"<question>(.*)</question>", user, re.S)[1].lower()
-        if "best" in question:
-            return {
-                "answer": "Gradient boosting has the highest AUC.",
-                "interpretation": "",
-                "evidence": [models],
-                "action": {"name": "go_to_stop", "ref": models},
-            }
-        if "pause" in question:
-            return {
-                "answer": "I pause.",
-                "interpretation": "",
-                "evidence": [],
-                "action": {"name": "pause_tour", "ref": ""},
-            }
-        return {
-            "answer": "All data in this report is synthetic.",
-            "interpretation": "",
-            "evidence": [summary],
-            "action": {"name": "none", "ref": ""},
-        }
+        return [
+            {
+                "ref": alias("Chart 'Historical Price'"),
+                "narration": "The price moves from 100.4 to 87.5 USD. "
+                "Then it doubles to 999.9 USD.",  # no data supports this sentence
+            },
+            {
+                "ref": alias("Room 'Summary'"),
+                "narration": "Welcome to the summary. All data is synthetic.",
+            },
+            # Several sentences each: on a slow machine the tour must outlast the test.
+            {
+                "ref": alias("Chart 'Rolling Volatility'"),
+                "narration": LONG % "Volatility changes over time.",
+            },
+            {
+                "ref": alias("Chart 'Drawdown from Peak'"),
+                "narration": LONG % "The drawdown shows the losses.",
+            },
+            {
+                "ref": alias("Chart 'Model Comparison'"),
+                "narration": LONG % "The models are close to chance.",
+            },
+            {
+                "ref": alias("Chart 'Model Metrics'"),
+                "narration": LONG % "These are the model metrics.",
+            },
+        ]
 
 
 class ToneVoice:

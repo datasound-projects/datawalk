@@ -39,7 +39,9 @@ class LLM(Protocol):
         except GuideError:
             pass
 
-    def chat(self, system: str, user: str, schema: dict[str, Any]) -> dict[str, Any]: ...
+    def chat(
+        self, system: str, user: str, schema: dict[str, Any], timeout: float | None = None
+    ) -> dict[str, Any]: ...
 
     def check(self) -> tuple[bool, str]: ...
 
@@ -113,7 +115,9 @@ class Ollama:
         except GuideError:
             pass
 
-    def chat(self, system: str, user: str, schema: dict[str, Any]) -> dict[str, Any]:
+    def chat(
+        self, system: str, user: str, schema: dict[str, Any], timeout: float | None = None
+    ) -> dict[str, Any]:
         body = {
             "model": self.model,
             "stream": False,
@@ -129,12 +133,12 @@ class Ollama:
         if self.think is None:
             del body["think"]
         try:
-            reply = self._request("/api/chat", body, timeout=self.timeout)
+            reply = self._request("/api/chat", body, timeout=timeout or self.timeout)
         except GuideError as e:
             if self.think is None or "think" not in str(e):
                 raise
             self.think = None  # a model without the option (for example llama3.2): ask again
-            return self.chat(system, user, schema)
+            return self.chat(system, user, schema, timeout)
         content = reply.get("message", {}).get("content", "")
         try:
             data = json.loads(content)

@@ -1567,6 +1567,10 @@ body.classified :is(.hud-title, .hub-bar) {
   gap: 4px 10px;
   align-items: baseline;
 }
+.guide-facts ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+}
 .guide-evidence button.link {
   color: var(--accent);
   text-decoration: underline;

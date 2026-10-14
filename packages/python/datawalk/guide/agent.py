@@ -1,14 +1,13 @@
-"""The guide's two tasks: plan a presentation, and answer a question.
+"""The guide's plan of a presentation (questions: answer.py).
 
-The model proposes; DataWalk checks. A JSON schema limits each answer to the report's own
-aliases and to five tools. Then every stop reference is resolved, every action is validated,
-and every sentence with a number that the report data does not contain is removed. When the
-model is not available, the plan comes from the report's own text (findings, notes).
+The model proposes; DataWalk checks. A JSON schema limits the plan to the report's own
+aliases. Then every stop reference is resolved, and every sentence with a number that the
+report data does not contain is removed. When the model is not available, the plan comes from
+the report's own text (findings, notes).
 """
 
 from __future__ import annotations
 
-import re
 from dataclasses import asdict, dataclass, field
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
@@ -22,7 +21,6 @@ if TYPE_CHECKING:
 WORDS_PER_SECOND = 2.3  # natural narration, about 140 words per minute
 MOVE_SECONDS = 2.5  # the camera glide to a stop
 LENGTHS = {3: 6, 5: 9, 10: 16}  # minutes -> about this many stops
-TOOLS = ("go_to_stop", "inspect_chart", "next_stop", "pause_tour", "resume_tour")
 LANGUAGES = {"en": "English", "de": "German"}
 
 RULES = """You are DataWalk's presentation guide. You explain a data report to an audience.
@@ -215,134 +213,3 @@ def model_plan(report: Report, llm: LLM, minutes: int, lang: str = "en") -> Plan
             0, f"{removed_total} statement(s) removed: the report data does not support them."
         )
     return Plan(report.revision, minutes, llm.model, stops, notes)
-
-
-# -- questions -----------------------------------------------------------------------------
-
-
-@dataclass
-class Answer:
-    answer: str
-    interpretation: str
-    evidence: list[dict[str, str]]  # [{ref, title}] of the cited report items
-    action: dict[str, str] | None  # {"name": tool, "ref": id or ""}, validated
-    removed: int
-    model: str
-
-    def to_json(self) -> dict[str, Any]:
-        return asdict(self)
-
-
-def _ask_schema(aliases: list[str]) -> dict[str, Any]:
-    ref = {"type": "string", "enum": aliases}
-    return {
-        "type": "object",
-        "properties": {
-            "answer": {"type": "string"},
-            "interpretation": {"type": "string"},
-            "evidence": {"type": "array", "items": ref},
-            "action": {
-                "type": "object",
-                "properties": {
-                    "name": {"type": "string", "enum": ["none", *TOOLS]},
-                    "ref": {"type": "string", "enum": ["", *aliases]},
-                },
-                "required": ["name", "ref"],
-            },
-        },
-        "required": ["answer", "interpretation", "evidence", "action"],
-    }
-
-
-def _mentioned(question: str, items: list[Item]) -> list[Item]:
-    """Charts whose title the question names: their data goes into the prompt."""
-    words = set(re.findall(r"\w{4,}", question.lower()))
-    scored = []
-    for item in items:
-        if item.kind != "chart":
-            continue
-        overlap = len(words & set(re.findall(r"\w{4,}", item.title.lower())))
-        if overlap:
-            scored.append((overlap, item))
-    return [i for _, i in sorted(scored, key=lambda s: -s[0])[:2]]
-
-
-def ask(
-    report: Report,
-    llm: LLM,
-    question: str,
-    current: str | None = None,
-    inspecting: str | None = None,
-    stops: list[str] | None = None,
-    lang: str = "en",
-) -> Answer:
-    """Answer a visitor's question from the report. `current` is the stop on screen,
-    `inspecting` the chart in the inspector, `stops` the refs of the tour being presented."""
-    items = build_items(report)
-    by_alias = {i.alias: i for i in items}
-    by_ref = {i.ref: i for i in items}
-    focus = [by_ref[r] for r in (inspecting, current) if r in by_ref]
-    for item in _mentioned(question, items):
-        if item not in focus:
-            focus.append(item)
-    extra = {i.alias: detail(report, i.viz_id) for i in focus}
-    here = ", ".join(f"{i.alias} '{i.title}'" for i in focus[:2]) or "a room overview"
-    data_now = "\n".join(f"{alias}: {text}" for alias, text in extra.items() if text)
-    user = (
-        f"{_data_block(report, items)}\n\n"
-        + (f"<chart_data>\n{data_now}\n</chart_data>\n\n" if data_now else "")
-        + f"The audience now looks at {here}. "
-        f"'This chart' means {focus[0].alias if focus else 'nothing'}.\n"
-        f"Question from the audience: <question>{question}</question>\n\n"
-        f"Answer in {LANGUAGES.get(lang, 'English')} in 1 to 3 spoken sentences, "
-        "from the data only. "
-        "In 'interpretation' write one sentence about what the facts may mean, or leave it "
-        "empty when the question asks only for facts. "
-        "List in 'evidence' the stops that support the answer. "
-        "If the visitor wants to see something, set 'action': go_to_stop or inspect_chart "
-        "with its ref. next_stop, pause_tour, and resume_tour control the presentation. "
-        "Otherwise use action 'none'."
-    )
-    data = llm.chat(RULES, user, _ask_schema(list(by_alias)))
-    cited = [by_alias[a] for a in data.get("evidence", []) if isinstance(a, str) and a in by_alias]
-    support = " ".join(
-        _evidence(report, i, by_alias, extra.get(i.alias, "")) for i in [*focus, *cited]
-    )
-    support = support or report_header(report)
-    answer, removed = ground(str(data.get("answer", ""))[:2000], support, lang == "de")
-    interpretation, removed_i = ground(
-        str(data.get("interpretation", ""))[:1000], support, lang == "de"
-    )
-    if not answer:
-        answer = (
-            "Der Bericht enthält dazu keine belegten Angaben."
-            if lang == "de"
-            else "The report does not contain data that answers this."
-        )
-    return Answer(
-        answer,
-        interpretation,
-        [{"ref": i.ref, "title": i.title} for i in {i.alias: i for i in cited}.values()],
-        _action(data.get("action"), by_alias, stops or []),
-        removed + removed_i,
-        llm.model,
-    )
-
-
-def _action(raw: Any, by_alias: dict[str, Item], stops: list[str]) -> dict[str, str] | None:
-    """Only the five tools, only with refs that exist. A chart outside the tour is inspected
-    instead of visited: the tour camera can frame only the tour's stops."""
-    if not isinstance(raw, dict) or raw.get("name") not in TOOLS:
-        return None
-    name, item = raw["name"], by_alias.get(str(raw.get("ref", "")))
-    if name in ("next_stop", "pause_tour", "resume_tour"):
-        return {"name": name, "ref": ""}
-    if item is None:
-        return None
-    if name == "go_to_stop":
-        if item.ref in stops:
-            return {"name": name, "ref": item.ref}
-        name = "inspect_chart"
-    if name == "inspect_chart" and item.viz_id:
-        return {"name": name, "ref": item.viz_id}
-    return None
