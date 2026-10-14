@@ -43,9 +43,9 @@ uv tool install "datawalk[all,voice] @ git+https://github.com/datasound-projects
 datawalk demo --guide
 ```
 
-The first line gets the AI model, the second adds the voice (its files download on the first
-start), the third starts the demo with the guide. Another Ollama model:
-`datawalk demo --model qwen3:14b` (after `ollama pull qwen3:14b`).
+This gets the AI model, adds the voice (downloaded on the first start), and starts the demo
+with the guide. To use another Ollama model, pull it and name it:
+`datawalk demo --model qwen3:14b`.
 
 **Update** (optional) to the latest version:
 
@@ -57,17 +57,23 @@ uv tool upgrade datawalk
 
 <p align="center">
   <img src="docs/images/ai-guide.gif" alt="The AI guide presents the demo report: it explains a room aloud with captions, moves to the next chart, and answers the question 'Which model performs best?' with the evidence" width="820">
-  <br><sub>A real run with the local model on a laptop (Apple M2). The model's thinking time before the answer is cut.</sub>
+  <br><sub>A real run with the local model on a laptop (Apple M2), from an earlier version. The model's thinking time before the answer is cut.</sub>
 </p>
 
-The AI guide presents your report for you. Click the avatar in the corner and choose
-**Present**: it plans a short tour (3, 5, or 10 minutes), moves from chart to chart, and
-explains each one aloud with captions. Ask a question at any time, for example "Explain this
-chart" or "Which model performs best?": the guide answers from your report's data and opens
-the evidence. Pause, resume, or take over with the clicker whenever you want.
+The AI guide presents your report like a person walking you through it. Press **X** (or
+click the avatar), choose 3, 5, or 10 minutes, and click **Present**:
 
-Everything runs on your computer. A local AI model writes the text, and DataWalk checks every
-stop and every number against your report, so the guide does not invent results.
+- It walks from room to room through the doors and introduces each one: "And now let's take
+  a look at *Model Evaluation*: Model Comparison, ROC Curve, and Walk-forward Evaluation."
+- It stops in front of each chart, close enough to read it, and explains it aloud with captions.
+- Ask anything, any time: "Explain this chart", "Which model performs best?", "When did it
+  happen?". It answers with the facts, what they mean, and their limits, and shows the evidence.
+
+**How it stays correct.** Everything runs on your computer. DataWalk computes the facts from
+your data and interprets them with expert rules (statistics, machine learning, finance); the
+local AI model only puts them into words, and every number is checked against your report.
+Without a model, the facts answer directly. On 92 test questions, the default 4B model
+passes 91 ([how it is measured](docs/guide.md#how-the-guide-answers)).
 
 Set it up: [Install](#install), "For the AI guide". More: [docs/guide.md](docs/guide.md).
 
@@ -90,7 +96,7 @@ report.show()  # opens the report in your browser
 ```
 
 **In the room:** W A S D and the mouse walk, **E** looks closer at a chart, **Tab** lists the
-rooms, **M** shows a map, **Page Down** starts the guided tour.
+rooms, **M** shows a map, **Page Down** starts the guided tour, **X** opens the AI guide.
 
 ## Room styles
 
