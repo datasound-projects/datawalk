@@ -37,7 +37,8 @@ export interface Answer {
   action: { name: Tool; ref: string } | null
   removed: number
   model: string
-  source: 'model' | 'template' | 'rule' // template: the model failed, the facts answered
+  source: 'model' | 'template' | 'rule' // template: the facts themselves answered
+  trace?: { fallback?: 'error' | 'refused' | 'unsupported' } // why the model's answer was not used
 }
 
 /** An earlier question and answer: what "it" and "that" refer to. */

@@ -249,6 +249,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.rescore:  # with the refs of the report that answered: each build has new ids
         saved = json.loads(args.rescore.read_text(encoding="utf-8"))
         cases = {c["id"]: c for c in json.loads(args.cases.read_text(encoding="utf-8"))["cases"]}
+        if "keys" not in saved:
+            print(
+                f"error: {args.rescore} has no refs (an older run): run it again", file=sys.stderr
+            )
+            return 1
         keys = {ref: set(k) for ref, k in saved["keys"].items()}
         results = [
             r | (score(cases[r["id"]], r["output"], keys) if not r["error"] else {})

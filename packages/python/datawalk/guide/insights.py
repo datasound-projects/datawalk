@@ -96,6 +96,13 @@ def _data(name: str, xname: str, xs: list[Any] | None, ys: list[Any], percent: b
 
 def chart_data(report: Report, viz: Any) -> list[Data]:
     """The chart's numeric series: line and bar data, Plotly traces, and table columns."""
+    try:
+        return _chart_data(report, viz)
+    except (KeyError, IndexError, TypeError, ValueError, AttributeError):
+        return []  # a payload shape that this reader does not know: no facts from this chart
+
+
+def _chart_data(report: Report, viz: Any) -> list[Data]:
     payload = report._payloads.get(viz.id) or {}
     axes = viz.source.axes[0] if viz.source.axes else None
     ylabel, xlabel = (axes.y.label, axes.x.label) if axes else ("", "")

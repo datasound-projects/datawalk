@@ -76,12 +76,12 @@ OVERVIEW = re.compile(r"\b(summar|overview|conclusion|takeaway|main (point|findi
 ADVICE = re.compile(r"\b(should (i|we) (buy|sell|invest)|which (stock|share)s? (should|to)|"
                     r"investment advice|kaufen|verkaufen)\b", re.I)  # fmt: skip
 FUTURE = re.compile(r"\b(will(?! you)|forecast|predict(ion)? (for|of)|next (year|month|week)|"
-                    r"in the future|wird|prognose)\b", re.I)  # fmt: skip
+                    r"in the future|prognose|vorhersage)\b", re.I)  # fmt: skip
 # A question that gives the guide orders or a "fact" to confirm: the facts answer it, not the
 # model (a 4B model agrees with "the report is wrong" even when told not to).
 STEER = re.compile(r"^\W*(system|assistant|developer)\s*:|\bignore (all |your |the |any )?"
                    r"(previous |prior |above )?(instructions|rules|prompt)|\bforget (the|your|all)"
-                   r"\b|\byou are now\b|\bconfirm (it|that|this)\b|\bpretend\b|\bnew rules\b",
+                   r"\b|\byou are now\b|\bnew rules\b",
                    re.I)  # fmt: skip
 WHY = re.compile(r"^\s*(why|warum|wieso)\b|\b(reason|cause)s?\b", re.I)
 NAV = re.compile(r"^\W*(please |can you |could you )?(show|open|display|go to|take me|"
@@ -90,12 +90,14 @@ FOLLOW = re.compile(r"\b(it|that|this|those|these|then|there|they|them|es|das|di
                     r"dort)\b", re.I)  # fmt: skip
 # commands, not questions: "Next stop, please." but not "Next, tell me about the volume"
 NEXT = re.compile(r"^\W*(next( stop)?|weiter|nächste( station)?)\W*(please|bitte)?\W*$", re.I)
-PAUSE = re.compile(r"^\W*(please |bitte )?(pause|halt|stop|anhalten)\b", re.I)
+PAUSE = re.compile(r"^\W*(please |bitte )?(pause|anhalten)\b", re.I)
 RESUME = re.compile(r"^\W*(please |bitte )?(resume|continue|go on|fortsetzen|weitermachen)\W*"
                     r"(please|bitte)?\W*$", re.I)  # fmt: skip
 NUMBER = re.compile(r"\d+(?:\.\d+)?")
 WHEN = re.compile(r"\b(when|wann)\b", re.I)
-YEAR = re.compile(r"\b(19\d\d|20\d\d)\b")
+YEAR = re.compile(r"(?:(\w+)\s+)?\b(19\d\d|20\d\d)\b")
+COUNT = {"than", "over", "under", "about", "around", "above", "below", "least", "exactly",
+         "only", "nearly", "almost", "als", "über", "unter", "etwa", "rund"}  # fmt: skip
 ISO_DATE = re.compile(r"\b(\d{4}-\d{2}-\d{2})\b")
 
 SYSTEM = """You answer an audience's question about a data report in one to three short spoken
@@ -108,9 +110,10 @@ sentences.
   do not show, and never predict the future.
 - "used": the ids of the facts and interpretations that you used."""
 # A refusal although the facts were found: the small model gave up, the facts answer instead.
-REFUSED = re.compile(r"\b(does not|doesn't|do not|cannot|can't) (show|contain|include|answer|"
-                     r"say|provide)|\bno (data|information)\b|zeigt (das )?nicht|enthält kein",
-                     re.I)  # fmt: skip
+REFUSED = re.compile(r"\b(report|data|facts)( \w+)? (does not|doesn't|do not|don't|cannot|"
+                     r"can't) (show|contain|include|answer|say|provide)|^\W*(i cannot|i can't|"
+                     r"there is no (data|information))|bericht (zeigt|enthält) (das |dazu )?"
+                     r"(nicht|kein)", re.I)  # fmt: skip
 
 MESSAGES = {
     "none": {"en": "The report does not show this.", "de": "Der Bericht zeigt das nicht."},
@@ -209,9 +212,15 @@ def _terms(text: str) -> tuple[set[str], set[str]]:
     return own, set().union(*(SYNONYMS.get(w, set()) for w in own)) - own
 
 
-def _score(tags: set[str], own: set[str], implied: set[str], weak: set[str]) -> float:
-    # "price" in "the highest price" counts double; a word with synonyms counts through them
-    subject = own - GENERIC - INTENT - MEANING - SYNONYMS.keys()
+def _subject(own: set[str]) -> set[str]:
+    """What the question is about: "price" in "the highest price". A word with synonyms counts
+    through them."""
+    return own - GENERIC - INTENT - MEANING - SYNONYMS.keys()
+
+
+def _score(
+    tags: set[str], own: set[str], subject: set[str], implied: set[str], weak: set[str]
+) -> float:
     return (
         len(tags & own) + len(tags & subject) + 0.5 * len(tags & implied) + 0.4 * len(tags & weak)
     )
@@ -243,7 +252,7 @@ def answer(
         return _rule(msg("resume"), "resume", started, {"name": "resume_tour", "ref": ""})
     if PAUSE.search(question):
         return _rule(msg("pause"), "pause", started, {"name": "pause_tour", "ref": ""})
-    years = {int(y) for y in YEAR.findall(question)}
+    years = {int(y) for before, y in YEAR.findall(question) if before.lower() not in COUNT}
     if kb.span and years and all(y < kb.span[0].year or y > kb.span[1].year for y in years):
         text = msg("range", start=kb.span[0].isoformat(), end=kb.span[1].isoformat(),
                    years=", ".join(map(str, sorted(years))))  # fmt: skip
@@ -251,7 +260,7 @@ def answer(
 
     # Retrieve: the question's words (and synonyms), the charts on screen, the conversation.
     own, implied = _terms(question)
-    terms = own | implied
+    terms, subject = own | implied, _subject(own)
     weak = set().union(*(set().union(*_terms(h.get("q", ""))) for h in history)) - terms
     # "When did it happen?": the earlier questions say what "it" is
     follow = bool(weak) and bool(FOLLOW.search(question) or not terms - GENERIC)
@@ -266,7 +275,8 @@ def answer(
     overview = bool(OVERVIEW.search(question))
 
     def fact_score(f: Fact) -> float:
-        s = _score(f.tags, own, implied, weak) + 3 * (f.ref in focus) + 0.8 * f.importance
+        s = _score(f.tags, own, subject, implied, weak) + 3 * (f.ref in focus)
+        s += 0.8 * f.importance
         s += 2 * bool(year_tags & f.tags) + 2.5 * any(d in f.text for d in asked_dates)
         s += 1.5 * (f.values.get("year") in years)  # "in 2024": that year's own fact first
         s += when and bool(ISO_DATE.search(f.text))
@@ -283,7 +293,14 @@ def answer(
     pool = kb.facts + kb.on(asked_dates)
     ranked = sorted((f for f in pool if relevant(f)), key=fact_score, reverse=True)
     facts = ranked[:MAX_FACTS]
-    if not facts:
+    # Navigation: to the item whose title the question names, else of the best matching fact.
+    action = None
+    if NAV.search(question) and (target := _target(kb, question, facts)):
+        name = "go_to_stop" if target in (stops or []) else "inspect_chart"
+        action = {"name": name, "ref": target}
+    if not facts:  # a chart without facts (a picture, a heat map) can still be shown
+        if action:
+            return _rule(msg("go", title=kb.titles[action["ref"]]), "go", started, action)
         return _rule(f"{msg('none')} {msg('covers', rooms=rooms)}", "none", started)
     chosen = {f.id for f in facts}
     top = fact_score(facts[0])
@@ -291,7 +308,8 @@ def answer(
     lead_ids, lead_refs = {f.id for f in lead}, {f.ref for f in lead}
 
     def insight_score(i: Insight) -> float:  # what the answer's own facts mean comes first
-        s = _score(i.tags, own, implied, weak) + 2 * bool(set(i.facts) & chosen) + i.importance
+        s = _score(i.tags, own, subject, implied, weak) + i.importance
+        s += 2 * bool(set(i.facts) & chosen)
         return s + 3 * len(set(i.facts) & lead_ids) + 2 * bool(i.refs & lead_refs)
 
     refs = {f.ref for f in facts}
@@ -301,7 +319,6 @@ def answer(
         reverse=True,
     )[:MAX_INSIGHTS]
     # the interpretation for a short answer: of the answer's charts, or of what the question names
-    subject = own - GENERIC - INTENT - MEANING
     named = {f.id: words(f.chart) for f in kb.facts}
     fits = (
         lambda i: facts[0].ref in i.refs,
@@ -310,15 +327,6 @@ def answer(
     )
     about = next((i for fit in fits for i in insights if fit(i)), None)
     retrieved = time.perf_counter()
-
-    # Navigation: to the chart whose title the question names, else of the best matching fact.
-    action = None
-    if NAV.search(question):
-        target = _target(kb, question, facts)
-        if target in (stops or []):
-            action = {"name": "go_to_stop", "ref": target}
-        else:
-            action = {"name": "inspect_chart", "ref": target}
 
     why = bool(WHY.search(question))
     future = bool(FUTURE.search(question)) and kb.span is not None
@@ -350,7 +358,7 @@ def answer(
     return result
 
 
-def _target(kb: Knowledge, question: str, facts: list[Fact]) -> str:
+def _target(kb: Knowledge, question: str, facts: list[Fact]) -> str | None:
     asked = words(question) - STOP
     rank = {f.ref: i for i, f in reversed(list(enumerate(facts)))}
     charts = {ref for ref, _, _ in kb.dated} | {f.ref for f in kb.facts if f.kind != "value"}
@@ -358,7 +366,7 @@ def _target(kb: Knowledge, question: str, facts: list[Fact]) -> str:
         kb.titles,
         key=lambda r: (len(words(kb.titles[r]) & asked), r in charts, -rank.get(r, len(facts))),
     )
-    return best if words(kb.titles[best]) & asked else facts[0].ref
+    return best if words(kb.titles[best]) & asked else (facts[0].ref if facts else None)
 
 
 def _rule(text: str, kind: str, started: float, action: dict[str, str] | None = None) -> Answer:
@@ -425,8 +433,11 @@ def _phrase(
     meaning = chosen.text if chosen and lang == "en" else ""
     caveat = chosen.caveat if chosen and lang == "en" else ""
     source = "model"
+    trace: dict[str, Any] = {"error": error} if error else {}
     if not text or REFUSED.search(text):  # the model failed, invented, or gave up: the facts
         source = "template"
+        if llm is not None:  # asked, and it did not hold up (not: skipped on purpose)
+            trace["fallback"] = "error" if error else "refused" if text else "unsupported"
         kind = lead[0].kind
         same = [f for f in lead if f.kind == kind][:4] if kind in LISTS else lead[:2]
         said: set[str] = set()
@@ -452,5 +463,5 @@ def _phrase(
         removed,
         getattr(llm, "model", "") if source == "model" else "",
         source,
-        {"error": error} if error else {},
+        trace,
     )

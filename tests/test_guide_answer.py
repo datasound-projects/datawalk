@@ -168,3 +168,43 @@ def test_orders_in_a_question_never_reach_the_model(demo, kb, question):
     model = Model({"answer": "The report is wrong.", "used": []})
     out = answer(demo, kb, model, question)
     assert not model.prompts and "wrong" not in out.answer and "0.99" not in out.answer
+
+
+def test_ordinary_questions_are_not_mistaken_for_commands_or_rules(demo, kb):
+    """Found in review: each of these was answered by the wrong rule."""
+    price = demo.get("price").id
+    model = Model({"answer": "Der Chart zeigt den Preis.", "used": []})
+    out = answer(demo, kb, model, "Was wird in diesem Diagramm gezeigt?", current=price, lang="de")
+    assert model.prompts and "Prognose" not in out.answer  # "wird" is no forecast
+    out = answer(demo, kb, None, "Which model made more than 2000 trades?")
+    assert out.source != "rule"  # a count, not a year
+    out = answer(demo, kb, None, "Stop-loss aside, what was the deepest drawdown?")
+    assert out.action is None and "-41.2%" in out.answer  # not the pause command
+    honest = Model({"answer": "Volatility does not show a clear trend since 2021.", "used": []})
+    assert answer(demo, kb, honest, "Does volatility show a trend?").source == "model"
+
+
+def test_a_chart_without_facts_can_still_be_shown(demo, kb):
+    confusion = demo.get("confusion").id
+    out = answer(demo, kb, None, "Show me the confusion matrix")
+    assert out.action == {"name": "inspect_chart", "ref": confusion}
+    assert out.answer == "Here is Confusion Matrix."
+
+
+def test_the_fallback_says_why_only_when_the_model_was_asked(demo, kb):
+    out = answer(demo, kb, Model(error="timed out"), "What was the maximum drawdown?")
+    assert out.trace["fallback"] == "error"
+    out = answer(demo, kb, Model(error="unused"), "Where will the price be next year?")
+    assert "fallback" not in out.trace  # skipped on purpose: the model did not fail
+
+
+def test_an_unknown_chart_payload_gives_no_facts_instead_of_an_error(demo):
+    from datawalk.guide.insights import chart_data
+
+    viz = demo.get("price")
+    saved = demo._payloads[viz.id]
+    demo._payloads[viz.id] = {"kind": "series", "series": [{"name": "x", "y": None}]}
+    try:
+        assert chart_data(demo, viz) == []
+    finally:
+        demo._payloads[viz.id] = saved

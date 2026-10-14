@@ -270,7 +270,7 @@ function MessageItem({ message }: { message: Message }) {
           </ul>
         </details>
       )}
-      {a?.source === 'template' && <p className="muted small">{t('guide.fromFacts')}</p>}
+      {a?.trace?.fallback && <p className="muted small">{t('guide.fromFacts')}</p>}
       {!!a?.removed && <p className="muted small">{t('guide.removed', { n: a.removed })}</p>}
     </li>
   )
