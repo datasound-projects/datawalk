@@ -146,3 +146,11 @@ def test_the_question_set_passes_without_a_model(demo):
     results = run(template_engine(None), demo, cases)
     failed = [(r["id"], r["failures"]) for r in results if r["score"] < 1]
     assert sum(r["score"] for r in results) / len(results) >= 0.95, failed
+
+
+def test_a_forecast_question_never_reaches_the_model(demo, kb):
+    """A small model forecasts anyway ("The price will be 87.49 next year")."""
+    model = Model({"answer": "The price will be 87.49 USD next year.", "used": []})
+    out = answer(demo, kb, model, "Where will the price be next year?")
+    assert not model.prompts and out.answer.startswith("The report does not forecast")
+    assert "will be" not in out.answer
