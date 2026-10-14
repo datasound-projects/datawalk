@@ -54,7 +54,7 @@ export const useGuide = create<GuideState>()((set) => ({
 }))
 
 const lang = () => (useViewer.getState().lang === 'de' ? 'de' : 'en')
-const ARRIVAL_TIMEOUT = 20_000 // a stop the camera cannot reach must not stop the presentation
+const ARRIVAL_TIMEOUT = 60_000 // a stop the camera cannot reach must not stop the presentation (a walk through a door to another room takes up to about 20 s)
 
 /** Resolves when the predicate holds for the store's state (now or later), when the timeout
  *  passes, or rejects when the signal aborts. */

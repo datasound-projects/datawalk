@@ -57,9 +57,11 @@ test('the guide presents the demo: plan, camera, narration, questions, and inter
   await panel.getByRole('tab', { name: 'Plan' }).click()
   await panel.getByRole('button', { name: 'Make a plan' }).click()
   const narration = panel.getByRole('textbox', { name: /Narration for/ })
-  await expect(narration).toHaveCount(6) // enough stops that the tour cannot end during the test
-  await expect(narration.first()).toHaveValue('Welcome to the summary. All data is synthetic.')
-  await expect(narration.nth(1)).toHaveValue('The price moves from 100.4 to 87.5 USD.')
+  // Each room is entered with its own stop: the guide names the room and what comes there.
+  await expect(narration).toHaveCount(8) // enough stops that the tour cannot end during the test
+  await expect(narration.first()).toHaveValue(/^Let's begin with “Summary”: .+\. Welcome to the summary\. All data is synthetic\.$/)
+  await expect(narration.nth(1)).toHaveValue(/^And now let's take a look at “Market Overview”: Historical Price, Rolling Volatility, and Drawdown from Peak\.$/)
+  await expect(narration.nth(2)).toHaveValue('The price moves from 100.4 to 87.5 USD.')
   await expect(panel.getByText(/1 statement\(s\) removed/)).toBeVisible()
 
   // Every caption, with the stop on screen and whether the camera stood still at that moment.
@@ -78,17 +80,23 @@ test('the guide presents the demo: plan, camera, narration, questions, and inter
   // Present: the camera arrives first, then the guide speaks, then it moves on by itself.
   await panel.getByRole('button', { name: 'Present', exact: true }).click()
   await expect.poll(async () => (await viewer(page)).presenting).toBe(true)
-  await expect(page.locator('.tour-title')).toContainText('/ 6')
+  await expect(page.locator('.tour-title')).toContainText('/ 8')
   await expect(panel).toHaveCount(0) // the room is the stage: captions and compact controls only
   const mini = page.getByRole('toolbar', { name: 'AI guide controls' })
   await expect(mini.getByRole('button', { name: 'Pause' })).toBeVisible()
   await expect.poll(async () => (await captions()).map((c) => c.text), { timeout: 90_000 }).toContain('The price moves from 100.4 to 87.5 USD.')
   const seen = await captions()
-  expect(seen.slice(0, 3)).toEqual([
+  expect(seen[0]).toMatchObject({ index: 0, arrived: true })
+  expect(seen[0].text).toMatch(/^Let's begin with “Summary”/)
+  expect(seen.slice(1, 3)).toEqual([
     { text: 'Welcome to the summary.', index: 0, arrived: true },
     { text: 'All data is synthetic.', index: 0, arrived: true },
-    { text: 'The price moves from 100.4 to 87.5 USD.', index: 1, arrived: true },
   ])
+  // Through the door into the next room: the guide names it, then speaks about the chart.
+  expect(seen[3]).toMatchObject({ index: 1, arrived: true })
+  expect(seen[3].text).toMatch(/^And now let's take a look at “Market Overview”/)
+  expect(seen[4]).toEqual({ text: 'The price moves from 100.4 to 87.5 USD.', index: 2, arrived: true })
+  expect(seen.every((c) => c.arrived)).toBe(true) // it speaks only where the camera stands still
   expect(clips.length).toBeGreaterThanOrEqual(3) // the Kokoro path: one clip per sentence
   expect(clips[0].face?.names).toContain('jawOpen') // Audio2Face frames come with the audio
   expect(clips[0].face!.frames.length).toBe(Math.floor(clips[0].seconds * 30))
@@ -119,7 +127,8 @@ test('the guide presents the demo: plan, camera, narration, questions, and inter
 
   // Resume: the narration of the stop on screen. A plain answer then goes on by itself.
   await panel.getByRole('button', { name: 'Resume' }).click()
-  await expect(page.locator('.guide-caption, .guide-now')).toHaveText('The models are close to chance.')
+  // (the camera may still walk to that room: the guide speaks once it stands at the chart)
+  await expect(page.locator('.guide-caption, .guide-now')).toHaveText('The models are close to chance.', { timeout: 60_000 })
   await input.fill('Is the data real?')
   await input.press('Enter')
   await expect(panel.locator('.guide-log li.guide-answer').last()).toContainText('synthetic')
