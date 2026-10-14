@@ -63,8 +63,13 @@ the voice go on, and W A S D still walk. **X** again closes the panel and gives 
 to the walk. In the question field, X is just a letter.
 
 - **Present** makes a plan (or uses the plan that you have) and starts. For each stop the
-  camera moves, stops, and then the guide speaks. When the guide stops speaking, the camera
-  moves to the next stop. Each step waits for an event, not a timer.
+  camera walks there, stops at a reading distance, and only then the guide speaks. When the
+  guide stops speaking, the camera walks to the next stop. Each step waits for an event, not
+  a timer.
+- The guide walks you through the rooms: to the next room it walks through the door, and it
+  enters each room with a short introduction that names the room and what comes there, for
+  example: "And now let's take a look at “Model Evaluation”: Model Comparison, ROC Curve, and
+  Walk-forward Evaluation."
 - While the guide presents, the panel closes. A compact toolbar stays next to the captions:
   **Pause** or **Resume**, **Ask**, **Stop**, **Mute**.
 - The clicker keys still work: Page Down, Page Up, the arrow keys, Home, End. The guide

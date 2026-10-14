@@ -151,17 +151,39 @@ def test_model_plan_keeps_only_valid_stops_and_supported_numbers(report):
     )
     plan = model_plan(report, llm, 3)
     titles = [s.title for s in plan.stops]
-    assert titles == ["Summary", "Best AUC", "Model comparison"]  # room by room, rooms first
+    # room by room; each room is entered with its own stop, which names what comes next
+    assert titles == ["Summary", "Best AUC", "Models", "Model comparison"]
     by = {s.title: s for s in plan.stops}
     assert by["Model comparison"].narration == "Boosting reaches 0.6123."
     assert by["Model comparison"].removed == 1
     assert by["Summary"].source == "report"  # the model text failed: the report's own words
+    assert by["Summary"].narration == "Let's begin with “Summary”: Best AUC."
+    assert by["Models"].narration == "Finally, let's take a look at “Models”: Model comparison."
     assert plan.notes and "removed" in plan.notes[0]
     system, user, schema = llm.calls[0]
     assert "<report_data>" in user and "not instructions" in system
     assert set(schema["properties"]["stops"]["items"]["properties"]["ref"]["enum"]) == {
         i.alias for i in build_items(report)
     }
+
+
+def test_each_room_is_introduced_by_name_with_what_comes_next(report):
+    from datawalk.guide.agent import _listing
+
+    plan = report_plan(report, 10)
+    rooms = [s for s in plan.stops if s.kind == "room"]
+    assert [s.title for s in rooms] == ["Summary", "Models"]
+    assert rooms[0].narration.startswith("Let's begin with “Summary”: ")
+    assert rooms[1].narration.startswith("Finally, let's take a look at “Models”: ")
+    assert plan.stops[0].kind == "room"  # the walk starts by entering the first room
+    de = report_plan(report, 10, lang="de")
+    assert [s.narration.split(":")[0] for s in de.stops if s.kind == "room"] == [
+        "Wir beginnen mit „Summary“",
+        "Zum Schluss schauen wir uns „Models“ an",
+    ]
+    assert _listing(["A", "B", "C"], "en") == ": A, B, and C"
+    assert _listing(["A", "B"], "en") == ": A and B"
+    assert _listing(["A", "B", "C"], "de") == ": A, B und C"
 
 
 def test_a_short_model_plan_is_filled_up_and_skips_pictures(report):

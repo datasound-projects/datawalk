@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Guided tours walk like a visitor: to a stop in another room, the camera walks to the door
+  and in through the next room's door (through up to two rooms in between) instead of
+  cutting. Displays are framed at a reading distance with the room around them (about 55 %
+  of the view's height, from a little to one side) instead of filling the screen. The AI
+  guide enters each room with an introduction that names it and what comes there ("And now
+  let's take a look at “Model Evaluation”: ..."), and speaks only once the camera stands at
+  the stop.
+
 - AI guide: **X** opens and closes its panel, also while you walk or while it speaks. The
   mouse is free for the panel without the pause menu, and X again gives it back to the walk.
   Keys typed into a text field (a question to the guide) no longer walk.
