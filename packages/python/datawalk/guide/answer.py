@@ -77,6 +77,12 @@ ADVICE = re.compile(r"\b(should (i|we) (buy|sell|invest)|which (stock|share)s? (
                     r"investment advice|kaufen|verkaufen)\b", re.I)  # fmt: skip
 FUTURE = re.compile(r"\b(will(?! you)|forecast|predict(ion)? (for|of)|next (year|month|week)|"
                     r"in the future|wird|prognose)\b", re.I)  # fmt: skip
+# A question that gives the guide orders or a "fact" to confirm: the facts answer it, not the
+# model (a 4B model agrees with "the report is wrong" even when told not to).
+STEER = re.compile(r"^\W*(system|assistant|developer)\s*:|\bignore (all |your |the |any )?"
+                   r"(previous |prior |above )?(instructions|rules|prompt)|\bforget (the|your|all)"
+                   r"\b|\byou are now\b|\bconfirm (it|that|this)\b|\bpretend\b|\bnew rules\b",
+                   re.I)  # fmt: skip
 WHY = re.compile(r"^\s*(why|warum|wieso)\b|\b(reason|cause)s?\b", re.I)
 NAV = re.compile(r"^\W*(please |can you |could you )?(show|open|display|go to|take me|"
                  r"jump to|bring up|zeig|öffne|gehe zu)\b", re.I)  # fmt: skip
@@ -319,7 +325,7 @@ def answer(
     looking_at = inspecting or current
     # a forecast question: a small model forecasts anyway ("the price will be..."), so the
     # latest facts answer it, after the code says that the report does not forecast
-    model = None if future else llm
+    model = None if future or STEER.search(question) else llm
     result = _phrase(
         report, model, question, facts, lead, insights, about, kb, history, looking_at, lang
     )
