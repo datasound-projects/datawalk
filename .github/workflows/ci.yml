@@ -26,8 +26,8 @@ jobs:
     env:
       DATAWALK_SKIP_VIEWER_BUILD: "1"  # the browser tests run in the e2e and package jobs
     steps:
-      - uses: actions/checkout@v5
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
       - run: uv sync -p ${{ matrix.python }} --all-packages --all-extras
       - run: uv run ruff check . && uv run ruff format --check .
         if: runner.os == 'Linux'
@@ -40,8 +40,8 @@ jobs:
       run:
         working-directory: apps/web
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -89,19 +89,19 @@ jobs:
       run:
         working-directory: apps/web
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v7
       - run: npm ci
       - run: npm run build
       - run: uv sync --all-packages --all-extras
       - run: npx playwright install --with-deps ${{ matrix.browser }}
       - run: npx playwright test ${{ matrix.args }} --reporter=list
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: e2e-traces-${{ strategy.job-index }}
@@ -114,13 +114,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v7
       - run: npm ci && npm run build
         working-directory: apps/web
       - run: uv sync --all-packages --all-extras
@@ -136,7 +136,7 @@ jobs:
           /tmp/clean/bin/datawalk adapters
           /tmp/clean/bin/python -c "import datawalk as dw, plotly.express as px; r = dw.Report('Smoke'); r.add(px.line(x=[1, 2], y=[3, 4]), key='a', room='Main'); r.save('/tmp/smoke.dwk')"
           /tmp/clean/bin/datawalk export /tmp/smoke.dwk --html /tmp/smoke.html --yes
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: wheel
           path: dist/datawalk-*.whl
@@ -156,8 +156,8 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v5
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
       - run: |
           uv tool install ".[all]"
           uv tool dir --bin >> "$GITHUB_PATH"
@@ -182,7 +182,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Build the hub image
         run: docker build -f packages/hub/Dockerfile -t datawalk-hub .
       - name: Start it and sign-in page answers
